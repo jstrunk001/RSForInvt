@@ -1,0 +1,155 @@
+---
+title: "Example_workflow"
+author: "Jacob Strunk"
+date: "5/7/2020"
+output: html_document
+---
+
+load packages - requires devtools package
+```{r , eval = FALSE}
+devtools::install_github("Jean-Romain/lidR")
+devtools::install_github("Jean-Romain/rlas")
+devtools::install_github("jacobstrunk001/RSForInvt")
+
+```
+
+#convert dtm raster to fusion .dtm rasters
+```{r}
+#library(RSForInvt)
+RSForInvt::raster2FUSION("D:\\Box\\VMARS\\Projects\\DAP_evaluation_Meston\\Data\\Tennessee\\DTM\\","D:\\Box\\VMARS\\Projects\\DAP_evaluation_Meston\\Data\\Tennessee\\DTM_fusion\\")
+
+
+```
+
+
+#look at lidar extent
+```{r}
+library(lidR)
+
+ctg = lidR::catalog(list.files("D:\\Box\\VMARS\\Projects\\DAP_evaluation_Meston\\Data\\Tennessee\\lidar_tiles\\",full.names=T,recursive=T))
+ctg = lidR::catalog(list.files("D:\\Box\\VMARS\\Projects\\DAP_evaluation_Meston\\Data\\Tennessee\\lidar_tiles\\",full.names=T,recursive=T)[1])
+
+hd1 = readLASheader(list.files("D:\\Box\\VMARS\\Projects\\DAP_evaluation_Meston\\Data\\Tennessee\\lidar_tiles\\",full.names=T,recursive=T)[1])
+las1 = readLAS(list.files("D:\\Box\\VMARS\\Projects\\DAP_evaluation_Meston\\Data\\Tennessee\\lidar_tiles\\",full.names=T,recursive=T)[1])
+
+projection(hd1)
+epsg(hd1)
+epsg(las1)
+epsg(projection(ctg))
+
+scan_las(
+    project="TN_lidar"
+    ,project_year="2018"
+    ,proj4_name=NA #"NAD_1983_HARN_StatePlane_Washington_South_FIPS_4601_Feet"
+    ,proj4= NA 
+    ,dir_las = "D:\\Box\\VMARS\\Projects\\DAP_evaluation_Meston\\Data\\Tennessee\\lidar_tiles\\"
+    ,pattern="[.]la.$"
+    ,notes=""
+    ,create_polys=T
+    )
+
+```
+
+#build project
+```{r }
+
+scan_las("D:\\Box\\VMARS\\Projects\\DAP_evaluation_Meston\\Data\\Tennessee\\lidar_tiles\\")
+
+RSForInvt::project_create(
+
+  dir_las="D:\\Box\\VMARS\\Projects\\DAP_evaluation_Meston\\Data\\Tennessee\\lidar_tiles\\"
+  ,dir_dtm="D:\\Box\\VMARS\\Projects\\DAP_evaluation_Meston\\Data\\Tennessee\\DTM_fusion\\"
+  ,path_gpkg_out="D:\\Box\\VMARS\\Projects\\DAP_evaluation_Meston\\R\\DAP_Lidar_analysis\\RSForInvt/Tennessee_lidar_RSForInvt.gpkg"
+  ,layer_plys = "RSForInvt_ply"
+  ,layer_config = "RSForInvt_config"
+  ,overwrite_project = T
+  ,project_dtm="lidar_dtm"
+  ,project_las="lidar_las"
+  ,dtm_year="2018"
+  ,las_year="2018"
+  ,do_scan_dtms=T
+  ,do_scan_las=T
+  ,tile_size=1650
+  ,pixel_size=66
+  ,xmn=561066,xmx=2805066,ymn=33066,ymx=1551066
+  ,proj4 = "+proj=lcc +lat_1=47.33333333333334 +lat_2=45.83333333333334 +lat_0=45.33333333333334 +lon_0=-120.5 +x_0=500000.0001016001 +y_0=0 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=us-ft +no_defs"
+  ,mask=NA
+  ,return=T
+
+)
+
+
+```
+
+
+#create gridmetrics output csvs
+```{r }
+
+
+
+```
+
+
+#load csvs into sqlite database
+```{r }
+
+
+
+```
+
+
+#create rasters from sqlite database
+```{r }
+
+
+
+```
+
+
+#create .dtm canopy models
+```{r }
+
+
+
+```
+
+
+#merge .dtm canopy models
+```{r }
+
+
+
+```
+
+
+#segment individual trees
+```{r }
+
+
+
+```
+
+
+#clip plots from lidar
+```{r }
+
+
+
+```
+
+
+#summarize plot clips
+```{r }
+
+
+
+```
+
+
+#interpolate raster data to plot locations (alternative to plot clips)
+```{r }
+
+
+
+```
+

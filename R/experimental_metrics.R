@@ -42,11 +42,11 @@
 #'    test2 = lasmetrics(las1,experimental_metrics(X,Y,Z))
 #'    test2
 #'
-#@import some_package,some_package2
+#@import lidR plyr raster
 #'
 #'@export
 #
-#'@seealso \code{\link{another_function}}\cr \code{\link{yet_another_function}}\cr
+#'@seealso \code{\link{lidR::readLAS}}\cr \code{\link{lidR::lasmetrics}}\cr \code{\link{lidR::grid_metrics}}\cr
 
 #Desired upgrades to this function:
 #

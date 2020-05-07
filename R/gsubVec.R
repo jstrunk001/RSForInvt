@@ -17,8 +17,8 @@
 #'
 #'Jacob Strunk <Jacob.strunk@@usda.gov>
 #'
-#'@param pattern
-#'@param replacement
+#'@param pattern vector of patterns
+#'@param replacement vector of replacements
 #'@param ... all other values as described in gsub
 #'
 #'@return
@@ -34,8 +34,8 @@
 
 
 
-gsubVec = function(pattern,replacement, x ,  ...){ 
-	
+gsubVec = function(pattern,replacement, x ,  ...){
+
 	for(i in 1:length(pattern)){
 		x = gsub( pattern[i] , replacement[i], x ,  ...)
 	}

@@ -53,7 +53,7 @@
 #'				))
 #'
 #'
-#'@import some_package,some_package2
+#'@import RODBC DBI
 #'
 #'@export
 #

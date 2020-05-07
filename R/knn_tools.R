@@ -47,38 +47,38 @@
 #'
 #' \cr\cr
 #' \bold{impute_id() parameters:}
-#'@param newtargs_id
+#'@param newtargs_id ?
 #'@param ...
 #'
 #'\cr\cr
 #'\bold{yai_weights() parameters:}
-#'@param yaimod
-#'@param dtype
-#'@param zero_dist()
+#'@param yaimod model returned by yai_id
+#'@param dtype distance type
+#'@param zero_dist() how to deal with zero distances (e.g. when everything is zero)
 #'
 #'\cr\cr
 #'\bold{tl_impute parameters:}
-#'@param wts
-#'@param env
-#'@param idNm
-#'@param cols_knn_id
-#'@param cols_knn_wt
-#'@param tr_pl
-#'@param debug
+#'@param wts weights from ?
+#'@param env environment with weights in it
+#'@param idNm name of id field
+#'@param cols_knn_id col names of knn ids
+#'@param cols_knn_wt col names of knn wts
+#'@param tr_pl tree records
+#'@param debug T/F debug?
 #'
 #'\cr\cr
 #'\bold{yai_cv() parameters:}
-#'@param omit
-#'@param idNm
-#'@param x
-#'@param yNm
-#'@param data
-#'@param iter_max
-#'@param max_comb
-#'@param k
-#'@param debug
-#'@param method
-#'@param ...
+#'@param omit observation to omit at time i
+#'@param idNm name of id field
+#'@param x ?
+#'@param yNm ?names of response fields
+#'@param data input data
+#'@param iter_max number of iterations max
+#'@param max_comb ??
+#'@param k ?number of neighbors?
+#'@param debug T/F
+#'@param method ? distance approach?
+#'@param ... other arguments to ??
 #'
 #'
 #'@return

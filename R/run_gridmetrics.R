@@ -18,9 +18,7 @@
 #'
 #'Jacob Strunk <Jstrunk@@fs.fed.us>
 #'
-#'@param lasR_project_csv csv file of intersections created by lasR_project() function
-#'@param lasR_project__gpkg polygon file of intersections created by lasR_project() function
-#'@param dir_out where should csv files be sent
+#'@param project_gpkg polygon file of intersections created by project_make() function
 #'@param n_core number of corest to run process on
 #'@param gridmetrics_path where is gridmetrics.exe (FUSION)
 #'@param heightbreak Height break for cover calculation
@@ -48,7 +46,7 @@
 #'@examples
 #'
 #'  gmi=run_gridmetrics(
-#' lasR_project_poly="D:\\projects\\2017_WA_DSM_Pilot_usgs\\2017Aug_NAIP_usgs\\lasR_project003.shp"
+#'  project_gpkg="D:\\projects\\2017_WA_DSM_Pilot_usgs\\2017Aug_NAIP_usgs\\lasR_project003.gpkg"
 #' ,dir_out="I:\\projects\\2017_WA_DSM_Pilot\\2017Aug_NAIP_usgs\\gridmetrics_07\\"
 #' ,dir_dtm="c:\\usgs_dtms\\dtms\\"
 #' ,dir_las="D:\\naip_2015_laz\\"
@@ -60,16 +58,14 @@
 #'
 
 #'
-#@import some_package,some_package2
+#'@import parallel rgdal raster
 #'
 #'@export
 #
-#'@seealso \code{\link{lasR_project}}\cr \code{\link{gridmetrics}}\cr
+#'@seealso \code{\link{project_make}}\cr \code{\link{lidR::gridmetrics}}\cr
 
 run_gridmetrics=function(
-  lasR_project_csv = NA
-  #,lasR_project_polys=NA
-  ,lasR_project_gpkg = NA
+  project_gpkg = NA
   ,dir_out = "c:/temp/test_project/gridmetrics"
   ,n_core = 4
   ,gridmetrics_path = "c:\\fusion\\gridmetrics.exe"
@@ -145,11 +141,6 @@ run_gridmetrics=function(
     }
     if(!is.null(attributes(class(lasR_project_csv)))) if(attributes(class(lasR_project_csv)) == "sp") proj_polys=lasR_project_csv
   }
-
-  # if(!is.na(lasR_project_polys[1])){
-  #   if(!inherits(lasR_project_polys,"sp")) proj_polys=readOGR(dirname(lasR_project_polys),gsub("[.]shp$","",basename(lasR_project_polys)),stringsAsFactors=F)
-  #   if(inherits(lasR_project_polys,"sp")) proj_polys=lasR_project_polys
-  # }
   if(!is.na(lasR_project_gpkg[1])){
     if(!inherits(lasR_project_gpkg,"sp")) proj_polys=readOGR(lasR_project_gpkg[1],"tiles",stringsAsFactors=F)
     if(inherits(lasR_project_gpkg,"sp")) proj_polys=lasR_project_gpkg
