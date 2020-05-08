@@ -37,21 +37,26 @@
 #'
 #'@examples
 #'
-#'  lasR_project(
-#'   dir_las="C:\\Temp\\las_test\\"
-#'   ,dir_dtm="C:\\Temp\\dtm_test\\"
-#'   ,dir_project="C:\\Temp\\naip_2015_t1650_p66\\"
-#'   ,project="test_project"
-#'   ,project_dtm="some_project"
-#'   ,project_las="some_project"
-#'   ,dtm_year="2099"
-#'   ,las_year="2099"
-#'   ,scan_dtms=T
-#'   ,scan_las=T
+#' proj_tn = RSForInvt::project_create(
+#'   #'proj = project_create(
+#'   dir_las="D:\\Box\\VMARS\\Projects\\DAP_evaluation_Meston\\Data\\Tennessee\\lidar_tiles\\"
+#'   ,dir_dtm="D:\\Box\\VMARS\\Projects\\DAP_evaluation_Meston\\Data\\Tennessee\\DTM_fusion\\"
+#'   ,path_gpkg_out="D:\\Box\\VMARS\\Projects\\DAP_evaluation_Meston\\R\\DAP_Lidar_analysis\\RSForInvt\\project\\TNLidar_RSForInvtProject.gpkg"
+#'   ,layer_project = "RSForInvt_prj"
+#'   ,layer_config = "RSForInvt_config"
+#'   ,overwrite_project = T
+#'   ,project_dtm="lidar_dtm"
+#'   ,project_las="lidar_las"
+#'   ,dtm_year="2018"
+#'   ,las_year="2018"
+#'   ,do_scan_dtms=F #'we already scanned the dtm folder - ok, to rescan, but slower
+#'   ,do_scan_las=F #'we already scanned the las folder - ok, to rescan, but slower
 #'   ,tile_size=1650
 #'   ,pixel_size=66
-#'   ,xmn=561066,xmx=2805066,ymn=33066,ymx=1551066
-#'   ,proj4  ="+proj=lcc +lat_1=47.33333333333334 +lat_2=45.83333333333334 +lat_0=45.33333333333334 +lon_0=-120.5 +x_0=500000.0001016001 +y_0=0 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=us-ft +no_defs"
+#'   #',xmn=561066,xmx=2805066,ymn=33066,ymx=1551066
+#'   ,proj4 = "+proj=lcc +lat_1=47.33333333333334 +lat_2=45.83333333333334 +lat_0=45.33333333333334 +lon_0=-120.5 +x_0=500000.0001016001 +y_0=0 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=us-ft +no_defs"
+#'   ,mask=NA
+#'   ,return=T
 #' )
 #'
 #'
@@ -73,7 +78,7 @@ project_create=function(
   ,recurse_dtm = F
   ,recurse_las = F
   ,path_gpkg_out="c:/lidar_projects/someProject_RSForInvt.gpkg"
-  ,layer_plys = "RSForInvt_ply"
+  ,layer_project = "RSForInvt_prj"
   ,layer_config = "RSForInvt_config"
   ,overwrite_project = T
   ,project_dtm="someProject_dtm"
@@ -93,6 +98,7 @@ project_create=function(
   ,return=T
 
 ){
+
   options(stringsAsFactors = F)
   this_time = Sys.time()
 
@@ -135,8 +141,10 @@ project_create=function(
   if(is.na(dtm_proj4)) proj4string(dtm_polys) = proj4_in
 
   #buffer polygons
-  dtm_polys1=buffer(dtm_polys,pixel_size*2+1,dissolve=F);gc()
-  las_polys1=buffer(las_polys,pixel_size*2+1,dissolve=F);gc()
+  dtm_polys1=gBuffer(dtm_polys,byid=T,width=round(pixel_size*2+1),capStyle="square");gc()
+  #dtm_polys1=buffer(dtm_polys,round(pixel_size*2+1),dissolve=F);gc()
+  #las_polys1=buffer(las_polys,round(pixel_size*2+1),dissolve=F);gc()
+  las_polys1=gBuffer(las_polys,byid=T,width=round(pixel_size*2+1),capStyle="square");gc()
 
   print("buffer complete");print(Sys.time())
 
@@ -214,7 +222,7 @@ project_create=function(
   #create config file
   df_config = data.frame(
     path_gpkg_out = path_gpkg_out
-    ,layer_plys = layer_plys
+    ,layer_project = layer_project
     ,layer_config  =  layer_config
     ,layer_las_buf = "las_tiles_bfr"
     ,layer_dtm_buf = "dtm_tiles_bfr"
@@ -249,7 +257,7 @@ project_create=function(
   #write project polygons
   proj4string(tile_polys1) = proj4_in
   sf_proj = sf::st_as_sf(tile_polys1)
-  try(sf::st_write(obj = sf_proj , dsn = path_gpkg_out , layer = layer_plys, driver="GPKG",  layer_options = c("OVERWRITE=yes") ))
+  try(sf::st_write(obj = sf_proj , dsn = path_gpkg_out , layer = layer_project, driver="GPKG",  layer_options = c("OVERWRITE=yes") ))
 
   #write dtm polygons
   proj4string(dtm_polys1) = proj4_in
@@ -270,8 +278,13 @@ project_create=function(
   smry_write_err = try(dbWriteTable(sqlite_proj ,layer_config , df_config, overwrite = T))
   dbDisconnect(sqlite_proj)
 
+  #save RDS object for redundancy
+  l_res = list(config=df_config , project_plys = tile_polys1 ,  dtm_tiles_bfr = dtm_polys1 ,  las_tiles_bfr = las_polys2)
+  outRDS = file.path(dirname(path_gpkg_out), gsub("[.]gpkg",".RDS",basename(path_gpkg_out),ignore.case=T))
+  saveRDS(l_res,outRDS)
+
   #return data to users
-  if(return) return(list(config=df_config , project_plys = tile_polys1 ,  dtm_tiles_bfr = dtm_polys1 ,  las_tiles_bfr = las_polys2))
+  if(return) return(l_res)
 
 }
 

@@ -36,7 +36,6 @@
 #'@param dir_dtm in case path to dtms has changed from lasR_project
 #'@param dir_las in case path to las has changed from lasR_project
 #'@param skip_existing skip tiles if they already have output csvs
-#'@param con a parallel connection, optional, function can also create parallel threads
 #'@param table output folder name
 #'@param existing_coms path to existing batch comamnds, incase processing was interrupted the first time
 #'
@@ -65,7 +64,11 @@
 #'@seealso \code{\link{project_make}}\cr \code{\link{lidR::gridmetrics}}\cr
 
 run_gridmetrics=function(
-  project_gpkg = NA
+
+   proj_polys = NA
+  ,proj_gpkg_path = NA
+  ,layer_proj_polys = "RSForInvt_prj"
+  ,layer_proj_config = "RSForInvt_config"
   ,dir_out = "c:/temp/test_project/gridmetrics"
   ,n_core = 4
   ,gridmetrics_path = "c:\\fusion\\gridmetrics.exe"
@@ -77,19 +80,16 @@ run_gridmetrics=function(
   ,outlier = c(-5,400)
   ,fusion_switches = "/nointensity /first"
   ,xmn = 561066,xmx=2805066,ymn=33066,ymx=1551066
-  ,fun = compute_metrics2#list(min=min,max=max,mean=mean,sd=sd)#,p20=function(x,...)quantile(x,.2,...),p75=function(x,...)quantile(x,.2,...),p95=function(x,...)quantile(x,.2,...))
+  ,fun = compute_metrics2 #list(min=min,max=max,mean=mean,sd=sd)#,p20=function(x,...)quantile(x,.2,...),p75=function(x,...)quantile(x,.2,...),p95=function(x,...)quantile(x,.2,...))
   ,temp = "c:\\temp\\run_gridmetrics\\"
 
   ,fast_cache = NA #preferrably a ram or ssd drive with good parallel read behavior
   ,n_cache = 90
 
-  ,dir_dtm = NA #in case drive paths are wrong (External drives...)
-  ,dir_las = NA #in case drive paths are wrong (External drives...)
+  ,new_dtm_path = c(from = NA, to = NA) #in case drive paths are wrong (e.g. External drives...)
+  ,new_las_path = c(from = NA, to = NA) #in case drive paths are wrong (e.g. External drives...)
 
   ,skip_existing = T
-
-  ,con = NA
-  ,table = "gridmetrics"
 
   ,existing_coms = c(NA,"C:\\Temp\\run_gridmetrics\\2017Aug17_100740\\all_commands.txt")   #skip setting up new dtm and las files
 
@@ -108,7 +108,7 @@ run_gridmetrics=function(
   require("rgdal")
 
   gridmetrics_type=gridmetrics_type[1]
-  do_fusion = F
+  do_fusion = T
   if(grepl("gridmetrics.exe",gridmetrics_type)) do_fusion = T
 
   #time stamp for outputs
@@ -125,31 +125,38 @@ run_gridmetrics=function(
 
   coms_out=file.path(temp,"all_commands.txt")
 
- #load lasR_project
-  if(!is.na(lasR_project_csv) & is.na(lasR_project_gpkg[1])){
-    if(is.data.frame(lasR_project_csv)){
-      proj=lasR_project_csv
-      proj_polys0=bbox2polys(proj[,c("tile_id","mnx","mxx","mny","mxy")])
-      row.names(proj)=proj[,"tile_id"]
-      proj_polys=SpatialPolygonsDataFrame(proj_polys0,proj)
-    }
-    if(!is.data.frame(lasR_project_csv))if(is.null(attributes(class(lasR_project_csv)))){
-      proj=read.csv(lasR_project_csv)
-      proj_polys0=bbox2polys(proj[,c("tile_id","mnx","mxx","mny","mxy")])
-      row.names(proj)=proj[,"tile_id"]
-      proj_polys=SpatialPolygonsDataFrame(proj_polys0,proj)
-    }
-    if(!is.null(attributes(class(lasR_project_csv)))) if(attributes(class(lasR_project_csv)) == "sp") proj_polys=lasR_project_csv
+ #load project
+  if(!is.na(proj_polys[1])){
+    proj = proj_polys
   }
-  if(!is.na(lasR_project_gpkg[1])){
-    if(!inherits(lasR_project_gpkg,"sp")) proj_polys=readOGR(lasR_project_gpkg[1],"tiles",stringsAsFactors=F)
-    if(inherits(lasR_project_gpkg,"sp")) proj_polys=lasR_project_gpkg
+  if(is.na(proj_polys[1]) & !is.na(proj_gpkg_path ) ){
+    proj_polys = rgdal::readOGR(dsn=proj_gpkg_path , layer = layer_proj_polys )
+    #df_config = sf::st_read(dsn=proj_gpkg_path , layer = layer_proj_config )
   }
-  print("load lasR_project");print(Sys.time())
+  if(is.na(proj_polys[1]) & is.na(proj_gpkg_path ) ) stop("must provide either proj_polys or proj_gpkg_path")
+
+  print("load project");print(Sys.time())
   #fix drive paths in lasR_project
 
-  if(!is.na(dir_dtm)) proj_polys@data[,"dtm_file"]=backslash(unlist(lapply(as.character(proj_polys@data[,"dtm_file"]),function(...,dir_dtm)paste(file.path(dir_dtm,basename(strsplit(...,",")[[1]])),collapse=","),dir_dtm=dir_dtm)))
-  if(!is.na(dir_las)) proj_polys@data[,"las_file"]=backslash(unlist(lapply(as.character(proj_polys@data[,"las_file"]),function(...,dir_dtm)paste(file.path(dir_dtm,basename(strsplit(...,",")[[1]])),collapse=","),dir_dtm=dir_las)))
+  #rename paths in case files have moved
+  if(!is.na(new_dtm_path)[1]){
+    new_dtm_path_in = normalizePath(new_dtm_path)
+    names(new_dtm_path_in) = names(new_dtm_path)
+    dtm_old = normalizePath(proj_polys@data[,"dtm_file"])
+    dtm_new = gsub(new_dtm_path_in["from"], new_dtm_path_in["to"], dtm_old , fixed = T)
+    proj_polys@data[,"dtm_file"] = dtm_new
+  }
+  if(!is.na(new_las_path)[1]){
+    new_las_path_in = normalizePath(new_las_path)
+    names(new_las_path_in) = names(new_las_path)
+    las_old = normalizePath(proj_polys@data[,"las_file"])
+    las_new = gsub(new_las_path_in["from"], new_las_path_in["to"], las_old , fixed = T)
+    proj_polys@data[,"las_file"] = las_new
+  }
+
+  #this approach doesn't work if the las files are in multiple directory
+  # if(!is.na(dir_dtm)) proj_polys@data[,"dtm_file"]=backslash(unlist(lapply(as.character(proj_polys@data[,"dtm_file"]),function(...,dir_dtm)paste(file.path(dir_dtm,basename(strsplit(...,",")[[1]])),collapse=","),dir_dtm=dir_dtm)))
+  # if(!is.na(dir_las)) proj_polys@data[,"las_file"]=backslash(unlist(lapply(as.character(proj_polys@data[,"las_file"]),function(...,dir_dtm)paste(file.path(dir_dtm,basename(strsplit(...,",")[[1]])),collapse=","),dir_dtm=dir_las)))
 
   #skip existing files
   if(skip_existing){

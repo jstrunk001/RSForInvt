@@ -4,7 +4,9 @@
 \alias{run_gridmetrics}
 \title{run gridmetrics across a project}
 \usage{
-run_gridmetrics(project_gpkg = NA,
+run_gridmetrics(proj_polys = NA, proj_gpkg_path = NA,
+  layer_proj_polys = "RSForInvt_prj",
+  layer_proj_config = "RSForInvt_config",
   dir_out = "c:/temp/test_project/gridmetrics", n_core = 4,
   gridmetrics_path = "c:\\\\fusion\\\\gridmetrics.exe",
   heightbreak = 6, cellsize = 66, minht = 6, first = T,
@@ -12,15 +14,13 @@ run_gridmetrics(project_gpkg = NA,
   fusion_switches = "/nointensity /first", xmn = 561066,
   xmx = 2805066, ymn = 33066, ymx = 1551066,
   fun = compute_metrics2, temp = "c:\\\\temp\\\\run_gridmetrics\\\\",
-  fast_cache = NA, n_cache = 90, dir_dtm = NA, dir_las = NA,
-  skip_existing = T, con = NA, table = "gridmetrics",
+  fast_cache = NA, n_cache = 90, new_dtm_path = c(from = NA, to =
+  NA), new_las_path = c(from = NA, to = NA), skip_existing = T,
   existing_coms = c(NA,
   "C:\\\\Temp\\\\run_gridmetrics\\\\2017Aug17_100740\\\\all_commands.txt"),
   debug = F, ...)
 }
 \arguments{
-\item{project_gpkg}{polygon file of intersections created by project_make() function}
-
 \item{n_core}{number of corest to run process on}
 
 \item{gridmetrics_path}{where is gridmetrics.exe (FUSION)}
@@ -49,17 +49,17 @@ run_gridmetrics(project_gpkg = NA,
 
 \item{n_cache}{experimental - number of las files to copy to cache}
 
+\item{skip_existing}{skip tiles if they already have output csvs}
+
+\item{existing_coms}{path to existing batch comamnds, incase processing was interrupted the first time}
+
+\item{project_gpkg}{polygon file of intersections created by project_make() function}
+
 \item{dir_dtm}{in case path to dtms has changed from lasR_project}
 
 \item{dir_las}{in case path to las has changed from lasR_project}
 
-\item{skip_existing}{skip tiles if they already have output csvs}
-
-\item{con}{a parallel connection, optional, function can also create parallel threads}
-
 \item{table}{output folder name}
-
-\item{existing_coms}{path to existing batch comamnds, incase processing was interrupted the first time}
 }
 \value{
 <Delete and Replace>

@@ -192,13 +192,13 @@ scan_las=function(
 
     #save outputs
     try(saveRDS(las_polys,path_polys_rds))
-    #try(maptools::writePolyShape(las_polys,polys_shp))
 
+    names(las_polys) = gsub("[.]","_",names(las_polys))
+    names(las_polys) = gsub(" ","_",names(las_polys))
     sf_obj = sf::st_as_sf(las_polys)
     try(sf::st_write(obj = sf_obj , dsn = las_gpkg , layer = "las_polys", driver="GPKG" , layer_options = c("OVERWRITE=yes") ))
 
   }
-
 
   if(return) return(list(project_id = project_id_df, las_ids = las_id_df  , plys = las_polys))
 

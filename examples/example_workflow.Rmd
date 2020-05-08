@@ -110,12 +110,12 @@ if(F){
 
 library(RSForInvt)
 
-proj_tn = RSForInvt::project_create(
-#proj = project_create(
+#proj_tn = RSForInvt::project_create(
+proj_tn = project_create(
   dir_las="D:\\Box\\VMARS\\Projects\\DAP_evaluation_Meston\\Data\\Tennessee\\lidar_tiles\\"
   ,dir_dtm="D:\\Box\\VMARS\\Projects\\DAP_evaluation_Meston\\Data\\Tennessee\\DTM_fusion\\"
   ,path_gpkg_out="D:\\Box\\VMARS\\Projects\\DAP_evaluation_Meston\\R\\DAP_Lidar_analysis\\RSForInvt\\project\\TNLidar_RSForInvtProject.gpkg"
-  ,layer_plys = "RSForInvt_ply"
+  ,layer_project = "RSForInvt_prj"
   ,layer_config = "RSForInvt_config"
   ,overwrite_project = T
   ,project_dtm="lidar_dtm"
@@ -124,7 +124,7 @@ proj_tn = RSForInvt::project_create(
   ,las_year="2018"
   ,do_scan_dtms=F #we already scanned the dtm folder - ok, to rescan, but slower
   ,do_scan_las=F #we already scanned the las folder - ok, to rescan, but slower
-  ,tile_size=1650
+  ,tile_size=6000
   ,pixel_size=66
   #,xmn=561066,xmx=2805066,ymn=33066,ymx=1551066
   ,proj4 = "+proj=lcc +lat_1=47.33333333333334 +lat_2=45.83333333333334 +lat_0=45.33333333333334 +lon_0=-120.5 +x_0=500000.0001016001 +y_0=0 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=us-ft +no_defs"
@@ -142,7 +142,13 @@ proj_tn$project_plys
 #create gridmetrics output csvs
 ```{r }
 
-
+  gmi=run_gridmetrics(
+    proj_gpkg_path="D:\\Box\\VMARS\\Projects\\DAP_evaluation_Meston\\R\\DAP_Lidar_analysis\\RSForInvt\\project\\TNLidar_RSForInvtProject.gpkg"
+    ,dir_out="D:\\Box\\VMARS\\Projects\\DAP_evaluation_Meston\\R\\DAP_Lidar_analysis\\RSForInvt\\"
+    #,new_las_path=c(from="D:\\Box\\VMARS\\Projects\\DAP_evaluation_Meston\\Data\\Tennessee\\lidar_tiles\\",to = "D:\\Box\\VMARS\\Projects\\DAP_evaluation_Meston\\Data\\Tennessee\\lidar_tiles\\")
+    #,new_dtm_path=c(from="D:\\Box\\VMARS\\Projects\\DAP_evaluation_Meston\\Data\\Tennessee\\DTM_fusion\\",to = "D:\\Box\\VMARS\\Projects\\DAP_evaluation_Meston\\Data\\Tennessee\\DTM_fusion\\")
+    ,n_core=4
+   )
 
 
 
@@ -151,6 +157,22 @@ proj_tn$project_plys
 
 #load csvs into sqlite database
 ```{r }
+
+
+csv_to_sqlite(
+      db="D:\\Box\\VMARS\\Projects\\DAP_evaluation_Meston\\R\\DAP_Lidar_analysis\\RSForInvt\\gridmetrics_sqlite\\gridmetrics.sqlite"
+       ,csv_folder = "D:\\Box\\VMARS\\Projects\\DAP_evaluation_Meston\\R\\DAP_Lidar_analysis\\RSForInvt\\gridmetrics_csv"
+       ,tb_summary="gm_summary"
+       ,tb_csv="gm"
+       ,project="TN_2018"
+       ,resolution="66"
+       ,units="feet"
+       ,proj4="+proj=lcc +lat_1=47.33333333333334 +lat_2=45.83333333333334 +lat_0=45.33333333333334 +lon_0=-120.5 +x_0=500000.0001016001 +y_0=0 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=us-ft +no_defs"
+       ,notes=""
+       ,skip_loaded=T
+       ,n_load=NA
+       ,use_col_classes=T
+       )
 
 
 
@@ -167,6 +189,14 @@ proj_tn$project_plys
 
 #create .dtm canopy models
 ```{r }
+
+  gmi=run_canopyModel(
+    proj_gpkg_path="D:\\Box\\VMARS\\Projects\\DAP_evaluation_Meston\\R\\DAP_Lidar_analysis\\RSForInvt\\project\\TNLidar_RSForInvtProject.gpkg"
+    ,dir_out="D:\\Box\\VMARS\\Projects\\DAP_evaluation_Meston\\R\\DAP_Lidar_analysis\\RSForInvt\\"
+    #,new_las_path=c(from="D:\\Box\\VMARS\\Projects\\DAP_evaluation_Meston\\Data\\Tennessee\\lidar_tiles\\",to = "D:\\Box\\VMARS\\Projects\\DAP_evaluation_Meston\\Data\\Tennessee\\lidar_tiles\\")
+    #,new_dtm_path=c(from="D:\\Box\\VMARS\\Projects\\DAP_evaluation_Meston\\Data\\Tennessee\\DTM_fusion\\",to = "D:\\Box\\VMARS\\Projects\\DAP_evaluation_Meston\\Data\\Tennessee\\DTM_fusion\\")
+    ,n_core=4
+   )
 
 
 

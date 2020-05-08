@@ -56,7 +56,8 @@
 #'@seealso \code{\link{run_gridmetrics}}\cr \code{\link{lasR_project}}\cr
 
 
-csv_to_sqlite=function(db
+csv_to_sqlite=function(
+                       db_csvOut
                        ,csv_folder
                        ,tb_summary="gm_summary"
                        ,tb_csv="gm"
@@ -68,14 +69,18 @@ csv_to_sqlite=function(db
                        ,skip_loaded=T
                        ,n_load=NA
                        ,use_col_classes=T
+
                        ){
+
+  if(class(db_csvOut) == "SQLiteConnection") db_in = db_csvOut
+  if(class(db_csvOut) == "character") db_in = dbConnect( RSQLite::SQLite(), db_csvOut )
 
   if(interactive()) require(RSQLite)
 
   csv_files=list.files(csv_folder,full.names=T,pattern="[.]csv")
 
   #check for existence of tables
-  tb_exist=dbListTables(db)
+  tb_exist=dbListTables(db_in)
 
   #prep data table - get column names
   dat0=read.csv(csv_files[1])
@@ -86,12 +91,12 @@ csv_to_sqlite=function(db
 
   if(!tb_csv %in% tb_exist | !skip_loaded ){
 
-    dbWriteTable(db,tb_csv,dat0[0,],overwrite = TRUE,append=F)
-    dat1=dbGetQuery(db,paste("select * from ",tb_csv,"limit 50"))
+    dbWriteTable(db_in,tb_csv,dat0[0,],overwrite = TRUE,append=F)
+    dat1=dbGetQuery(db_in,paste("select * from ",tb_csv,"limit 50"))
     names1=names(dat1)
   }else{
 
-    dat1=dbGetQuery(db,paste("select * from ",tb_csv,"limit 50"))
+    dat1=dbGetQuery(db_in,paste("select * from ",tb_csv,"limit 50"))
     names1=names(dat1)
   }
 
@@ -105,11 +110,11 @@ csv_to_sqlite=function(db
   if(!tb_summary %in% tb_exist | !skip_loaded){
 
     summ0=data.frame(date=as.character(Sys.Date()),file="",nrows=0,status="")
-    dbWriteTable(db,tb_summary,summ0[0,],overwrite = TRUE,append=F)
+    dbWriteTable(db_in,tb_summary,summ0[0,],overwrite = TRUE,append=F)
 
   }else{
 
-    summ0=dbReadTable(db,tb_summary)
+    summ0=dbReadTable(db_in,tb_summary)
     files_loaded=basename(csv_files) %in% basename(summ0$file[summ0$status == "completed"])
     csv_files=csv_files[!files_loaded]
 
@@ -135,12 +140,12 @@ csv_to_sqlite=function(db
 
       #write data
       if(nrow(dati)>0){
-         err_i=try(dbWriteTable(db,tb_csv,dati,append=T))
+         err_i=try(dbWriteTable(db_in,tb_csv,dati,append=T))
 
         #write summary record
         if(!class(err_i) == "try-error"){
           summ_i=data.frame(date=as.character(Sys.Date()),file=csv_files[i],nrows=nrow(dati),status="completed")
-          try(dbWriteTable(db,tb_summary,summ_i,append=T))
+          try(dbWriteTable(db_in,tb_summary,summ_i,append=T))
         }
       }
     }
@@ -148,7 +153,7 @@ csv_to_sqlite=function(db
   }
 
 
-
+  if(class(db_csvOut) == "character") dbDisconnect(db_in)
 
   }
 
