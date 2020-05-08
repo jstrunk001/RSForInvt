@@ -23,7 +23,7 @@
 #'@param proj4 proj4 string for projection
 #'@param dir_dtm where to find dtm files
 #'@param recursive T/F recurse into dir_dtm subdirectories ?
-#'@param pattern pattern to use in searching for las files
+#'@param pattern pattern to use in searching for dtm files
 #'@param notes and descriptionn that may be helpful in using a project
 #'@param create_polys output shapefiles of polygon bboxes
 #'@param return T/F return objects
@@ -77,7 +77,7 @@ scan_dtm=function(
   dtm_gpkg=paste(project_id_folder,"manage_dtm.gpkg",sep="")
 
   #create out directory if missing
-  if(!file.exists(project_id_folder)) dir.create(project_id_folder)
+  if(!dir.exists(project_id_folder)) try(dir.create(project_id_folder),silent=T)
 
   #create or connect to geopackage
   con_gpkg = dbConnect(RSQLite::SQLite(), dtm_gpkg)
@@ -91,7 +91,6 @@ scan_dtm=function(
   exist_project_id_gpkg = "project_id" %in% tables_gpkg
   exist_dtm_id_gpkg = "dtm_id" %in% tables_gpkg
   exist_dtm_ply_gpkg = "dtm_polys" %in% tables_gpkg
-
 
   #if(exist_project_id_csv){
   if(exist_project_id_gpkg){
@@ -191,7 +190,7 @@ scan_dtm=function(
     try(saveRDS(dtm_polys,polys_rds))
 
     sf_obj = sf::st_as_sf(dtm_polys)
-    try(sf::st_write(obj = sf_obj , dsn = las_gpkg , layer = "dtm_polys", driver="GPKG" , layer_options = c("OVERWRITE=yes") ))
+    try(sf::st_write(obj = sf_obj , dsn = dtm_gpkg , layer = "dtm_polys", driver="GPKG" , layer_options = c("OVERWRITE=yes") ))
 
   }
 

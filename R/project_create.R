@@ -70,12 +70,14 @@ project_create=function(
 
   dir_las=NA
   ,dir_dtm=NA
+  ,recurse_dtm = F
+  ,recurse_las = F
   ,path_gpkg_out="c:/lidar_projects/someProject_RSForInvt.gpkg"
   ,layer_plys = "RSForInvt_ply"
   ,layer_config = "RSForInvt_config"
   ,overwrite_project = T
-  ,project_dtm="test_project_dtm"
-  ,project_las="test_project_las"
+  ,project_dtm="someProject_dtm"
+  ,project_las="someProject_las"
   ,dtm_year="2099"
   ,las_year="2099"
   ,do_scan_dtms=T
@@ -111,25 +113,23 @@ project_create=function(
   #create sqlite database / tables
 
   #inventory las and dtms
-  if(do_scan_las) scan_las(project=project_las, project_year=las_year,dir_las=dir_las,create_polys=T)
+  if(do_scan_las) scan_las(project=project_las, project_year=las_year,dir_las=dir_las,create_polys=T , recursive = recurse_las , proj4 = proj4)
   print("scan_las");print(Sys.time())
-  if(do_scan_dtms) scan_dtm(project=project_dtm, project_year=dtm_year,dir_dtm=dir_dtm)
+  if(do_scan_dtms) scan_dtm(project=project_dtm, project_year=dtm_year,dir_dtm=dir_dtm, recursive = recurse_dtm , proj4 = proj4)
   print("scan_dtm");print(Sys.time())
 
-  #get project extent
-  browser()
-
   #file names
-  path_dtm_proj=paste(dir_dtm,"/manage_dtm",sep="")
-  path_las_proj=paste(dir_las,"/manage_las",sep="")
+  path_dtm_proj=paste(dir_dtm,"/manage_dtm/manage_dtm.gpkg",sep="")
+  path_las_proj=paste(dir_las,"/manage_las/manage_las.gpkg",sep="")
 
   #read in las and dtm polygons
-  dtm_polys=readOGR(path_dtm_proj,"dtm_polys")
-  las_polys=readOGR(path_las_proj,"las_polys")
+  dtm_polys=readOGR(dsn = path_dtm_proj,"dtm_polys")
+  las_polys=readOGR(dsn = path_las_proj,"las_polys")
 
   #buffer polygons
   dtm_polys1=buffer(dtm_polys,pixel_size*2+1,dissolve=F);gc()
   las_polys1=buffer(las_polys,pixel_size*2+1,dissolve=F);gc()
+
   print("buffer complete");print(Sys.time())
 
   #create processing tiles
@@ -282,7 +282,8 @@ project_create=function(
   dbDisconnect(sqlite_proj)
 
   #write polygons
-  plys_write_err = try(writeOGR(tile_polys1, dsn = path_gpkg_out, layer = layer_plys, driver="GPKG", overwrite_layer=overwrite_project ),silent=T)
+  sf_obj = sf::st_as_sf(tile_polys1)
+  try(sf::st_write(obj = sf_obj , dsn = path_gpkg_out , layer = layer_plys, driver="GPKG",  layer_options = c("OVERWRITE=yes") ))
 
   #return data to users
   if(return) return(list(path_gpkg = path_gpkg_out , plys = tile_polys1 , config=proj_config , layer_plys = layer_pls, layer_config = layer_config))

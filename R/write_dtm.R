@@ -66,7 +66,7 @@ write_dtm=function(
     header=vector(mode="raw",length=200)
 
     header[1:21 ]=writeBin("PLANS-PC BINARY .DTM", raw(),size=20)
-    header[22:(22+nchar("lasR R Package") )]=writeBin("lasR R Package", raw())
+    header[22:(22+nchar("RSForInvt R Package") )]=writeBin("RSForInvt R Package", raw())
     header[83:86 ]=writeBin(3.1, raw(),size=4)
     header[87:94 ]=writeBin(as.double(dtm@extent[1]), raw(), size = 8)
     header[95:102 ] = writeBin(dtm@extent[3], raw(), size = 8)

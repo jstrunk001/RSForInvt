@@ -46,14 +46,16 @@ View(las_info$las_ids)
 plot(las_info$plys) 
 
 #grab the exact same data from geopackage
-plys = rgdal::readOGR(dsn = "D:\\Box\\VMARS\\Projects\\DAP_evaluation_Meston\\Data\\Tennessee\\lidar_tiles\\manage_las\\manage_las.gpkg" , layer = "las_polys" )
+plys_las = rgdal::readOGR(dsn = "D:\\Box\\VMARS\\Projects\\DAP_evaluation_Meston\\Data\\Tennessee\\lidar_tiles\\manage_las\\manage_las.gpkg" , layer = "las_polys" )
 con_gpkg = dbConnect(RSQLite::SQLite(), "D:\\Box\\VMARS\\Projects\\DAP_evaluation_Meston\\Data\\Tennessee\\lidar_tiles\\manage_las\\manage_las.gpkg")
 las_ids = dbReadTable(con_gpkg,"las_id")
 proj_id = dbReadTable(con_gpkg,"project_id")  
 
-plot(plys)
+plot(plys_las)
 proj_id
 View(las_ids)
+
+dbDisconnect(con_gpkg)
 
 ```
 
@@ -77,19 +79,28 @@ library(RSForInvt)
     )
 
 #look at results that are returned directly 
-las_info$project_id
-View(las_info$las_ids) 
-plot(las_info$plys) 
+dtm_info$project_id
+View(dtm_info$dtm_ids) 
+plot(dtm_info$plys) 
 
 #grab the exact same data from geopackage
-plys = rgdal::readOGR(dsn = "D:\\Box\\VMARS\\Projects\\DAP_evaluation_Meston\\Data\\Tennessee\\lidar_tiles\\manage_las\\manage_las.gpkg" , layer = "las_polys" )
-con_gpkg = dbConnect(RSQLite::SQLite(), "D:\\Box\\VMARS\\Projects\\DAP_evaluation_Meston\\Data\\Tennessee\\lidar_tiles\\manage_las\\manage_las.gpkg")
-las_ids = dbReadTable(con_gpkg,"las_id")
-proj_id = dbReadTable(con_gpkg,"project_id")  
+plys_dtm = rgdal::readOGR(dsn = "D:\\Box\\VMARS\\Projects\\DAP_evaluation_Meston\\Data\\Tennessee\\DTM_fusion\\manage_dtm\\manage_dtm.gpkg" , layer = "dtm_polys" )
+con_gpkg_dtm = dbConnect(RSQLite::SQLite(), "D:\\Box\\VMARS\\Projects\\DAP_evaluation_Meston\\Data\\Tennessee\\DTM_fusion\\manage_dtm\\manage_dtm.gpkg")
+dtm_ids = dbReadTable(con_gpkg_dtm,"dtm_id")
+proj_id_dtm = dbReadTable(con_gpkg_dtm,"project_id")  
 
-plot(plys)
-proj_id
-View(las_ids)
+proj_id_dtm
+View(dtm_ids)
+plot(plys_dtm)
+
+dbDisconnect(con_gpkg)
+
+if(F){
+  
+  plot(subset(plys_dtm,subset = 1:nrow(plys_dtm) ==1  ))
+  plot( plys_las , add=T , border = "red")
+    
+}
 
 ```
 
@@ -97,13 +108,12 @@ View(las_ids)
 #build project
 ```{r }
 
-scan_las("D:\\Box\\VMARS\\Projects\\DAP_evaluation_Meston\\Data\\Tennessee\\lidar_tiles\\")
 
 RSForInvt::project_create(
 
   dir_las="D:\\Box\\VMARS\\Projects\\DAP_evaluation_Meston\\Data\\Tennessee\\lidar_tiles\\"
   ,dir_dtm="D:\\Box\\VMARS\\Projects\\DAP_evaluation_Meston\\Data\\Tennessee\\DTM_fusion\\"
-  ,path_gpkg_out="D:\\Box\\VMARS\\Projects\\DAP_evaluation_Meston\\R\\DAP_Lidar_analysis\\RSForInvt/Tennessee_lidar_RSForInvt.gpkg"
+  ,path_gpkg_out="D:\\Box\\VMARS\\Projects\\DAP_evaluation_Meston\\R\\DAP_Lidar_analysis\\RSForInvt\\TNLidar_RSForInvtProject.gpkg"
   ,layer_plys = "RSForInvt_ply"
   ,layer_config = "RSForInvt_config"
   ,overwrite_project = T
