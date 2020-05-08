@@ -28,7 +28,15 @@
 #'@param return T/F return objects
 #'
 #'@return
-#'  <Delete and Replace>
+#'  NULL
+#'
+#'  or
+#'
+#'  list(
+#'   project_id - data.frame with one one row
+#'   ,las_ids - data.frame with as many rows as las files
+#'   ,plys - SpatialPolygonsDataFrame with all of las tile extents
+#'  )
 #'
 #'@examples
 #'
