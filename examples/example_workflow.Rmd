@@ -108,12 +108,13 @@ if(F){
 #build project
 ```{r }
 
+library(RSForInvt)
 
-RSForInvt::project_create(
-
+proj_tn = RSForInvt::project_create(
+#proj = project_create(
   dir_las="D:\\Box\\VMARS\\Projects\\DAP_evaluation_Meston\\Data\\Tennessee\\lidar_tiles\\"
   ,dir_dtm="D:\\Box\\VMARS\\Projects\\DAP_evaluation_Meston\\Data\\Tennessee\\DTM_fusion\\"
-  ,path_gpkg_out="D:\\Box\\VMARS\\Projects\\DAP_evaluation_Meston\\R\\DAP_Lidar_analysis\\RSForInvt\\TNLidar_RSForInvtProject.gpkg"
+  ,path_gpkg_out="D:\\Box\\VMARS\\Projects\\DAP_evaluation_Meston\\R\\DAP_Lidar_analysis\\RSForInvt\\project\\TNLidar_RSForInvtProject.gpkg"
   ,layer_plys = "RSForInvt_ply"
   ,layer_config = "RSForInvt_config"
   ,overwrite_project = T
@@ -121,23 +122,27 @@ RSForInvt::project_create(
   ,project_las="lidar_las"
   ,dtm_year="2018"
   ,las_year="2018"
-  ,do_scan_dtms=T
-  ,do_scan_las=T
+  ,do_scan_dtms=F #we already scanned the dtm folder - ok, to rescan, but slower
+  ,do_scan_las=F #we already scanned the las folder - ok, to rescan, but slower
   ,tile_size=1650
   ,pixel_size=66
-  ,xmn=561066,xmx=2805066,ymn=33066,ymx=1551066
+  #,xmn=561066,xmx=2805066,ymn=33066,ymx=1551066
   ,proj4 = "+proj=lcc +lat_1=47.33333333333334 +lat_2=45.83333333333334 +lat_0=45.33333333333334 +lon_0=-120.5 +x_0=500000.0001016001 +y_0=0 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=us-ft +no_defs"
   ,mask=NA
   ,return=T
-
 )
 
+proj_tn$las_tiles_bfr
+proj_tn$dtm_tiles_bfr
+proj_tn$project_plys
 
 ```
 
 
 #create gridmetrics output csvs
 ```{r }
+
+
 
 
 

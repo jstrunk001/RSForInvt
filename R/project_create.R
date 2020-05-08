@@ -88,11 +88,12 @@ project_create=function(
   ,xmx=c(NA,2805066)
   ,ymn=c(NA,33066)
   ,ymx=c(NA,1551066)
-  ,proj4 = "+proj=lcc +lat_1=47.33333333333334 +lat_2=45.83333333333334 +lat_0=45.33333333333334 +lon_0=-120.5 +x_0=500000.0001016001 +y_0=0 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=us-ft +no_defs"
+  ,proj4 = c(NA,"+proj=lcc +lat_1=47.33333333333334 +lat_2=45.83333333333334 +lat_0=45.33333333333334 +lon_0=-120.5 +x_0=500000.0001016001 +y_0=0 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=us-ft +no_defs")
   ,mask=NA
   ,return=T
 
 ){
+  options(stringsAsFactors = F)
   this_time = Sys.time()
 
   require("DBI")
@@ -126,6 +127,13 @@ project_create=function(
   dtm_polys=readOGR(dsn = path_dtm_proj,"dtm_polys")
   las_polys=readOGR(dsn = path_las_proj,"las_polys")
 
+  #get proj4 if not provided and add to dtms if needed
+  if(!is.na(proj4)) proj4_in = proj4
+  else proj4_in = proj4string(las_polys)
+
+  dtm_proj4 = proj4string(dtm_polys)
+  if(is.na(dtm_proj4)) proj4string(dtm_polys) = proj4_in
+
   #buffer polygons
   dtm_polys1=buffer(dtm_polys,pixel_size*2+1,dissolve=F);gc()
   las_polys1=buffer(las_polys,pixel_size*2+1,dissolve=F);gc()
@@ -133,20 +141,20 @@ project_create=function(
   print("buffer complete");print(Sys.time())
 
   #create processing tiles
-  if( is.na(xmn) | is.na(xmx) | is.na(ymn) | is.na(ymx)  ){
+  if( ( is.na(xmn[1]) | is.na(xmx[1]) | is.na(ymn[1]) | is.na(ymx[1]) ) ){
     ext = extent(las_polys1)
     xmn = ext@xmin
     xmx = ext@xmax
     ymn = ext@ymin
     ymx = ext@ymax
   }
-  proc_rast=raster(xmn=xmn,xmx=xmx,ymn=ymn,ymx=ymx,resolution=tile_size,crs=crs);gc()
+  proc_rast=raster(xmn=xmn,xmx=xmx,ymn=ymn,ymx=ymx,resolution=tile_size,crs=crs(proj4_in));gc()
   proc_rast[]=cellsFromExtent(proc_rast,extent(proc_rast));gc()
   xy=raster::as.data.frame(proc_rast,xy=T)
   print("tile scheme complete");print(Sys.time())
 
   #create sub-processing tiles (100x density) for intersection with polygons
-  proc_rast1=raster(xmn=xmn,xmx=xmx,ymn=ymn,ymx=ymx,resolution=tile_size/10,crs=crs);gc()
+  proc_rast1=raster(xmn=xmn,xmx=xmx,ymn=ymn,ymx=ymx,resolution=tile_size/10,crs=crs(proj4_in));gc()
   xy1=raster::as.data.frame(proc_rast1,xy=T);gc()
   xy1[,"layer"]=NULL;gc()
   xy1[,"tile_id"]=cellFromXY(proc_rast, xy1[,c(1:2)]);gc()
@@ -204,10 +212,13 @@ project_create=function(
   tile_polys1=SpatialPolygonsDataFrame(tile_polys0,tiles_bbx)
 
   #create config file
-  layer_config = data.frame(
-    path_project = path_project
+  df_config = data.frame(
+    path_gpkg_out = path_gpkg_out
     ,layer_plys = layer_plys
     ,layer_config  =  layer_config
+    ,layer_las_buf = "las_tiles_bfr"
+    ,layer_dtm_buf = "dtm_tiles_bfr"
+    ,tile_buffer = ts2
 
     ,dir_las = dir_las
     ,dir_dtm = dir_dtm
@@ -216,11 +227,11 @@ project_create=function(
 
     ,dtm_year  = dtm_year
     ,las_year  = las_year
-    ,n_las = n_las
-    ,n_dtm = n_dtm
-    ,n_tile = n_tile
-    ,origin_x = origin_x
-    ,origin_y = origin_y
+    ,n_las = nrow(las_polys)
+    ,n_dtm = nrow(dtm_polys)
+    ,n_tile = nrow(tile_polys1)
+    ,origin_x = origin(proc_rast)[1]
+    ,origin_y = origin(proc_rast)[2]
 
     ,overwrite_project  =  overwrite_project
     ,xmn  = xmn
@@ -233,60 +244,34 @@ project_create=function(
     ,pixel_size  = pixel_size
     ,proj4  = proj4
     ,has_mask  = is.na(mask)
-    # ,  =
     )
 
+  #write project polygons
+  proj4string(tile_polys1) = proj4_in
+  sf_proj = sf::st_as_sf(tile_polys1)
+  try(sf::st_write(obj = sf_proj , dsn = path_gpkg_out , layer = layer_plys, driver="GPKG",  layer_options = c("OVERWRITE=yes") ))
 
+  #write dtm polygons
+  proj4string(dtm_polys1) = proj4_in
+  sf_dtm_bfr = sf::st_as_sf(dtm_polys1)
+  try(sf::st_write(obj = sf_dtm_bfr , dsn = path_gpkg_out , layer = "dtm_tiles_bfr", driver="GPKG",  layer_options = c("OVERWRITE=yes") ))
 
-
-  #write project to file
-  #write polygons
-  sqlite_proj = dbConnect(RSQLite::SQLite(), path_gpkg_out)
-  proj_tables = dbListTables(sqlite_proj)
-  layer_plys_exist = layer_plys %in% proj_tables
-  layer_config_exist = layer_config %in% proj_tables
-
-  #test for existing tables and make new names if overwrite = T
-  if(overwrite_project){
-
-    try(dbSendQuery(sqlite_proj, paste("drop table",layer_plys)) )
-    try(dbSendQuery(sqlite_proj, paste("drop table",layer_config)) )
-
-  }else{
-
-    if(layer_plys_exist | layer_config_exist){
-
-      for(i in 1:10){
-
-        layer_plys_i = sprintf(paste(layer_plys,"%03d"), i)
-        layer_config_i = sprintf(paste(layer_config,"%03d"), i)
-
-        proj_tables = dbListTables(sqlite_proj)
-        layer_plys_exist = layer_plys_i %in% proj_tables
-        layer_config_exist = layer_config_i %in% proj_tables
-
-        #make sure we can do i in both
-        if((!layer_plys_exist) & (!layer_config_exist)){
-          warning(i," versions of project already exist")
-          i =30
-          layer_plys = layer_plys_i
-          layer_config= layer_config_i
-        }
-      }
-      if(i == 10) stop("10 versions of project already exist, please clean up project geopackage and try again")
-    }
-  }
+  #write las polygons - fix names to remove "[.]"  and " "
+  las_polys2 = las_polys1
+  names(las_polys2@data) = gsub("[.]","_",names(las_polys2@data ))
+  names(las_polys2@data) = gsub(" ","_",names(las_polys2@data ))
+  las_polys2@data$file_path = normalizePath(as.character(las_polys1@data$file_path), winslash = "/")
+  proj4string(las_polys2) = proj4_in
+  sf_las_bfr = sf::st_as_sf(las_polys2)
+  try(sf::st_write(obj = sf_las_bfr , dsn = path_gpkg_out , layer = "las_tiles_bfr", driver="GPKG",  layer_options = c("OVERWRITE=yes") ))
 
   #write config table
-  smry_write_err = try(dbWriteTable(sqlite_proj ,layer_config , proj_config))
+  sqlite_proj = dbConnect(RSQLite::SQLite(), path_gpkg_out)
+  smry_write_err = try(dbWriteTable(sqlite_proj ,layer_config , df_config, overwrite = T))
   dbDisconnect(sqlite_proj)
 
-  #write polygons
-  sf_obj = sf::st_as_sf(tile_polys1)
-  try(sf::st_write(obj = sf_obj , dsn = path_gpkg_out , layer = layer_plys, driver="GPKG",  layer_options = c("OVERWRITE=yes") ))
-
   #return data to users
-  if(return) return(list(path_gpkg = path_gpkg_out , plys = tile_polys1 , config=proj_config , layer_plys = layer_pls, layer_config = layer_config))
+  if(return) return(list(config=df_config , project_plys = tile_polys1 ,  dtm_tiles_bfr = dtm_polys1 ,  las_tiles_bfr = las_polys2))
 
 }
 

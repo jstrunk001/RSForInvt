@@ -25,7 +25,7 @@ scan_dtm(project = "wa_dtm", project_year = "2099",
 
 \item{recursive}{T/F recurse into dir_dtm subdirectories ?}
 
-\item{pattern}{pattern to use in searching for las files}
+\item{pattern}{pattern to use in searching for dtm files}
 
 \item{notes}{and descriptionn that may be helpful in using a project}
 
