@@ -63,13 +63,13 @@ View(las_ids)
 library(lidR)
 library(RSForInvt)
 
- las_info = scan_las(
+ dtm_info = scan_dtm(
     project="TN_lidar"
     ,project_year="2018"
     ,proj4_name=NA #"NAD_1983_HARN_StatePlane_Washington_South_FIPS_4601_Feet"
     ,proj4= NA 
-    ,dir_las = "D:\\Box\\VMARS\\Projects\\DAP_evaluation_Meston\\Data\\Tennessee\\lidar_tiles\\"
-    ,pattern="[.]la.$"
+    ,dir_dtm = "D:\\Box\\VMARS\\Projects\\DAP_evaluation_Meston\\Data\\Tennessee\\DTM_fusion"
+    ,pattern="[.]dtm$"
     ,notes=""
     ,create_polys=T
     ,recursive = T

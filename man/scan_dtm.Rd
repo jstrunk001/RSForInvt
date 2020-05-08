@@ -5,9 +5,12 @@
 \title{scan a directory of dtm files}
 \usage{
 scan_dtm(project = "wa_dtm", project_year = "2099",
-  proj4_name = "NAD_1983_HARN_StatePlane_Washington_South_FIPS_4601_Feet",
-  proj4 = "1395 +proj=lcc +lat_1=47.33333333333334 +lat_2=45.83333333333334 +lat_0=45.33333333333334 +lon_0=-120.5 +x_0=500000.0001016001 +y_0=0 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=us-ft +no_defs",
-  dir_dtm = "", pattern = "[.]dtm$", notes = "", create_polys = T)
+  proj4_name = c(NA,
+  "NAD_1983_HARN_StatePlane_Washington_South_FIPS_4601_Feet"),
+  proj4 = c(NA,
+  "1395 +proj=lcc +lat_1=47.33333333333334 +lat_2=45.83333333333334 +lat_0=45.33333333333334 +lon_0=-120.5 +x_0=500000.0001016001 +y_0=0 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=us-ft +no_defs"),
+  dir_dtm = "", recursive = F, pattern = "[.]dtm$", notes = "",
+  create_polys = T, return = F)
 }
 \arguments{
 \item{project}{name of lidar project}
@@ -20,14 +23,26 @@ scan_dtm(project = "wa_dtm", project_year = "2099",
 
 \item{dir_dtm}{where to find dtm files}
 
+\item{recursive}{T/F recurse into dir_dtm subdirectories ?}
+
 \item{pattern}{pattern to use in searching for las files}
 
 \item{notes}{and descriptionn that may be helpful in using a project}
 
 \item{create_polys}{output shapefiles of polygon bboxes}
+
+\item{return}{T/F return objects}
 }
 \value{
-<Delete and Replace>
+NULL
+
+ or
+
+ list(
+  project_id - data.frame with one one row
+  ,dtm_ids - data.frame with as many rows as dtms
+  ,plys - SpatialPolygonsDataFrame with all of dtm extents
+ )
 }
 \description{
 scan a directory of dtm files

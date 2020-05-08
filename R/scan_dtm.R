@@ -77,14 +77,14 @@ scan_dtm=function(
   dtm_gpkg=paste(project_id_folder,"manage_dtm.gpkg",sep="")
 
   #create out directory if missing
-  if(!exist_project_id_folder) dir.create(project_id_folder)
+  if(!file.exists(project_id_folder)) dir.create(project_id_folder)
 
   #create or connect to geopackage
   con_gpkg = dbConnect(RSQLite::SQLite(), dtm_gpkg)
   tables_gpkg = dbListTables(con_gpkg)
 
   #Test for files
-  exist_project_id_folder=dir.exists(project_id_folder)
+  #exist_project_id_folder=dir.exists(project_id_folder)
   exist_project_id_csv=file.exists(project_id_csv)
   exist_dtm_id_csv=file.exists(dtm_id_csv)
 

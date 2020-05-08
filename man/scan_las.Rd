@@ -24,9 +24,19 @@ scan_las(project = "some_project", project_year = "2099",
 \item{notes}{and descriptionn that may be helpful in using a project}
 
 \item{create_polys}{output shapefiles of polygon bboxes}
+
+\item{return}{T/F return objects}
 }
 \value{
-<Delete and Replace>
+NULL
+
+ or
+
+ list(
+  project_id - data.frame with one one row
+  ,las_ids - data.frame with as many rows as las files
+  ,plys - SpatialPolygonsDataFrame with all of las tile extents
+ )
 }
 \description{
 scan las files and add them to summary table
