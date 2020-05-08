@@ -22,22 +22,13 @@ RSForInvt::raster2FUSION("D:\\Box\\VMARS\\Projects\\DAP_evaluation_Meston\\Data\
 ```
 
 
-#look at lidar extent
+#scan a lidar project
+# ?essentially an S3 version of a lidR catalog object stored in a geopackage ?
 ```{r}
 library(lidR)
+library(RSForInvt)
 
-ctg = lidR::catalog(list.files("D:\\Box\\VMARS\\Projects\\DAP_evaluation_Meston\\Data\\Tennessee\\lidar_tiles\\",full.names=T,recursive=T))
-ctg = lidR::catalog(list.files("D:\\Box\\VMARS\\Projects\\DAP_evaluation_Meston\\Data\\Tennessee\\lidar_tiles\\",full.names=T,recursive=T)[1])
-
-hd1 = readLASheader(list.files("D:\\Box\\VMARS\\Projects\\DAP_evaluation_Meston\\Data\\Tennessee\\lidar_tiles\\",full.names=T,recursive=T)[1])
-las1 = readLAS(list.files("D:\\Box\\VMARS\\Projects\\DAP_evaluation_Meston\\Data\\Tennessee\\lidar_tiles\\",full.names=T,recursive=T)[1])
-
-projection(hd1)
-epsg(hd1)
-epsg(las1)
-epsg(projection(ctg))
-
-scan_las(
+ las_info = scan_las(
     project="TN_lidar"
     ,project_year="2018"
     ,proj4_name=NA #"NAD_1983_HARN_StatePlane_Washington_South_FIPS_4601_Feet"
@@ -46,7 +37,24 @@ scan_las(
     ,pattern="[.]la.$"
     ,notes=""
     ,create_polys=T
+    ,recursive = T
+    ,return=T
     )
+
+#look at results that are returned directly 
+las_info$project_id
+View(las_info$las_ids) 
+plot(las_info$plys) 
+
+#grab the exact same data from geopackage
+plys = rgdal::readOGR(dsn = "D:\\Box\\VMARS\\Projects\\DAP_evaluation_Meston\\Data\\Tennessee\\lidar_tiles\\manage_las\\manage_las.gpkg" , layer = "las_polys" )
+con_gpkg = dbConnect(RSQLite::SQLite(), "D:\\Box\\VMARS\\Projects\\DAP_evaluation_Meston\\Data\\Tennessee\\lidar_tiles\\manage_las\\manage_las.gpkg")
+las_ids = dbReadTable(con_gpkg,"las_id")
+proj_id = dbReadTable(con_gpkg,"project_id")  
+
+plot(plys)
+proj_id
+View(las_ids)
 
 ```
 

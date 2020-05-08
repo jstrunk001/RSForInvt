@@ -46,32 +46,35 @@ scan_las=function(
     ,proj4_name = NA #"NAD_1983_HARN_StatePlane_Washington_South_FIPS_4601_Feet"
     ,proj4 = NA #"1395 +proj=lcc +lat_1=47.33333333333334 +lat_2=45.83333333333334 +lat_0=45.33333333333334 +lon_0=-120.5 +x_0=500000.0001016001 +y_0=0 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=us-ft +no_defs"
     ,dir_las = ""
+    ,recursive = F
     ,pattern = "[.]la.$"
     ,notes = ""
     ,create_polys = T
+    ,return = F
     ){
 
   require(uuid)
   require(RSQLite)
   require(lidR)
+  library(sf)
 
 
   proc_date=Sys.time()
 
-  files_las=list.files(dir_las,full.names=T,recursive=F,include.dirs = FALSE,pattern=pattern)
+  files_las=list.files(dir_las,full.names=T,recursive=recursive,include.dirs = FALSE,pattern=pattern )
   if(length(files_las)==0) stop("'scan_las' argument dir_las is not a directory or is empty")
-
-  #create output directory if missing
-  if(!dir.exists(project_id_folder)) dir.create(project_id_folder,recursive=T)
-
-  #get projection if missing - currently no good way to get proj4 simple name
-  if(is.na(proj4)) proj4 = lidR::readLASheader(files_las[1])
 
   #prepare / read project_id file
   project_id_folder=paste(dir_las,"/manage_las/",sep="")
   project_id_csv=paste(project_id_folder,"project_id.csv",sep="")
   las_id_csv=paste(project_id_folder,"las_id.csv",sep="")
   las_gpkg=paste(project_id_folder,"manage_las.gpkg",sep="")
+
+  #create output directory if missing
+  if(!dir.exists(project_id_folder)) dir.create(project_id_folder,recursive=T)
+
+  #get projection if missing - currently no good way to get proj4 simple name
+  if(is.na(proj4)) proj4 = projection( lidR::readLASheader(files_las[1]))
 
   #create or connect to geopackage
   con_gpkg = dbConnect(RSQLite::SQLite(), las_gpkg)
@@ -81,21 +84,13 @@ scan_las=function(
   exist_project_id_folder=dir.exists(project_id_folder)
   exist_project_id_csv=file.exists(project_id_csv)
   exist_las_id_csv=file.exists(las_id_csv)
-  exist_gpkg=file.exists(las_gpkg)
 
-  if(exist_gpkg){
-
-
-  }
-
-
-
-
+  exist_project_id_gpkg = "project_id" %in% tables_gpkg
+  exist_las_id_gpkg = "las_id" %in% tables_gpkg
+  exist_las_ply_gpkg = "las_polys" %in% tables_gpkg
 
   #if(exist_project_id_csv){
-  if(exist_las_gpkg){
-
-    tables_gpkg = dbListTables(con_gpkg)
+  if(exist_project_id_gpkg){
 
     #project_id_df=read.csv(project_id_csv,stringsAsFactors = F)
     project_id_df = dbReadTable( con_gpkg , "project_id" , stringsAsFactors = F )
@@ -119,10 +114,10 @@ scan_las=function(
   }
 
   #if(exist_las_id_csv){
-  if(exist_las_id_csv){
+  if(exist_las_id_gpkg){
 
     #las_id_df = read.csv(las_id_csv,stringsAsFactors = F)
-    las_id_df = dbReadTable(con_gpkg,stringsAsFactors = F)
+    las_id_df = dbReadTable(con_gpkg , "las_id" , stringsAsFactors = F)
 
   }else{
 
@@ -149,7 +144,7 @@ scan_las=function(
     files_las=files_las[!names_las_exist]
 
     #get lidar headers
-    headers=read_header(files_las)
+    headers=RSForInvt::read_header(files_las)
 
     #prep data for database
     names(headers)=gsub("max","max_",gsub("min","min_",tolower(names(headers))))
@@ -166,18 +161,19 @@ scan_las=function(
     else las_id_df = headers
 
     write.csv(las_id_df,las_id_csv,row.names=F)
+    dbWriteTable( con_gpkg , "las_id" , las_id_df )
 
   }
 
+  #if(exist_las_ply_gpkg) try(dbSendQuery(con_gpkg, "drop table las_polys"))
+  dbDisconnect(con_gpkg)
 
   if(create_polys){
 
-    las_id_df=read.csv(las_id_csv , stringsAsFactors =F)
-
     path_polys_rds=paste(project_id_folder,"las_polys.rds",sep="")
-    path_polys_shp=paste(project_id_folder,"las_polys.shp",sep="")
-    path_polys_gpkg=paste(project_id_folder,"las_polys.gpkg",sep="")
-    #las_id_df[is.na(las_id_df[,c("max_y")]),][1:5,]
+    #path_polys_shp=paste(project_id_folder,"las_polys.shp",sep="")
+    #path_polys_gpkg=paste(project_id_folder,"manage_las.gpkg",sep="")
+
     bad_files=apply(las_id_df[,c("min_x","max_x","min_y","max_y")],1,function(x)any(is.na(x)) )
     las_id_df1=las_id_df[!bad_files,]
 
@@ -188,12 +184,14 @@ scan_las=function(
     #save outputs
     try(saveRDS(las_polys,path_polys_rds))
     #try(maptools::writePolyShape(las_polys,polys_shp))
-    try(rgdal::writeOGR(las_polys, dsn = path_polys_gpkg , layer = "las_polys", driver="GPKG", overwrite_layer=T))
+
+    sf_obj = sf::st_as_sf(las_polys)
+    try(sf::st_write(obj = sf_obj , dsn = las_gpkg , layer = "las_polys", driver="GPKG" , layer_options = c("OVERWRITE=yes") ))
 
   }
 
 
-  dbDisconnect(con_gpkg)
+  if(return) return(list(project_id = project_id_df, las_ids = las_id_df  , plys = las_polys))
 
 }
 
