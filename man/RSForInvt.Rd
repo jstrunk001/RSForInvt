@@ -10,7 +10,7 @@ RSForInvt()
 #stuff
 }
 \description{
-Tools for forest inventory with Remote Sensing
+Tools for forest inventory with Remote Sensing - Many are Wrappers for USDA FUSION lidar .exe's
 }
 \details{
 Tools for forest inventory with Remote Sensing

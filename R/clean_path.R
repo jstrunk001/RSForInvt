@@ -1,10 +1,10 @@
 #'@name clean_path
 #'@title
-#'standardize path to file
+#'standardize paths and easy clipboard path updating
 #'
 #'@description
 #'
-#'paths often have extra slashes, or in opposing directions. This function standardizes slashes
+#'paths often have extra slashes, or in opposing directions. These functions standardize slashes
 #'
 #'@details
 #'
@@ -81,4 +81,21 @@ clean_path=function(
 #'@rdname clean_path
 #'@export
         forwardslash=function(path) clean_path(path,backslash=F)
+
+#'@rdname clean_path
+        #'@export
+        bs=function(){
+          txt = normalizePath(gsub("\"","",readClipboard()),winslash = "\\", mustWork = F)
+          writeClipboard("")
+          writeClipboard(shQuote(gsub("\\\\","\\\\\\\\",txt)))
+          txt
+        }
+#'@rdname clean_path
+        #'@export
+        fs=function(){
+          txt = normalizePath(gsub("\"","",readClipboard()),winslash = "/",F)
+          writeClipboard("")
+          writeClipboard(shQuote(txt))
+          txt
+        }
 

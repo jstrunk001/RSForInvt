@@ -4,13 +4,19 @@
 \alias{clean_path}
 \alias{backslash}
 \alias{forwardslash}
-\title{standardize path to file}
+\alias{bs}
+\alias{fs}
+\title{standardize paths and easy clipboard path updating}
 \usage{
 clean_path(path, backslash = T, force_endslash = F)
 
 backslash(path)
 
 forwardslash(path)
+
+bs()
+
+fs()
 }
 \arguments{
 \item{path}{supply a path}
@@ -23,7 +29,7 @@ forwardslash(path)
 updated path
 }
 \description{
-paths often have extra slashes, or in opposing directions. This function standardizes slashes
+paths often have extra slashes, or in opposing directions. These functions standardize slashes
 }
 \details{
 standardizes slashes - forward or back

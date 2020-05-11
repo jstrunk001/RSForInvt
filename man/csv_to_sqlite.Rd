@@ -4,14 +4,12 @@
 \alias{csv_to_sqlite}
 \title{load csvs into database}
 \usage{
-csv_to_sqlite(db, csv_folder, tb_summary = "gm_summary", tb_csv = "gm",
-  project = "naip_2015", resolution = "66", units = "feet",
-  proj4 = "", notes = "", skip_loaded = T, n_load = NA,
-  use_col_classes = T)
+csv_to_sqlite(db_csvOut, csv_folder, tb_summary = "gm_summary",
+  tb_csv = "gm", project = "naip_2015", resolution = "66",
+  units = "feet", proj4 = "", notes = "", skip_loaded = T,
+  n_load = NA, use_col_classes = T)
 }
 \arguments{
-\item{db}{sqlite database connection}
-
 \item{csv_folder}{location of csv files}
 
 \item{tb_summary}{output name of summary table of csv files}
@@ -33,6 +31,8 @@ csv_to_sqlite(db, csv_folder, tb_summary = "gm_summary", tb_csv = "gm",
 \item{n_load}{max number of files to load}
 
 \item{use_col_classes}{read colClasses from first file, and apply to remaining files - big read speedup}
+
+\item{db}{sqlite database connection}
 }
 \description{
 point at a directory and load fusion derived tabular csv data into an sqlite database

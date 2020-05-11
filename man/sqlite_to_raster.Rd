@@ -2,17 +2,33 @@
 % Please edit documentation in R/sqlite_to_raster.R
 \name{sqlite_to_raster}
 \alias{sqlite_to_raster}
-\title{Convert columns of metrics to rasters}
+\alias{colsAll}
+\alias{colsID}
+\alias{colsAllX}
+\alias{colsSomeX}
+\alias{colsFewX}
+\title{helpers to convert sqlite table to rasters}
 \usage{
-sqlite_to_raster(db, tb_csv = "gm", colsxy = c("center_x", "center_y"),
-  cols2Raster = c(colsSomeX), format = ".img",
-  dirOut = "E:\\\\projects\\\\2017_NAIP\\\\rasters\\\\", crs = NA,
-  nProc = 10, doDebug = F, doBuild = F)
+sqlite_to_raster(db, tb_gm = "gm", colsxy = c("center_x", "center_y"),
+  cols2Raster = colsSomeX(), format = ".img",
+  dirOut = "E:\\\\projects\\\\2017_NAIP\\\\rasters\\\\",
+  raster_prefix = "", crs = NA, nProc = 4, doDebug = F,
+  doBuild = F)
+
+colsAll(thresh = "6_00")
+
+colsID()
+
+colsAllX(thresh = "6_00")
+
+colsSomeX(thresh = "6_00")
+
+colsFewX(thresh = "6_00")
 }
 \arguments{
 \item{db}{a database object, tested for sqlite database}
 
-\item{tb_csv}{which table has data}
+\item{tb_gm}{which table has gridmetrics data}
 
 \item{colsxy}{names of xy columns}
 
@@ -22,11 +38,15 @@ sqlite_to_raster(db, tb_csv = "gm", colsxy = c("center_x", "center_y"),
 
 \item{dirOut}{where to export rasters}
 
+\item{raster_prefix}{give a name to rasters for id purposes}
+
 \item{crs}{proj4 string or other crs notation used by raster package (see writeRaster)}
 
 \item{nProc}{number of cores to use in converting to raster}
 
 \item{doDebug}{run in debug mode and only read 50k rows?}
+
+\item{thresh}{character string like "2_50" that matches height representation in column names in tb_gm}
 }
 \value{
 <Delete and Replace>
