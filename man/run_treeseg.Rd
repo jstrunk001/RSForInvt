@@ -4,9 +4,15 @@
 \alias{run_treeseg}
 \title{runs treeSeg.exe (USDA FUSION) across a bunch of .dtm caanopy surfaces}
 \usage{
-run_treeseg(dir_dtms = NA, dtm_paths = NA, dir_out = NA,
-  ht_threshold = 40, switches = "/shape",
-  treeseg_path = "c:\\\\fusion\\\\treeseg.exe", ncore = 4)
+run_treeseg(
+  dir_dtms = NA,
+  dtm_paths = NA,
+  dir_out = NA,
+  ht_threshold = 40,
+  switches = "/shape",
+  treeseg_path = "c:\\\\fusion\\\\treeseg.exe",
+  ncore = 4
+)
 }
 \arguments{
 \item{dir_dtms}{(character - optional) must provide either dir_dtm - a directory with .dtm CSM files - or dtm_paths}

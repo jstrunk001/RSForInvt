@@ -4,9 +4,18 @@
 \alias{scan_las}
 \title{scan las files and add them to summary table}
 \usage{
-scan_las(project = "some_project", project_year = "2099",
-  proj4_name = NA, proj4 = NA, dir_las = "", recursive = F,
-  pattern = "[.]la.$", notes = "", create_polys = T, return = F)
+scan_las(
+  project = "some_project",
+  project_year = "2099",
+  proj4_name = NA,
+  proj4 = NA,
+  dir_las = "",
+  recursive = F,
+  pattern = "[.]la.$",
+  notes = "",
+  create_polys = T,
+  return = F
+)
 }
 \arguments{
 \item{project}{name of lidar project}

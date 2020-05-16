@@ -4,18 +4,23 @@
 \alias{getFIA}
 \title{Get FIA data from citrix (Make Sure You Are Using 32bit R)}
 \usage{
-getFIA(nims_channel, dbqrys = c(tr =
-  "select * from fs_nims_pnwrs.nims_tree_vw where statecd > -1 and invyr > -1 and COUNTYCD < 10E6 and rownum < 50",
-  pl_snp =
-  "select * from fs_nims_pnwrs.nims_plotsnap_vw where statecd > -1 and invyr > -1 and COUNTYCD < 10E6 and rownum < 50",
-  cond =
-  "select * from fs_nims_pnwrs.nims_cond_vw where statecd > -1 and invyr > -1 and COUNTYCD < 10E6 and rownum < 50",
-  coords =
-  "select * from FS_NIMS_PNWRS.NIMS_GPS_PNWRS where statecd > -1 and SAMPLE_YEAR > -1 and COUNTYCD < 10E6 and rownum < 50",
-  wts =
-  "select * from fs_nims_pnwrs.nims_pop_expall_vw where statecd > -1 and invyr > -1 and COUNTYCD < 10E6 and rownum < 50"),
+getFIA(
+  nims_channel,
+  dbqrys = c(tr =
+    "select * from fs_nims_pnwrs.nims_tree_vw where statecd > -1 and invyr > -1 and COUNTYCD < 10E6 and rownum < 50",
+    pl_snp =
+    "select * from fs_nims_pnwrs.nims_plotsnap_vw where statecd > -1 and invyr > -1 and COUNTYCD < 10E6 and rownum < 50",
+    cond =
+    "select * from fs_nims_pnwrs.nims_cond_vw where statecd > -1 and invyr > -1 and COUNTYCD < 10E6 and rownum < 50",
+    coords =
+    "select * from FS_NIMS_PNWRS.NIMS_GPS_PNWRS where statecd > -1 and SAMPLE_YEAR > -1 and COUNTYCD < 10E6 and rownum < 50",
+    wts =
+    "select * from fs_nims_pnwrs.nims_pop_expall_vw where statecd > -1 and invyr > -1 and COUNTYCD < 10E6 and rownum < 50"),
   dir_out = c(file.path("c:/data/RFIA/NIMS", format(Sys.Date())), NA),
-  return = F, put_data_parent_env = F, stringsAsFactors = F)
+  return = F,
+  put_data_parent_env = F,
+  stringsAsFactors = F
+)
 }
 \arguments{
 \item{nims_channel}{<Delete and Replace>}

@@ -5,11 +5,27 @@
 \alias{pdf_compare}
 \title{fit and compare pdfs}
 \usage{
-fit_pdf(y, wts = NA, bins = NA, breaks = NA, lims = range(c(y,
-  bins)), MA = TRUE, MA_n = 3, plot = F)
+fit_pdf(
+  y,
+  wts = NA,
+  bins = NA,
+  breaks = NA,
+  lims = range(c(y, bins)),
+  MA = TRUE,
+  MA_n = 3,
+  plot = F
+)
 
-pdf_compare(fit_pdf1, fit_pdf2, plot = TRUE, legend = T,
-  xlab = "bin", ylab = "y_dens", add = F, ...)
+pdf_compare(
+  fit_pdf1,
+  fit_pdf2,
+  plot = TRUE,
+  legend = T,
+  xlab = "bin",
+  ylab = "y_dens",
+  add = F,
+  ...
+)
 }
 \arguments{
 \item{y}{vector of respone values}
@@ -24,7 +40,7 @@ pdf_compare(fit_pdf1, fit_pdf2, plot = TRUE, legend = T,
 
 \item{MA_n}{number of bins to include in smoother}
 
-\item{plot}{T/F plot histograms of pdf?}
+\item{plot}{T/F plot two histograms?}
 
 \item{fit_pdf1}{first pdf to use in comparison - object returned by fit_pdf()}
 
@@ -33,8 +49,6 @@ pdf_compare(fit_pdf1, fit_pdf2, plot = TRUE, legend = T,
 \item{add}{T/F histogram to existing plot? - in the case of multiple comparisons...}
 
 \item{...}{additional arguments to plot}
-
-\item{plot}{T/F plot two histograms?}
 }
 \value{
 fit_pdf: a pdf specially prepared to be handled by pdf_compare

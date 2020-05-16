@@ -12,25 +12,48 @@
 \alias{lm_summary}
 \title{functions related to modeling}
 \usage{
-reg_model(dat_yx, reg_obj, rank = 1, rank_by = c("bic", "rsq", "rss",
-  "adjr2", "cp"), debug = FALSE, ...)
+reg_model(
+  dat_yx,
+  reg_obj,
+  rank = 1,
+  rank_by = c("bic", "rsq", "rss", "adjr2", "cp"),
+  debug = FALSE,
+  ...
+)
 
 lm_boot(model, y = NA, data = NA, n_boot = 50)
 
 many_boots(model, n_range, r_boots = 10, n_clus = 1, lm_boot, ...)
 
-reg_multi(y_vars, data, form_y = c("y~.", "y~.*."), n_v_max = 3,
-  n_best = 1, really_big = FALSE, n_clus = 1, ...)
+reg_multi(
+  y_vars,
+  data,
+  form_y = c("y~.", "y~.*."),
+  n_v_max = 3,
+  n_best = 1,
+  really_big = FALSE,
+  n_clus = 1,
+  ...
+)
 
 mod_multi(reg_multi_obj, data, ...)
 
-pred_multi(mods, data, dat0, id_col, n_clus = 1, clus = NA,
-  out_dir = NULL, se_fit = TRUE, return = FALSE, fix_outliers = T,
-  outlier_fun = function(y0, yhat, yhat_se) {     large = yhat > max(y0)
-  * 1.5     small = yhat < 0     yhat[small] = 0     yhat[large] =
-  quantile(y0, 0.99) * 1.5     yhat_se[large] = max(yhat_se[!large &
-  !small])     yhat_se[small] = max(yhat_se[!large & !small])    
-  data.frame(fit = yhat, se_fit = yhat_se) })
+pred_multi(
+  mods,
+  data,
+  dat0,
+  id_col,
+  n_clus = 1,
+  clus = NA,
+  out_dir = NULL,
+  se_fit = TRUE,
+  return = FALSE,
+  fix_outliers = T,
+  outlier_fun = function(y0, yhat, yhat_se) {     large = yhat > max(y0) * 1.5    
+    small = yhat < 0     yhat[small] = 0     yhat[large] = quantile(y0, 0.99) * 1.5    
+    yhat_se[large] = max(yhat_se[!large & !small])     yhat_se[small] =
+    max(yhat_se[!large & !small])     data.frame(fit = yhat, se_fit = yhat_se) }
+)
 
 multi_bs(mods, n_boot = 50, n_clus, lm_boot)
 
@@ -49,7 +72,7 @@ lm_summary(x, data, resids = FALSE)
 
 \item{...}{tbd
 \cr\cr
-\bold{lm_boot() parameters:}}
+\bold{pred_multi() parameters:}}
 
 \item{model}{tbd}
 
@@ -57,9 +80,7 @@ lm_summary(x, data, resids = FALSE)
 
 \item{data}{tbd}
 
-\item{n_boot}{tbd
-\cr\cr
-\bold{many_boots() parameters:}}
+\item{n_boot}{tbd}
 
 \item{n_range}{tbd}
 
@@ -67,7 +88,9 @@ lm_summary(x, data, resids = FALSE)
 
 \item{n_clus}{tbd}
 
-\item{lm_boot}{tbd}
+\item{lm_boot}{tbd
+\cr\cr
+\bold{lm_summary() parameters:}}
 
 \item{y_vars}{tbd}
 
@@ -104,42 +127,6 @@ lm_summary(x, data, resids = FALSE)
 \item{x}{tbd}
 
 \item{resids}{tbd}
-
-\item{model}{tbd}
-
-\item{...}{tbd
-\cr\cr
-\bold{reg_multi() parameters:}}
-
-\item{data}{tbd}
-
-\item{n_clus}{tbd}
-
-\item{...}{tbd
-\cr\cr
-\bold{mod_multi() parameters:}}
-
-\item{data}{tbd}
-
-\item{...}{tbd
-\cr\cr
-\bold{pred_multi() parameters:}}
-
-\item{data}{tbd}
-
-\item{n_clus}{tbd}
-
-\item{mods}{tbd}
-
-\item{n_boot}{tbd}
-
-\item{n_clus}{tbd}
-
-\item{lm_boot}{tbd
-\cr\cr
-\bold{lm_summary() parameters:}}
-
-\item{data}{tbd}
 }
 \value{
 reg_model:

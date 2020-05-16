@@ -4,11 +4,24 @@
 \alias{experimental_metrics}
 \title{compute experimental lidar metrics}
 \usage{
-experimental_metrics(x = NA, y = NA, z = NA, i = NA, rn = NA,
-  cl = NA, r = NA, g = NA, b = NA, resxy = 20, resxyz = 20,
-  ressurf = 5, htcover = 6, zthresh = c(3, 6, 12, 20),
-  adjustz = c("none", "positive", "min0", "zq01"), outlier = c(min =
-  NA, max = NA))
+experimental_metrics(
+  x = NA,
+  y = NA,
+  z = NA,
+  i = NA,
+  rn = NA,
+  cl = NA,
+  r = NA,
+  g = NA,
+  b = NA,
+  resxy = 20,
+  resxyz = 20,
+  ressurf = 5,
+  htcover = 6,
+  zthresh = c(3, 6, 12, 20),
+  adjustz = c("none", "positive", "min0", "zq01"),
+  outlier = c(min = NA, max = NA)
+)
 }
 \arguments{
 \item{x}{lidR object X vector : las1$X}

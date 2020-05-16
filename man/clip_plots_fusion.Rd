@@ -4,10 +4,18 @@
 \alias{clip_plots_fusion}
 \title{clip plots or polygons form lidar}
 \usage{
-clip_plots_fusion(idxyd = NA, dir_las = NA, dir_dtm = NA,
-  dir_clipdata = "c:\\\\fusion\\\\clipdata.exe", dir_out = NA,
-  out_f = c(".las", ".laz"), clipdata_switches = c("/height /shape:1",
-  "")[1], n_core = 6, temp = "c:\\\\temp\\\\clipdata", run = T)
+clip_plots_fusion(
+  idxyd = NA,
+  dir_las = NA,
+  dir_dtm = NA,
+  dir_clipdata = "c:\\\\fusion\\\\clipdata.exe",
+  dir_out = NA,
+  out_f = c(".las", ".laz"),
+  clipdata_switches = c("/height /shape:1", "")[1],
+  n_core = 6,
+  temp = "c:\\\\temp\\\\clipdata",
+  run = T
+)
 }
 \value{
 <Delete and Replace>

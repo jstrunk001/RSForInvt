@@ -4,21 +4,37 @@
 \alias{run_gridmetrics}
 \title{run gridmetrics across a project}
 \usage{
-run_gridmetrics(proj_polys = NA, proj_gpkg_path = NA,
+run_gridmetrics(
+  proj_polys = NA,
+  proj_gpkg_path = NA,
   layer_proj_polys = "RSForInvt_prj",
   layer_proj_config = "RSForInvt_config",
-  dir_out = "c:/temp/test_project/gridmetrics", n_core = 4,
+  dir_out = "c:/temp/test_project/gridmetrics",
+  n_core = 4,
   gridmetrics_path = "c:\\\\fusion\\\\gridmetrics.exe",
-  heightbreak = 6, cellsize = 66, minht = 6, first = T,
-  intensity = F, outlier = c(-5, 400),
-  fusion_switches = "/nointensity /first", xmn = 561066,
-  xmx = 2805066, ymn = 33066, ymx = 1551066,
-  fun = compute_metrics2, temp = "c:\\\\temp\\\\run_gridmetrics\\\\",
-  fast_cache = NA, n_cache = 90, new_dtm_path = c(from = NA, to =
-  NA), new_las_path = c(from = NA, to = NA), skip_existing = T,
+  heightbreak = 6,
+  cellsize = 66,
+  minht = 6,
+  first = T,
+  intensity = F,
+  outlier = c(-5, 400),
+  fusion_switches = "/nointensity /first",
+  xmn = 561066,
+  xmx = 2805066,
+  ymn = 33066,
+  ymx = 1551066,
+  fun = compute_metrics2,
+  temp = "c:\\\\temp\\\\run_gridmetrics\\\\",
+  fast_cache = NA,
+  n_cache = 90,
+  new_dtm_path = c(from = NA, to = NA),
+  new_las_path = c(from = NA, to = NA),
+  skip_existing = T,
   existing_coms = c(NA,
-  "C:\\\\Temp\\\\run_gridmetrics\\\\2017Aug17_100740\\\\all_commands.txt"),
-  debug = F, ...)
+    "C:\\\\Temp\\\\run_gridmetrics\\\\2017Aug17_100740\\\\all_commands.txt"),
+  debug = F,
+  ...
+)
 }
 \arguments{
 \item{n_core}{number of corest to run process on}

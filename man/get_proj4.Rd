@@ -4,8 +4,14 @@
 \alias{get_proj4}
 \title{Search for proj4 string}
 \usage{
-get_proj4(details = c("HARN", "wash", "ftUS", "nad83"), EPSG,
-  omit = "deprecated", ignore.case = T, fixed = T, ...)
+get_proj4(
+  details = c("HARN", "wash", "ftUS", "nad83"),
+  EPSG,
+  omit = "deprecated",
+  ignore.case = T,
+  fixed = T,
+  ...
+)
 }
 \arguments{
 \item{details}{strings to use in searching for projection nam}

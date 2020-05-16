@@ -9,11 +9,19 @@
 \alias{colsFewX}
 \title{helpers to convert sqlite table to rasters}
 \usage{
-sqlite_to_raster(db, tb_gm = "gm", colsxy = c("center_x", "center_y"),
-  cols2Raster = colsSomeX(), format = ".img",
+sqlite_to_raster(
+  db,
+  tb_gm = "gm",
+  colsxy = c("center_x", "center_y"),
+  cols2Raster = colsSomeX(),
+  format = ".img",
   dirOut = "E:\\\\projects\\\\2017_NAIP\\\\rasters\\\\",
-  raster_prefix = "", crs = NA, nProc = 4, doDebug = F,
-  doBuild = F)
+  raster_prefix = "",
+  crs = NA,
+  nProc = 4,
+  doDebug = F,
+  doBuild = F
+)
 
 colsAll(thresh = "6_00")
 

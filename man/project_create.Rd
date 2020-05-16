@@ -4,18 +4,32 @@
 \alias{project_create}
 \title{Build point cloud processing tiling project (.laz, .las, .dtm) for use with FUSION}
 \usage{
-project_create(dir_las = NA, dir_dtm = NA, recurse_dtm = F,
+project_create(
+  dir_las = NA,
+  dir_dtm = NA,
+  recurse_dtm = F,
   recurse_las = F,
   path_gpkg_out = "c:/lidar_projects/someProject_RSForInvt.gpkg",
-  layer_project = "RSForInvt_prj", layer_config = "RSForInvt_config",
-  overwrite_project = T, project_dtm = "someProject_dtm",
-  project_las = "someProject_las", dtm_year = "2099",
-  las_year = "2099", do_scan_dtms = T, do_scan_las = T,
-  tile_size = 1650, pixel_size = 66, xmn = c(NA, 561066),
-  xmx = c(NA, 2805066), ymn = c(NA, 33066), ymx = c(NA, 1551066),
+  layer_project = "RSForInvt_prj",
+  layer_config = "RSForInvt_config",
+  overwrite_project = T,
+  project_dtm = "someProject_dtm",
+  project_las = "someProject_las",
+  dtm_year = "2099",
+  las_year = "2099",
+  do_scan_dtms = T,
+  do_scan_las = T,
+  tile_size = 1650,
+  pixel_size = 66,
+  xmn = c(NA, 561066),
+  xmx = c(NA, 2805066),
+  ymn = c(NA, 33066),
+  ymx = c(NA, 1551066),
   proj4 = c(NA,
-  "+proj=lcc +lat_1=47.33333333333334 +lat_2=45.83333333333334 +lat_0=45.33333333333334 +lon_0=-120.5 +x_0=500000.0001016001 +y_0=0 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=us-ft +no_defs"),
-  mask = NA, return = T)
+    "+proj=lcc +lat_1=47.33333333333334 +lat_2=45.83333333333334 +lat_0=45.33333333333334 +lon_0=-120.5 +x_0=500000.0001016001 +y_0=0 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=us-ft +no_defs"),
+  mask = NA,
+  return = T
+)
 }
 \arguments{
 \item{dir_las}{where are las files}

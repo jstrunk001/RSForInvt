@@ -4,13 +4,27 @@
 \alias{project_subset}
 \title{subset tiles in a RSForInvt project}
 \usage{
-project_subset(project_ply, subset_ply, path_out_gpkg = NA,
-  layer_out_gpkg = "project_subset", path_out_csv = c(NA, ""),
-  ignore_proj4 = T, return = F, plot = T)
+project_subset(
+  project_ply,
+  subset_ply,
+  path_out_gpkg = NA,
+  layer_out_gpkg = "project_subset",
+  path_out_csv = c(NA, ""),
+  ignore_proj4 = T,
+  return = F,
+  plot = T
+)
 
-project_subset(project_ply, subset_ply, path_out_gpkg = NA,
-  layer_out_gpkg = "project_subset", path_out_csv = c(NA, ""),
-  ignore_proj4 = T, return = F, plot = T)
+project_subset(
+  project_ply,
+  subset_ply,
+  path_out_gpkg = NA,
+  layer_out_gpkg = "project_subset",
+  path_out_csv = c(NA, ""),
+  ignore_proj4 = T,
+  return = F,
+  plot = T
+)
 }
 \arguments{
 \item{ignore_proj4}{should proj4 differences be ignored}
@@ -24,18 +38,6 @@ project_subset(project_ply, subset_ply, path_out_gpkg = NA,
 \item{path_shapefile}{path to shapefile}
 
 \item{dir_out}{where to put subset}
-
-\item{path_project}{path to project file}
-
-\item{path_shapefile}{path to shapefile}
-
-\item{ignore_proj4}{should proj4 differences be ignored}
-
-\item{dir_out}{where to put subset}
-
-\item{return}{should the subset project be returned}
-
-\item{plot}{show a plot of project subset}
 }
 \description{
 supply a polygon and subset tiles in a lasR project

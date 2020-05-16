@@ -4,10 +4,20 @@
 \alias{csv_to_sqlite}
 \title{load csvs into database}
 \usage{
-csv_to_sqlite(db_csvOut, csv_folder, tb_summary = "gm_summary",
-  tb_csv = "gm", project = "naip_2015", resolution = "66",
-  units = "feet", proj4 = "", notes = "", skip_loaded = T,
-  n_load = NA, use_col_classes = T)
+csv_to_sqlite(
+  db_csvOut,
+  csv_folder,
+  tb_summary = "gm_summary",
+  tb_csv = "gm",
+  project = "naip_2015",
+  resolution = "66",
+  units = "feet",
+  proj4 = "",
+  notes = "",
+  skip_loaded = T,
+  n_load = NA,
+  use_col_classes = T
+)
 }
 \arguments{
 \item{csv_folder}{location of csv files}

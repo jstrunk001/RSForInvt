@@ -4,21 +4,39 @@
 \alias{run_canopyModel}
 \title{run gridmetrics across a project}
 \usage{
-run_canopyModel(proj_polys = NA, proj_gpkg_path = NA,
+run_canopyModel(
+  proj_polys = NA,
+  proj_gpkg_path = NA,
   layer_proj_polys = "RSForInvt_prj",
   layer_proj_config = "RSForInvt_config",
-  dir_out = "c:/temp/test_project/canopymodel", n_core = 4,
-  fusion_path = "c:\\\\fusion\\\\canopymodel.exe", cellsize = 5,
-  xyunits = c("F", "M"), zunits = c("F", "M"), cdsys = c(0, 1, 2),
-  zone = c(0, 1, 2), hzd = c(0, 1, 2), vtd = c(0, 1, 2, 3),
-  outlier = c(-5, 400), fusion_switches = NA, xmn = 561066,
-  xmx = 2805066, ymn = 33066, ymx = 1551066,
-  fun = compute_metrics2, temp = "c:\\\\temp\\\\run_canopymodel\\\\",
-  dir_dtm = NA, dir_las = NA, new_dtm_path = c(from = NA, to = NA),
-  new_las_path = c(from = NA, to = NA), skip_existing = T,
+  dir_out = "c:/temp/test_project/canopymodel",
+  n_core = 4,
+  fusion_path = "c:\\\\fusion\\\\canopymodel.exe",
+  cellsize = 5,
+  xyunits = c("F", "M"),
+  zunits = c("F", "M"),
+  cdsys = c(0, 1, 2),
+  zone = c(0, 1, 2),
+  hzd = c(0, 1, 2),
+  vtd = c(0, 1, 2, 3),
+  outlier = c(-5, 400),
+  fusion_switches = NA,
+  xmn = 561066,
+  xmx = 2805066,
+  ymn = 33066,
+  ymx = 1551066,
+  fun = compute_metrics2,
+  temp = "c:\\\\temp\\\\run_canopymodel\\\\",
+  dir_dtm = NA,
+  dir_las = NA,
+  new_dtm_path = c(from = NA, to = NA),
+  new_las_path = c(from = NA, to = NA),
+  skip_existing = T,
   existing_coms = c(NA,
-  "C:\\\\Temp\\\\run_gridmetrics\\\\2017Aug17_100740\\\\all_commands_canopyModel.txt"),
-  debug = F, ...)
+    "C:\\\\Temp\\\\run_gridmetrics\\\\2017Aug17_100740\\\\all_commands_canopyModel.txt"),
+  debug = F,
+  ...
+)
 }
 \arguments{
 \item{dir_out}{where should csv files be sent}

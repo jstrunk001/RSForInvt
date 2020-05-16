@@ -4,8 +4,7 @@
 \alias{read_header}
 \title{read an las/laz file header}
 \usage{
-read_header(paths = NA, dir_las = NA, recursive = F,
-  pattern = "[.]la.$", ...)
+read_header(paths = NA, dir_las = NA, recursive = F, pattern = "[.]la.$", ...)
 }
 \arguments{
 \item{paths}{vector of paths to las files}

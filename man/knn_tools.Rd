@@ -11,37 +11,68 @@
 \alias{yai_cv}
 \title{helpers for tree list imputation, knn}
 \usage{
-yai_id(xNms = NULL, yNms = NULL, idNm = NULL, data = NULL,
-  omity = NULL, dup_ids_remove = T, ...)
+yai_id(
+  xNms = NULL,
+  yNms = NULL,
+  idNm = NULL,
+  data = NULL,
+  omity = NULL,
+  dup_ids_remove = T,
+  ...
+)
 
 newtargets_id(yai_mod, idNm, data, ann = NULL)
 
 impute_id(newtargs_id, ...)
 
-yai_weights(yaimod, dtype = c("invdist", "invdist2", "eq"),
-  zero_dist = c("small", "min", "NA"))
+yai_weights(
+  yaimod,
+  dtype = c("invdist", "invdist2", "eq"),
+  zero_dist = c("small", "min", "NA")
+)
 
-tl_impute(wts, idNm, cols_knn_id = "col_id", cols_knn_wt = "col_wt",
-  trees, sort_targets = F, debug = F)
+tl_impute(
+  wts,
+  idNm,
+  cols_knn_id = "col_id",
+  cols_knn_wt = "col_wt",
+  trees,
+  sort_targets = F,
+  debug = F
+)
 
-tl_impute_2(wts, idNm, cols_knn_id = "col_id", cols_knn_wt = "col_wt",
-  trees, debug = F)
+tl_impute_2(
+  wts,
+  idNm,
+  cols_knn_id = "col_id",
+  cols_knn_wt = "col_wt",
+  trees,
+  debug = F
+)
 
-yai_cv(omit = 5, idNm, xNm, yNm, data, iter_max = 500, k = 5,
-  debug = FALSE, method = "msn", min_rows = 15,
-  method_impute = c("closest", "mean", "median", "dstWeighted"), ...)
+yai_cv(
+  omit = 5,
+  idNm,
+  xNm,
+  yNm,
+  data,
+  iter_max = 500,
+  k = 5,
+  debug = FALSE,
+  method = "msn",
+  min_rows = 15,
+  method_impute = c("closest", "mean", "median", "dstWeighted"),
+  ...
+)
 }
 \arguments{
 \item{idNm}{name of id field}
 
-\item{data}{data to use for knn}
+\item{data}{input data}
 
 \item{omity}{optional: records to omit}
 
-\item{...}{additional arguments to yai in yaImpute package
-
-\cr\cr
-\bold{newtargets_id() parameters:}}
+\item{...}{other arguments to ??}
 
 \item{yai_mod}{model returned by yai_id}
 
@@ -62,10 +93,7 @@ yai_cv(omit = 5, idNm, xNm, yNm, data, iter_max = 500, k = 5,
 
 \item{cols_knn_wt}{col names of knn wts}
 
-\item{debug}{T/F debug?
-
-\cr\cr
-\bold{yai_cv() parameters:}}
+\item{debug}{T/F}
 
 \item{omit}{observation to omit at time i}
 
@@ -83,11 +111,6 @@ yai_cv(omit = 5, idNm, xNm, yNm, data, iter_max = 500, k = 5,
 
 \item{id}{id column}
 
-\item{data}{dataset with new xy variables}
-
-\item{...}{\cr\cr
-\bold{yai_weights() parameters:}}
-
 \item{zero_dist()}{how to deal with zero distances (e.g. when everything is zero)
 
 \cr\cr
@@ -97,17 +120,9 @@ yai_cv(omit = 5, idNm, xNm, yNm, data, iter_max = 500, k = 5,
 
 \item{tr_pl}{tree records}
 
-\item{idNm}{name of id field}
-
 \item{x}{?}
 
-\item{data}{input data}
-
 \item{max_comb}{??}
-
-\item{debug}{T/F}
-
-\item{...}{other arguments to ??}
 }
 \value{
 yai_id: \cr

@@ -4,11 +4,24 @@
 \alias{clip_plots}
 \title{clip plots or polygons form lidar}
 \usage{
-clip_plots(idxyd = NA, idxy = NA, plot_polys = NA,
-  id_field_plots = "plot", lasR_project = NA,
-  lasR_project_polys = NA, plot_tile_intersect = NA, dir_out = NA,
-  height = F, do_plot = F, return = F, n_core = 6, dir_dtm = NA,
-  dir_las = NA, skip_existing = T, fix_dsm_bug = F)
+clip_plots(
+  idxyd = NA,
+  idxy = NA,
+  plot_polys = NA,
+  id_field_plots = "plot",
+  lasR_project = NA,
+  lasR_project_polys = NA,
+  plot_tile_intersect = NA,
+  dir_out = NA,
+  height = F,
+  do_plot = F,
+  return = F,
+  n_core = 6,
+  dir_dtm = NA,
+  dir_las = NA,
+  skip_existing = T,
+  fix_dsm_bug = F
+)
 }
 \arguments{
 \item{idxyd}{dataframe with point id, x and y coordinates, and circle diameter}

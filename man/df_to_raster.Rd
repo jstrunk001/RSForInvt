@@ -4,10 +4,16 @@
 \alias{df_to_raster}
 \title{Convert columns of metrics in a data.frame to rasters, requires}
 \usage{
-df_to_raster(df, colsxy = c("center_x", "center_y"),
-  cols2Raster = c(colsSomeX), format = ".img",
-  dirOut = "E:\\\\projects\\\\2017_NAIP\\\\rasters\\\\", crs = NA,
-  nProc = 10, doDebug = F)
+df_to_raster(
+  df,
+  colsxy = c("center_x", "center_y"),
+  cols2Raster = c(colsSomeX),
+  format = ".img",
+  dirOut = "E:\\\\projects\\\\2017_NAIP\\\\rasters\\\\",
+  crs = NA,
+  nProc = 10,
+  doDebug = F
+)
 }
 \arguments{
 \item{df}{a dataframe with xy and columns to use in making a rasters}

@@ -4,9 +4,15 @@
 \alias{search_text}
 \title{search for string in text files in a directory}
 \usage{
-search_text(match_string = "", directory = NA, file = NA,
-  pattern = ".r", pattern_omit = c(NA, "dev_"), recursive = T,
-  clus = NA)
+search_text(
+  match_string = "",
+  directory = NA,
+  file = NA,
+  pattern = ".r",
+  pattern_omit = c(NA, "dev_"),
+  recursive = T,
+  clus = NA
+)
 }
 \arguments{
 \item{match_string}{string to find within searched files}

@@ -4,9 +4,20 @@
 \alias{pairs2}
 \title{xy plot of variables in two dataframes}
 \usage{
-pairs2(x, y, str_max = 12, oneLine = F, mai_fig = c(0.3, 0.3, 0.3,
-  0.1), mai_edge = c(0, 0, 0, 0), title = NA, lattice = F,
-  pdf_out = NA, pdf_ht = 8, pdf_wd = 11, ...)
+pairs2(
+  x,
+  y,
+  str_max = 12,
+  oneLine = F,
+  mai_fig = c(0.3, 0.3, 0.3, 0.1),
+  mai_edge = c(0, 0, 0, 0),
+  title = NA,
+  lattice = F,
+  pdf_out = NA,
+  pdf_ht = 8,
+  pdf_wd = 11,
+  ...
+)
 }
 \arguments{
 \item{x}{first data.frame}

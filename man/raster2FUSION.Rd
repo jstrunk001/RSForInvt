@@ -4,8 +4,14 @@
 \alias{raster2FUSION}
 \title{<Delete and Replace>}
 \usage{
-raster2FUSION(dir_in, dir_out, pattern = "[.]img", recursive = T,
-  ncore = 4, ...)
+raster2FUSION(
+  dir_in,
+  dir_out,
+  pattern = "[.]img",
+  recursive = T,
+  ncore = 4,
+  ...
+)
 }
 \arguments{
 \item{dir_in}{where are the input rasters}
