@@ -93,8 +93,8 @@ NVEL_voleq = function(
   ,districtNm = "district"
   ,spcdNm = "spcd"
 
-  ,dll_64 = 'code/VolLibDll20190514/vollib-64bits/vollib.dll'
-  ,dll_32 = 'code/VolLibDll20190514/vollib-32bits/vollib.dll'
+  ,dll_64 = 'lib/VolLibDll20190514/vollib-64bits/vollib.dll'
+  ,dll_32 = 'lib/VolLibDll20190514/vollib-32bits/vollib.dll'
   ,dll_func_voleq = "getvoleq_r"
   ,load_dll = T
 
@@ -137,8 +137,11 @@ NVEL_voleq = function(
   arch_in = R.Version()$arch
   loaded_dlls_in = names(getLoadedDLLs())
   dll_loaded = "vollib" %in% loaded_dlls_in
-  if(arch_in == "x86_64" & !dll_loaded) library.dynam(dll_64)
-  if(arch_in == "x86_32" & !dll_loaded) library.dynam(dll_32)
+  if(arch_in == "x86_64" & !dll_loaded) dyn.load(system.file(dll_64, package="RSForInvt"))
+  if(arch_in == "x86_32" & !dll_loaded) dyn.load(system.file(dll_32, package="RSForInvt"))
+
+  system.file(dll_64, package="RSForInvt")
+
 }
 
 

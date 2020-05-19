@@ -257,15 +257,15 @@ NVEL_volume=function(
   data.frame(dfTL0_in,vol_pd0_df)
 
 }
-
-#load dll if needed
-.load_dll = function(dll_64,dll_32,dll_func ){
-  arch_in = R.Version()$arch
-  loaded_dlls_in = names(getLoadedDLLs())
-  dll_loaded = "vollib" %in% loaded_dlls_in
-  if(arch_in == "x86_64" & !dll_loaded) library.dynam(dll_64)
-  if(arch_in == "x86_32" & !dll_loaded) library.dynam(dll_32)
-}
+#
+# #load dll if needed
+# .load_dll = function(dll_64,dll_32,dll_func ){
+#   arch_in = R.Version()$arch
+#   loaded_dlls_in = names(getLoadedDLLs())
+#   dll_loaded = "vollib" %in% loaded_dlls_in
+#   if(arch_in == "x86_64" & !dll_loaded) library.dynam(dll_64)
+#   if(arch_in == "x86_32" & !dll_loaded) library.dynam(dll_32)
+# }
 
 #call fortran
 .fn_fortran_vol = function(
