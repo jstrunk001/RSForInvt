@@ -148,8 +148,8 @@ NVEL_volume=function(
   ,dbtbhNm = c("dbtbh")
   ,btrNm = c("btr")
 
-  ,dll_64 = 'code/VolLibDll20190514/vollib-64bits/vollib.dll'
-  ,dll_32 = 'code/VolLibDll20190514/vollib-32bits/vollib.dll'
+  ,dll_64 = 'lib/vollib-64bits/vollib.dll'
+  ,dll_32 = 'lib/vollib-32bits/vollib.dll'
   ,load_dll = T
 
   ,dll_func_vol = "vollib_r"
@@ -209,7 +209,7 @@ NVEL_volume=function(
                       ,forestNm = "forest"
                       ,districtNm = "district"
                       ,spcdNm = "spcd"
-                      ,dll_func_voleq = dll_func_voleq
+                      #,dll_func_voleq = dll_func_voleq
                       ,load_dll = F
                       )
     dfTL0_in[,"voleq"] = vol_eqns_in[,"voleq"]
@@ -257,15 +257,17 @@ NVEL_volume=function(
   data.frame(dfTL0_in,vol_pd0_df)
 
 }
-#
-# #load dll if needed
-# .load_dll = function(dll_64,dll_32,dll_func ){
-#   arch_in = R.Version()$arch
-#   loaded_dlls_in = names(getLoadedDLLs())
-#   dll_loaded = "vollib" %in% loaded_dlls_in
-#   if(arch_in == "x86_64" & !dll_loaded) library.dynam(dll_64)
-#   if(arch_in == "x86_32" & !dll_loaded) library.dynam(dll_32)
-# }
+
+#load dll if needed
+.load_dll = function(dll_64,dll_32,dll_func ){
+
+  arch_in = R.Version()$arch
+  loaded_dlls_in = names(getLoadedDLLs())
+  dll_loaded = "vollib" %in% loaded_dlls_in
+  if(arch_in == "x86_64" & !dll_loaded) dyn.load(system.file(dll_64, package="RSForInvt"))
+  if(arch_in == "x86_32" & !dll_loaded) dyn.load(system.file(dll_32, package="RSForInvt"))
+
+}
 
 #call fortran
 .fn_fortran_vol = function(
@@ -287,10 +289,12 @@ NVEL_volume=function(
                     ,fclass
                     ,dbtbh
                     ,btr
-                    ,dll_func_vol){
+                    ,dll_func_vol
+                    ){
 
 
-    res_vol0 =.Fortran(dll_func_vol
+    res_vol0 =.Fortran(
+              dll_func_vol
              ,as.character(voleq)
              ,as.integer(region)
              ,as.character(forest)
@@ -310,6 +314,7 @@ NVEL_volume=function(
              ,as.double(btr)
              ,as.double(c(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0))
              ,as.integer(0)
+             ,PACKAGE = "vollib"
              )
     #return
     data.frame(t(res_vol0[[18]] ),err=res_vol0[[19]])
@@ -409,8 +414,6 @@ NVEL_volume=function(
 
 }
 
-
-
 #examples of using getvoleq
 if(F){
   getvoleq_NVEL(region = 2, forest = "01",district = "01", spcd=951)
@@ -436,48 +439,6 @@ biomass_NVEL = function(){
 
 
 
-#volume computation
-calcTreeVolume <- function(e,r,f,d,s,dbh,h){
-  q <- .Fortran(
-    "vollib_r",
-    as.character(e), #volume equation number
-    as.integer(r),   #USFS Region -- 8: Southern Region
-    as.character(f), #USFS Forest -- 12: Francis Marion-Sumnter National Forest
-    as.character(d), #USFS Forest District -- 03:Long Cane District; 00:Default; 01:Enoree District; 02:Andrew Pickens District; 05:Francis Marion District
-    as.integer(s),   #Species Code ie 122
-    as.double(dbh),  #dbh outside bark
-    as.double(h),  #height top
-    as.double(0),  #merch top diameter
-    as.double(0),  #
-    as.double(0),  #height for saw timber
-    as.double(0),  #pulp height (height to 4" top)
-    as.double(0),  #
-    as.double(0),  #
-    as.double(0),  #
-    as.integer(0), #
-    as.double(0),  #
-    as.double(0),  #
-    as.double(c(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)),  #vector of volumes; filled in with values that can be calculated
-    as.integer(0)  #error flag; >0 an error returned
-  )
-  return( q[[18]] ) #volume vector of 15 tree volumes; want [1], total cubic volume
-  # 1)	Total Cubic Volume from ground to tip
-  # 2)	Gross Scribner board foot volume. Note: The VOL(2) is International ¼ board foot volume for Region 8 Forest 8, 9, 10, and 12 (except Andrew Pickens district); and Region 9 Forest 4,5,8,11,12,14,19,20,21,22,24, and 30 when using Clark profile equation.
-  # 3)	Net Scribner board foot volume.
-  # 4)	Gross merchantable cubic foot volume
-  # 5)	Net merchantable cubic foot volume
-  # 6)	Merchantable cordwood volume
-  # 7)	Gross secondary product volume in cubic feet
-  # 8)	Net secondary product volume in cubic feet
-  # 9)	Secondary product in cordwood
-  # 10)	Gross International ¼ board foot volume
-  # 11)	Net International ¼ board foot volume
-  # 12)	Gross secondary product in Scribner board feet
-  # 13)	Net secondary product in Scribner board feet
-  # 14)	Stump volume
-  # 15)	Tip volume
-}
-
 
 
 #testing
@@ -489,11 +450,14 @@ if(F){
 
 if(F){
 
-  library(RSForInvt)
+  library(NVEL)
 
   if(!"dfSpp" %in% ls()){
     library(RSQLite)
-    db0 = dbConnect(RSQLite::SQLite(), "code/BiomassEqns.db")
+
+    system.file("misc/BiomassEqns.db", package="RSForInvt")
+
+    db0 = dbConnect(RSQLite::SQLite(), "misc/BiomassEqns.db")
     dfSpp = dbGetQuery(db0, paste("select * from tblspp"))
     dfCoeff = dbGetQuery(db0, paste("select * from BM_EQCoefs"))
     dbDisconnect(db0)

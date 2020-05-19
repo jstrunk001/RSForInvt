@@ -93,8 +93,8 @@ NVEL_voleq = function(
   ,districtNm = "district"
   ,spcdNm = "spcd"
 
-  ,dll_64 = 'lib/VolLibDll20190514/vollib-64bits/vollib.dll'
-  ,dll_32 = 'lib/VolLibDll20190514/vollib-32bits/vollib.dll'
+  ,dll_64 = 'lib/vollib-64bits/vollib.dll'
+  ,dll_32 = 'lib/vollib-32bits/vollib.dll'
   ,dll_func_voleq = "getvoleq_r"
   ,load_dll = T
 
@@ -121,7 +121,7 @@ NVEL_voleq = function(
   #catch warning about portabiliyt of passing a char vector
   defaultW <- getOption("warn")
   options(warn = -1)
-  dfTL[,"voleq"] = mapply(.fn_fortran_voleq,dfTL[,regionNm],dfTL[,forestNm],dfTL[,districtNm],dfTL[,spcdNm] ,MoreArgs=list(dll_func_voleq=dll_func_voleq), SIMPLIFY = T)
+  dfTL[,"voleq"] = mapply(.fn_fortran_voleq,dfTL[,regionNm],dfTL[,forestNm],dfTL[,districtNm],dfTL[,spcdNm] , MoreArgs = list(dll_func_voleq = dll_func_voleq), SIMPLIFY = T)
   options(warn = defaultW)
 
   return(dfTL)
@@ -129,29 +129,33 @@ NVEL_voleq = function(
 }
 #call fortran
 .fn_fortran_voleq = function(region,forest,district,species,dll_func_voleq){
-  .Fortran(dll_func_voleq,as.integer(region),as.character(forest),as.character(district),as.integer(species),as.character("          "),as.integer(0))[[5]]
+
+  #browser()
+  .Fortran(dll_func_voleq,as.integer(region),as.character(forest),as.character(district),as.integer(species),as.character("          "),as.integer(0), PACKAGE="vollib")[[5]]
+
 }
 
 #load dll if needed
 .load_dll = function(dll_64,dll_32,dll_func ){
+
   arch_in = R.Version()$arch
   loaded_dlls_in = names(getLoadedDLLs())
   dll_loaded = "vollib" %in% loaded_dlls_in
   if(arch_in == "x86_64" & !dll_loaded) dyn.load(system.file(dll_64, package="RSForInvt"))
   if(arch_in == "x86_32" & !dll_loaded) dyn.load(system.file(dll_32, package="RSForInvt"))
 
-  system.file(dll_64, package="RSForInvt")
-
 }
 
 
 if(F){
 
-  library(RSForInvt)
+  #library(RSForInvt)
+  library(NVEL)
+  NVEL_voleq(region = 2, forest = "01",district = "01", spcd=951)
 
   if(!"dfSpp" %in% ls()){
     library(RSQLite)
-    db0 = dbConnect(RSQLite::SQLite(), "code/BiomassEqns.db")
+    db0 = dbConnect(RSQLite::SQLite(), "misc/BiomassEqns.db")
     dfSpp = dbGetQuery(db0, paste("select * from tblspp"))
     dfCoeff = dbGetQuery(db0, paste("select * from BM_EQCoefs"))
     dbDisconnect(db0)
@@ -172,5 +176,16 @@ if(F){
   }
 
   NVEL_voleq( dfTL = df_fake )
+
+
+  #examples of using getvoleq
+  if(F){
+
+    NVEL_voleq(region = 2, forest = "01",district = "01", spcd=951)
+
+
+    NVEL_voleq(region = 2, forest = "01",district = "01", spcd=rep(c(951,201),2))
+    NVEL_voleq(dfTL=data.frame(region = 6, forest = "01",district = "01", spcd=rep(c(951,201),2)))
+  }
 
 }
