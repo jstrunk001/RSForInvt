@@ -11,39 +11,110 @@
 bm_NBEL = function(
 
   tlDF
-  ,spcd = ""
-  ,NBEL_db_path = "../code/BiomassEqns.db"
+
+  ,dbhNm ="dbh"
+  ,htNm = "ht"
+  ,spcdNm = "spcd"
+  #,regionNm = ""
+
+
+  ,NBEL_db_path = "code/BiomassEqns.db"
+  ,NBEL_db_coef = "BM_EQCoefs"
+  ,NBEL_db_eqn = "BM_EQForms2"
+  ,NBEL_db_eqn_col = "equation_r"
+  ,NBEL_db_comp = "BM_Comp"
+
+  ,comp_ids = (1:49)[1:2]
+
+  ,nclus = 5
 
   ){
 
   library(RSQLite)
+  if(!file.exists(NBEL_db_path)) stop("please check NBEL_db_path, try file.exists('somepath...') to verify that path to BiomassEqns.db is correct")
   db_in = dbConnect(RSQLite::SQLite(), NBEL_db_path)
-  all_spp = unique(tlDF[,spcd])
+  spp_all_in = sort(unique(tlDF[,spcdNm]))
 
-  coeffsDF = dbGetQuery(db_in, paste("select * from BM_EQCoefs where species_code in (",paste(all_spp,sep=","),")"))
-  eqnsDF = dbGetQuery(db_in, paste("select * from BM_EQForms where species_code in (",paste(all_spp,sep=","),")"))
-
-  #test that all species codes in tlDF are present in coeffs
-
-
-  #build prediction models or formulae
-
+  coeffsDF_in0 = dbGetQuery(db_in, paste("select * from", NBEL_db_coef))
+  eqnsDF_in = dbGetQuery(db_in, paste("select * from", NBEL_db_eqn))
+  #eqnsNewDF_in = dbGetQuery(db_in, paste("select * from tblEqnsNew"))
+  compsDF_in = dbGetQuery(db_in, paste("select * from",NBEL_db_comp ))
 
   dbDisconnect(db_in)
+
+  #subset
+  keep_spp = (coeffsDF_in0[,"species_code"] %in%  spp_all_in) & (coeffsDF_in0[,"comp_id"] %in%  comp_ids)
+  coeffsDF_in = coeffsDF_in0[ keep_spp,]
+
+  #test that all species codes in tlDF are present in coeffs
+  spp_sql = sort(unique(coeffsDF_in[,"species_code"]))
+  missing_spp = !spp_all_in %in% spp_sql
+  if(sum(missing_spp) > 0) warning("some species not present in NBEL for the selected components:", paste(spp_all_in[missing_spp],collapse=","),". these obsevations will receive NA.")
+
+  #build prediction models or formulae
+  form_ids_in = sort(unique(coeffsDF_in[,"eq_form_id"]))
+  eqnsDF_in1 = eqnsDF_in[eqnsDF_in[,"eqform_id"] %in% form_ids_in , ]
+  eqns_in0 = eqnsDF_in[,NBEL_db_eqn_col]
+
+  #merge coefficients with formulae
+  m1_in = merge(x = coeffsDF_in, y = eqnsDF_in1 , by.x = "eq_form_id", by.y = "eqform_id")
+
+  #substitute variable names
+  m1_in[,"equation_r_in"] = gsub("tht", htNm, gsub("dia", dbhNm, m1_in[,c(NBEL_db_eqn_col)]))
+
+  #parse coefficients into formulae
+  fn_coef=function(fmla,coeffs){
+    #print(fmla)
+    eq = try(eval(parse(text=paste("substitute(~I(",fmla,"), as.list(coeffs))"))))
+    #if(class(eq) == "try-error") browser()
+    eq
+  }
+
+  spl_coeffs = split(m1_in[,c(letters[1:5])],1:nrow(m1_in))
+  eqns_update = mapply( fn_coef , fmla = m1_in[,"equation_r_in"] , coeffs = spl_coeffs )
+
+  #add equations to input df
+  m1_in[,"equation_coefs"] = sapply(eqns_update,function(x)rlang::quo_text(x))
+
+  browser()
+
+  #for(i in 1:nrow(tlDF)){
+  for(i in 1:nrow(coeffsDF_in)){
+
+    #get trees that match formula 1
+    tl_idx_i = tlDF[,spcdNm] == coeffsDF_in[1,"species_code"]
+
+    #get values
+    tlDF[,spcdNm] = model.frame(eqns_update[[1]],data = tlDF[tl_idx_i,,drop=F])
+
+  }
 
 }
 
 
 
-if(F){
+if(T){
 
+
+  if(!"dfSpp" %in% ls()){
+    library(RSQLite)
+    db0 = dbConnect(RSQLite::SQLite(), "code/BiomassEqns.db")
+    dfSpp = dbGetQuery(db0, paste("select * from tblspp"))
+    dfCoeff = dbGetQuery(db0, paste("select * from BM_EQCoefs"))
+    dbDisconnect(db0)
+  }
   set.seed=111
-  nfake=50
-  df_fake = data.frame(tlDFid=1:50
-                       ,db=10*abs(rnorm(nfake))
+  nfake=length(unique(dfCoeff$species_code))
+  df_fake = data.frame(
+                        trid=1:(nfake)
+                       ,dbh=10*abs(rnorm(nfake))
                        ,ht=100*abs(rnorm(nfake))
-                       ,spp = sample(c("a","b","c","d") , nfake , T)
-  )
+                       ,spcd = unique(dfCoeff$species_code)# sample(c("a","b","c","d") , nfake , T)
+                      )
+
+  #df_fake[,"spcd"] = as.numeric(df_fake$spp)
+
+  bm_NBEL(df_fake,spcdNm="spcd")
 
 }
 

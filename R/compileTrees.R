@@ -39,7 +39,7 @@
 #'     #create a fake dataset
 #'     set.seed=111
 #'     nfake=50
-#'     df_fake = data.frame(tlDFid=1:50
+#'     df_fake = data.frame(trID=1:50
 #'                        ,db=10*abs(rnorm(nfake))
 #'                        ,ht=100*abs(rnorm(nfake))
 #'                        ,spp = sample(c("a","b","c","d") , nfake , T)
@@ -47,9 +47,9 @@
 #'
 #'    #compile fake datase
 #'     test =
-#'     compiletlDFees(
+#'     compileTrees(
 #'       df_fake
-#'       ,tlDFID = "tlDFid"
+#'       ,trID = "trID"
 #'       ,sppNm = "spp"
 #'       ,dbNm = "db"
 #'       ,htNm = "ht"
@@ -201,6 +201,7 @@ dbclSppY = function(x,trID,sppY,dbclNm,sppNm,...){
   return(x_in)
 }
 
+#test this code
 if(F){
 
   set.seed=111
@@ -237,89 +238,3 @@ if(F){
 
 }
 
-
-
-#
-#
-#
-# defComputeTL = list(
-#
-# 	ba_ft = function(x,dbNm) data.frame(x, ba_ft = 0.005454 * (x[,args[["dbNm"]]]^2))
-#
-# 	,dbcl = function(x,args,...){
-# 		labelsDBCL = (args[["dbcl"]][-1] + args[["dbcl"]][-length(args[["dbcl"]])]) / 2
-# 		res_dbcl = data.frame(labelsDBCL[cut(x[,args[["dbNm"]]],args[["dbcl"]],labels=FALSE)])
-# 		names(res_dbcl) = args[["dbclNm"]]
-# 		res_df = data.frame(x,res_dbcl)
-# 		return(res_df)
-# 	}
-#
-# 	,dbclY = function(x,args,...){
-#
-# 		require("reshape2")
-# 		x_in = x
-#
-# 		for(i in 1:length(args[["dbclY"]])){
-#
-# 			#cross dbcl with response attlDFibutes
-# 			mi = melt(x_in[,c(args[["tlDFID"]],args[["dbclNm"]],args[["dbclY"]][i])],id.vars=c(args[["tlDFID"]],args[["dbclNm"]]) )
-# 			fi = as.formula(paste("variable +",args[["tlDFID"]],"~",args[["dbclNm"]]))
-# 			dfi = dcast(mi, formula =  fi)[,-1]
-# 			names(dfi)[-1] = paste(args[["dbclY"]][i], paste(args[["dbclNm"]],names(dfi)[-1],sep=""),sep="_")
-#
-# 			#merge back in
-# 			x_in = merge(x_in, dfi, by = args[["tlDFID"]])
-# 		}
-#
-# 		return(x_in)
-#
-# 	}
-#
-# 	,sppY = function(x,args,...){
-#
-# 		require("reshape2")
-# 		x_in = x
-#
-# 		for(i in 1:length(args[["sppY"]])){
-#
-# 			#cross dbcl with response attlDFibutes
-# 			mi = melt(x_in[,c(args[["tlDFID"]],args[["sppNm"]],args[["sppY"]][i])],id.vars=c(args[["tlDFID"]],args[["sppNm"]]) )
-# 			fi = as.formula(paste("variable +",args[["tlDFID"]],"~",args[["sppNm"]]))
-# 			dfi = dcast(mi, formula =  fi)[,-1]
-# 			names(dfi)[-1] = paste(args[["sppY"]][i], paste(args[["sppNm"]],names(dfi)[-1],sep=""),sep="_")
-#
-# 			#merge back in
-# 			x_in = merge(x_in, dfi,  by = args[["tlDFID"]])
-# 		}
-# 		return(x_in)
-# 	}
-#
-# 	,dbclSppY = function(x,args,...){
-#
-# 		require("reshape2")
-# 		x_in = x
-#
-# 		for(i in 1:length(args[["sppY"]])){
-#
-# 			#cross dbcl with response attlDFibutes
-#
-# 			mi = melt(x_in[,c(args[["tlDFID"]],args[["sppNm"]],args[["dbclNm"]],args[["sppY"]][i])],id.vars=c(args[["tlDFID"]],args[["sppNm"]],args[["dbclNm"]]) )
-#
-#
-# 			fi = as.formula(paste("variable +",args[["tlDFID"]],"~",args[["sppNm"]],"+",args[["dbclNm"]]))
-# 			dfi = dcast(mi, formula =  fi)[,-1]
-# 			names(dfi)[-1] = paste(args[["sppNm"]],args[["dbclNm"]],names(dfi)[-1],sep="_")
-#
-# 			#merge back in
-# 			x_in = merge(x_in, dfi,  by = args[["tlDFID"]])
-# 		}
-# 		return(x_in)
-# 	}
-# )
-#
-# if(F){
-#
-# 	if(!"tlDF1" %in% ls()) tlDF1 = readRDS("D:\\data\\RFIA\\NIMS\\2018-10-24\\tlDF.rds")
-# 	if(!"tlDF2" %in% ls()) tlDF2 = compiletlDFees(tlDF1)
-#
-# }
