@@ -68,21 +68,14 @@
 #'
 #'
 #'
-#'@import some_package,some_package2
 #'
 #'@export
 #
-#'@seealso \code{\link{another_function}}\cr \code{\link{yet_another_function}}\cr
+#'@seealso \code{\link{NVEL_volume}}\cr
 
 #Desired upgrades to this function:
 #
 #
-
-# x = function(x){}
-
-#copy function arguments and use this code to format arguments
-##writeClipboard(paste(gsub("^[[:space:]]*[,]*","#'@param ",gsub("=.*"," ?",readClipboard())),collapse="\n"))
-
 
 NVEL_voleq = function(
 
@@ -143,6 +136,7 @@ NVEL_voleq = function(
 
 if(F){
 
+  library(RSForInvt)
 
   if(!"dfSpp" %in% ls()){
     library(RSQLite)
@@ -150,10 +144,7 @@ if(F){
     dfSpp = dbGetQuery(db0, paste("select * from tblspp"))
     dfCoeff = dbGetQuery(db0, paste("select * from BM_EQCoefs"))
     dbDisconnect(db0)
-  }
 
-  #if(!"dfSpp" %in% ls()){
-  if(f){
     set.seed=111
     nfake=length(unique(dfCoeff$species_code))
 

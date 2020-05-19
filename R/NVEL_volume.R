@@ -202,7 +202,7 @@ NVEL_volume=function(
 
   #get volume equations
   if( is.na(voleq[1]) & (!voleqNm %in% names(dfTL)) ){
-    vol_eqns_in = getvoleq_NVEL(
+    vol_eqns_in = NVEL_voleq(
                       dfTL = dfTL
                       #optional, provide region, forest, district for every tree
                       ,regionNm = "region"
@@ -496,10 +496,7 @@ if(F){
     dfSpp = dbGetQuery(db0, paste("select * from tblspp"))
     dfCoeff = dbGetQuery(db0, paste("select * from BM_EQCoefs"))
     dbDisconnect(db0)
-  }
 
-  #if(!"dfSpp" %in% ls()){
-  if(f){
     set.seed=111
     nfake=length(unique(dfCoeff$species_code))
 
@@ -515,6 +512,6 @@ if(F){
 
   }
 
-  volume_NVEL( dfTL = df_fake )
+  NVEL_volume( dfTL = df_fake )
 
 }
