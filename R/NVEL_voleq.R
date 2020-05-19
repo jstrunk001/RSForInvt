@@ -132,6 +132,14 @@ NVEL_voleq = function(
   .Fortran(dll_func_voleq,as.integer(region),as.character(forest),as.character(district),as.integer(species),as.character("          "),as.integer(0))[[5]]
 }
 
+#load dll if needed
+.load_dll = function(dll_64,dll_32,dll_func ){
+  arch_in = R.Version()$arch
+  loaded_dlls_in = names(getLoadedDLLs())
+  dll_loaded = "vollib" %in% loaded_dlls_in
+  if(arch_in == "x86_64" & !dll_loaded) library.dynam(dll_64)
+  if(arch_in == "x86_32" & !dll_loaded) library.dynam(dll_32)
+}
 
 
 if(F){

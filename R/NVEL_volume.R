@@ -263,8 +263,8 @@ NVEL_volume=function(
   arch_in = R.Version()$arch
   loaded_dlls_in = names(getLoadedDLLs())
   dll_loaded = "vollib" %in% loaded_dlls_in
-  if(arch_in == "x86_64" & !dll_loaded) dyn.load(dll_64)
-  if(arch_in == "x86_32" & !dll_loaded) dyn.load(dll_32)
+  if(arch_in == "x86_64" & !dll_loaded) library.dynam(dll_64)
+  if(arch_in == "x86_32" & !dll_loaded) library.dynam(dll_32)
 }
 
 #call fortran
@@ -489,6 +489,7 @@ if(F){
 
 if(F){
 
+  library(RSForInvt)
 
   if(!"dfSpp" %in% ls()){
     library(RSQLite)
