@@ -90,11 +90,7 @@
 #'
 #'@export
 #
-<<<<<<< HEAD
-#'@seealso \code{\link{NVEL_voleq}}\cr  \code{\link{NVEL_volume}}\cr
-=======
-#'@seealso \code{\link{NVEL_bioeq}}\cr
->>>>>>> 505cc0d6b77f2efa63cd656e05e7f91f860843d1
+
 
 #Desired upgrades to this function:
 #
@@ -311,7 +307,7 @@ NVEL_biomass=function(
 }
 
 
-
+#Testing
 if(F){
 
   library(RSForInvt)
