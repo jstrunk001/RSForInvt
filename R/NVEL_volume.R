@@ -74,7 +74,7 @@
 #'         #grab list of species
 #'         if(!"dfSpp" %in% ls()){
 #'           library(RSQLite)
-#'           db0 = dbConnect(RSQLite::SQLite(), "code/BiomassEqns.db")
+#'           db0 = dbConnect(RSQLite::SQLite(), system.file("misc/NBEL/BiomassEqns.db", package="RSForInvt"))
 #'           dfSpp = dbGetQuery(db0, paste("select * from tblspp"))
 #'           dfCoeff = dbGetQuery(db0, paste("select * from BM_EQCoefs"))
 #'           dbDisconnect(db0)
@@ -155,7 +155,7 @@ NVEL_volume=function(
   ,dll_func_vol = "vollib_r"
   ,dll_func_voleq = "getvoleq_r"
 
-  ,nclus = 4
+  #,ncore = 4
 
   ){
   options(stringsAsFactors = F)
@@ -414,25 +414,19 @@ NVEL_volume=function(
 
 }
 
-#examples of using getvoleq
-if(F){
-  getvoleq_NVEL(region = 2, forest = "01",district = "01", spcd=951)
-  getvoleq_NVEL(region = 2, forest = "01",district = "01", spcd=rep(c(951,201),2))
-  getvoleq_NVEL(dfTL=data.frame(region = 6, forest = "01",district = "01", spcd=rep(c(951,201),2)))
-}
 
-ht2topd_NVEL = function(){
+NVEL_ht2topd = function(){
 
 
 }
 
 
-calcdob_NVEL = function(){
+NVEL_calcdob = function(){
 
 
 }
 
-biomass_NVEL = function(){
+NVEL_biomass = function(){
 
 
 }
@@ -440,24 +434,15 @@ biomass_NVEL = function(){
 
 
 
-
-#testing
-if(F){
-
-  volume_NVEL()
-
-}
 
 if(F){
 
-  library(NVEL)
+  library(RSForInvt)
 
   if(!"dfSpp" %in% ls()){
+
     library(RSQLite)
-
-    system.file("misc/BiomassEqns.db", package="RSForInvt")
-
-    db0 = dbConnect(RSQLite::SQLite(), "misc/BiomassEqns.db")
+    db0 = dbConnect(RSQLite::SQLite(), system.file("misc/NBEL/BiomassEqns.db", package="RSForInvt"))
     dfSpp = dbGetQuery(db0, paste("select * from tblspp"))
     dfCoeff = dbGetQuery(db0, paste("select * from BM_EQCoefs"))
     dbDisconnect(db0)

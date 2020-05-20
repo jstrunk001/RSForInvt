@@ -35,6 +35,11 @@
 #'
 #'@examples
 #'
+#'         library(RSForInvt)
+#'          NVEL_voleq(region = 2, forest = "01",district = "01", spcd=951)
+#'          NVEL_voleq(region = 2, forest = "01",district = "01", spcd=951)
+#'          NVEL_voleq(region = 2, forest = "01",district = "01", spcd=rep(c(951,201),2))
+#'          NVEL_voleq(dfTL=data.frame(region = 6, forest = "01",district = "01", spcd=rep(c(951,201),2)))
 #'
 #'         #grab list of species
 #'         if(!"dfSpp" %in% ls()){
@@ -71,7 +76,7 @@
 #'
 #'@export
 #
-#'@seealso \code{\link{NVEL_volume}}\cr
+#'@seealso \code{\link{NVEL_volume}}\cr \code{\link{NVEL_biomass}}\cr
 
 #Desired upgrades to this function:
 #
@@ -149,13 +154,17 @@ NVEL_voleq = function(
 
 if(F){
 
-  #library(RSForInvt)
-  library(NVEL)
+
+  library(RSForInvt)
+
   NVEL_voleq(region = 2, forest = "01",district = "01", spcd=951)
+  NVEL_voleq(region = 2, forest = "01",district = "01", spcd=951)
+  NVEL_voleq(region = 2, forest = "01",district = "01", spcd=rep(c(951,201),2))
+  NVEL_voleq(dfTL=data.frame(region = 6, forest = "01",district = "01", spcd=rep(c(951,201),2)))
 
   if(!"dfSpp" %in% ls()){
     library(RSQLite)
-    db0 = dbConnect(RSQLite::SQLite(), "misc/BiomassEqns.db")
+    db0 = dbConnect(RSQLite::SQLite(), system.file("misc/NBEL/BiomassEqns.db", package="RSForInvt"))
     dfSpp = dbGetQuery(db0, paste("select * from tblspp"))
     dfCoeff = dbGetQuery(db0, paste("select * from BM_EQCoefs"))
     dbDisconnect(db0)
@@ -177,15 +186,5 @@ if(F){
 
   NVEL_voleq( dfTL = df_fake )
 
-
-  #examples of using getvoleq
-  if(F){
-
-    NVEL_voleq(region = 2, forest = "01",district = "01", spcd=951)
-
-
-    NVEL_voleq(region = 2, forest = "01",district = "01", spcd=rep(c(951,201),2))
-    NVEL_voleq(dfTL=data.frame(region = 6, forest = "01",district = "01", spcd=rep(c(951,201),2)))
-  }
 
 }
