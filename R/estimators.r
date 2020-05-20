@@ -5,7 +5,7 @@ estimate=function(
   ,resp_nm="volcfgrs"
   ,aux_nm="ht_p70"
   ,strata_nm="str"
-  ,wt_nm=c(NA,"ef")
+  ,wt_nm=c(NA,"wt")
   ,ef_nm=c(NA,"ef")      # 1/wt
   ,su_nm=c(NA,"su") #sampling unit for two-stage / multi-stage
   ,reg_form= "ht_p20 + ht_p70 * percentage_first_returns_above_6_00"
@@ -25,7 +25,8 @@ estimate=function(
     wt_nm="wt"
     x[,wt_nm] = N
   }
-  #warning("Multi-stage Not Yet Implemented")
+
+  warning("calibrate, two-stage, Multi-stage Not Yet Implemented")
 
   if(length(resp_nm) > 1){stop("1 response at this time")}
 
@@ -419,12 +420,12 @@ estimate=function(
 
 .cb=function(x,resp_nm,wt_nm,ef_name,reg_form,pop,N,type,var_type){
 
-
+  stop("calibration Not Yet Implemented")
 }
 
 .ts=function(...){
 
-
+  stop("two-stage Not Yet Implemented")
 
 }
 
@@ -535,11 +536,13 @@ pop_test=function(
   }
   if(type[1]=="two-stage"){
 
+    stop("two-stage Not Yet Implemented")
     #res=list(type=type[1],pop=dat_pop,s=s_in,N=N,n=n,wt=wt[1],nstrat=nstrat,nclus=nclus)
 
   }
   if(type[1]=="multi-stage"){
 
+    stop("multi-stage Not Yet Implemented")
     #res=list(type=type[1],pop=dat_pop,s=s_in,N=N,n=n,wt=wt[1],nstrat=nstrat,nclus=nclus)
 
   }

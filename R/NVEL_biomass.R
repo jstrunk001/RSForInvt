@@ -22,26 +22,14 @@
 #'
 #'@param dfTL tree list with a minimum of diamter and height columns
 #'@param bioeq (optional) use single equation for all trees
-#@param region (optional) region,forest,district but these supercede values in dfTL columns regionNm,forestNm, districtNm
-#@param forest (optional) region,forest,district but these supercede values in dfTL columns regionNm,forestNm, districtNm
-#@param district (optional) region,forest,district but these supercede values in dfTL columns regionNm,forestNm, districtNm
 #'@param bioeqNm  (optional) column name in DFTL: provide region, forest, district for every tree in dfTL
-#@param regionNm (optional) column name in DFTL:provide region, forest, district for every tree in dfTL
-#@param forestNm (optional) column name in DFTL:provide region, forest, district for every tree in dfTL
-#@param districtNm (optional) column name in DFTL: provide region, forest, district for every tree in dfTL
 #'@param spcdNm (required) column name in DFTL: USFS species code
 #'@param dbhNm  (required) column name in DFTL: dbh in inches
 #'@param htNm (required) column name in DFTL: height in feet
-#@param pulpDbNm (optional) column name in DFTL: upper db miminum for pulp (in)
+#'@param clNm (optional) column name in DFTL: crown length in feet
 #'@param merchDbNm  (optional) column name in DFTL: upper db miminum for saw (in)
 #'@param htPrd1Nm (optional) column name in DFTL: Height to the minimum top diameter inside bark for primary product (ft)
 #'@param htPrd2Nm (optional) column name in DFTL: Height to the minimum top diameter inside bark for secondary product (ft)
-#@param upHt1Nm  (optional) column name in DFTL: Upper stem height in feet where upper stem diameter was measured or where AVG1 is to be applied. OR For Region 8 the upper stem reference height defined by their profile model (ht0, ht4, ht7, ht9). OR For region 9 the UPSHT1 is the height to 7.6/9.6 top diameter when HT1PRD is not the height to 7.6/9.6 top diameter.
-#@param upDb1Nm  (optional) column name in DFTL: Upper stem diameter measured at
-#@param stumpHtNm  (optional) column name in DFTL: stump height (ft)
-#@param fclassNm (optional) column name in DFTL: Girard’s form class.  Diameter at the top of the first log given as a percent of DBH.
-#@param dbtbhNm  (optional) column name in DFTL: Double bark thickness at breast height in inches
-#@param btrNm  (optional) column name in DFTL: Bark thickness ratio given as the percent of diameter inside bark to diameter outside bark.  (dib/dob *100).
 #'@param dll_64  path to 64bit dll
 #'@param dll_32  path to 64bit dll
 #'@param load_dll T/F should dll be loaded (in case it is already loaded)
