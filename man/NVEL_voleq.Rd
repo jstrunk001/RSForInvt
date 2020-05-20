@@ -15,8 +15,9 @@ NVEL_voleq(
   forestNm = "forest",
   districtNm = "district",
   spcdNm = "spcd",
-  dll_64 = "lib/VolLibDll20190514/vollib-64bits/vollib.dll",
-  dll_32 = "lib/VolLibDll20190514/vollib-32bits/vollib.dll",
+  dll_64 = "lib/vollib-64bits/vollib.dll",
+  dll_32 = "lib/vollib-32bits/vollib.dll",
+  dll_func_voleq = "getvoleq_r",
   load_dll = T
 )
 }
@@ -41,9 +42,9 @@ NVEL_voleq(
 
 \item{dll_32}{path to 64bit dll}
 
-\item{load_dll}{T/F should dll be loaded (in case it is already loaded)}
-
 \item{dll_func_voleq}{name of volume equation chooser function call in NVEL .dll}
+
+\item{load_dll}{T/F should dll be loaded (in case it is already loaded)}
 }
 \value{
 reformatted tree list with with a new column volume equation codes for NVEL - "voleq"

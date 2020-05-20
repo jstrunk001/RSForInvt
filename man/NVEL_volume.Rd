@@ -27,9 +27,11 @@ NVEL_volume(
   fclassNm = c("fclass"),
   dbtbhNm = c("dbtbh"),
   btrNm = c("btr"),
-  dll_64 = "code/VolLibDll20190514/vollib-64bits/vollib.dll",
-  dll_32 = "code/VolLibDll20190514/vollib-32bits/vollib.dll",
+  dll_64 = "lib/vollib-64bits/vollib.dll",
+  dll_32 = "lib/vollib-32bits/vollib.dll",
   load_dll = T,
+  dll_func_vol = "vollib_r",
+  dll_func_voleq = "getvoleq_r",
   nclus = 4
 )
 }
@@ -84,11 +86,11 @@ NVEL_volume(
 
 \item{load_dll}{T/F should dll be loaded (in case it is already loaded)}
 
-\item{nclus}{number of cores to use}
-
 \item{dll_func_vol}{name of volume prediction function call in NVEL .dll}
 
 \item{dll_func_voleq}{name of volume equation chooser function call in NVEL .dll}
+
+\item{nclus}{number of cores to use}
 }
 \value{
 a data.frame reformatted to include all of the original columns, any missing columns for the NVEL .dll, 15 columns of predicted volumes, and an error column
