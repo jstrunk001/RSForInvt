@@ -70,7 +70,6 @@ df_to_raster = function(
   xy1 = xy
   coordinates(xy) = xy[,colsxy]
   ids = raster::cellFromXY(r0, xy1)
-  browser()
   r0[] = NA
   crs(r0) = crs
 
