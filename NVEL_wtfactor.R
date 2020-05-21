@@ -83,7 +83,7 @@
 
 NVEL_wtfactor = function(
 
-  dfTL = list(NA, data.frame(spcd=201, dbh=5 ,ht=5 ,region = 0 , forest = "01", district = "01") )[[1]]
+  dfTL = list(NA, data.frame(spcd=201, dbh=5 ,ht=5 ,region = 0 , forest = "01") )[[1]]
 
   #optional, but these supercede values in dfTL columns regionNm,forestNm
   ,region = NA
@@ -122,7 +122,7 @@ NVEL_wtfactor = function(
   #catch warning about portabiliyt of passing a char vector
   defaultW <- getOption("warn")
   options(warn = -1)
-  res_wf0 = mapply(.fn_fortran_voleq,dfTL[,regionNm],dfTL[,forestNm],dfTL[,spcdNm] , MoreArgs = list(dll_func_wtfactor = dll_func_wtfactor), SIMPLIFY = F)
+  res_wf0 = mapply(.fn_fortran_wtf,dfTL[,regionNm],dfTL[,forestNm],dfTL[,spcdNm] , MoreArgs = list(dll_func_wtfactor = dll_func_wtfactor), SIMPLIFY = F)
   options(warn = defaultW)
 
   #merge predictions together
@@ -130,11 +130,11 @@ NVEL_wtfactor = function(
 
 }
 #call fortran
-.fn_fortran_voleq = function(region,forest,species,dll_func_wtfactor){
+.fn_fortran_wtf = function(region,forest,species,dll_func_wtfactor){
 
   #browser()
   res_wf0 = .Fortran(dll_func_wtfactor,as.integer(region),as.character(forest),as.integer(species),as.double(0),as.double(0), PACKAGE="vollib")
-  data.frame(grnwf = res_wf0[[4]] , drywf = res_wf0[[5]] )
+  data.frame(WFGRN_LBSCFT = res_wf0[[4]] , WFDRY_LBSCFT = res_wf0[[5]] )
 
 }
 
