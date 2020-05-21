@@ -1,0 +1,417 @@
+---
+title: "Example_workflow"
+author: "Jacob Strunk"
+date: "5/7/2020"
+output: html_document
+---
+
+load packages - requires devtools package
+```{r , eval = FALSE}
+#load required packages from github
+# lidR and rlas can be a bit tricky to install
+# if you are strugglign to install from github, look at the console and see which dependency is 
+# causing the failure. For example the "glue" package was failing when I prepared this workflow.
+# To overcome the issue I used install.packages("glue") and then tried install_github("Jean-Romain/lidR")
+# you may also need to compile something from source if the wrong package version is available, e.g.
+# install.packages("glue", type="source") which also fails for some packages...
+
+# you can optionally also install from binaries with install.packages(c("rlas","lidR"))
+
+
+devtools::install_github("Jean-Romain/rlas")
+devtools::install_github("Jean-Romain/lidR")
+devtools::install_github("jacobstrunk001/RSForInvt")
+
+```
+
+#convert dtm raster to fusion .dtm rasters
+```{r}
+
+RSForInvt::raster2FUSION(
+  "D:\\Box\\VMARS\\Projects\\DAP_evaluation_Meston\\Data\\Tennessee\\DTM\\"
+  ,"D:\\Box\\VMARS\\Projects\\DAP_evaluation_Meston\\Data\\Tennessee\\DTM_fusion\\"
+  )
+
+
+```
+
+
+#scan a lidar project
+```{r}
+
+ #scan las/laz files and build vector files in a .gpkg (geopackage)
+ las_info = RSForInvt::scan_las(
+    project="TN_lidar"
+    ,project_year="2018"
+    ,proj4_name=NA #"NAD_1983_HARN_StatePlane_Washington_South_FIPS_4601_Feet"
+    ,proj4= NA 
+    ,dir_las = "D:\\Box\\VMARS\\Projects\\DAP_evaluation_Meston\\Data\\Tennessee\\lidar_tiles\\"
+    ,pattern="[.]la.$"
+    ,notes=""
+    ,create_polys=T
+    ,recursive = T
+    ,return=T
+    )
+
+#look at results that are returned directly when return=T
+  las_info$project_id
+  View(las_info$las_ids) 
+  plot(las_info$plys) 
+
+#grab the exact same data from geopackage
+  plys_las = rgdal::readOGR(dsn = "D:\\Box\\VMARS\\Projects\\DAP_evaluation_Meston\\Data\\Tennessee\\lidar_tiles\\manage_las\\manage_las.gpkg" , layer = "las_polys" )
+  con_gpkg = dbConnect(RSQLite::SQLite(), "D:\\Box\\VMARS\\Projects\\DAP_evaluation_Meston\\Data\\Tennessee\\lidar_tiles\\manage_las\\manage_las.gpkg")
+  las_ids = dbReadTable(con_gpkg,"las_id")
+  proj_id = dbReadTable(con_gpkg,"project_id")  
+  dbDisconnect(con_gpkg)
+  
+  plot(plys_las)
+  proj_id
+  View(las_ids)
+  
+  
+
+```
+
+
+#scan dtms
+```{r}
+#scan dtms and build vector files in a .gpkg (geopackage)
+ dtm_info = RSForInvt::scan_dtm(
+    project="TN_lidar"
+    ,project_year="2018"
+    ,proj4_name=NA #"NAD_1983_HARN_StatePlane_Washington_South_FIPS_4601_Feet"
+    ,proj4= NA 
+    ,dir_dtm = "D:\\Box\\VMARS\\Projects\\DAP_evaluation_Meston\\Data\\Tennessee\\DTM_fusion"
+    ,pattern="[.]dtm$"
+    ,notes=""
+    ,create_polys=T
+    ,recursive = T
+    ,return=T
+    )
+
+#look at results that are returned directly 
+  dtm_info$project_id
+  View(dtm_info$dtm_ids) 
+  plot(dtm_info$plys) 
+
+#grab the exact same data from geopackage
+  plys_dtm = rgdal::readOGR(dsn = "D:\\Box\\VMARS\\Projects\\DAP_evaluation_Meston\\Data\\Tennessee\\DTM_fusion\\manage_dtm\\manage_dtm.gpkg" , layer = "dtm_polys" )
+  con_gpkg_dtm = dbConnect(RSQLite::SQLite(), "D:\\Box\\VMARS\\Projects\\DAP_evaluation_Meston\\Data\\Tennessee\\DTM_fusion\\manage_dtm\\manage_dtm.gpkg")
+  dtm_ids = dbReadTable(con_gpkg_dtm,"dtm_id")
+  proj_id_dtm = dbReadTable(con_gpkg_dtm,"project_id")  
+  
+  proj_id_dtm
+  View(dtm_ids)
+  plot(plys_dtm)
+  
+  dbDisconnect(con_gpkg)
+
+if(F){
+  
+  plot(subset(plys_dtm,subset = 1:nrow(plys_dtm) ==1  ))
+  plot( plys_las , add=T , border = "red")
+    
+}
+
+```
+
+
+#build project
+```{r }
+
+#build project
+# !!A really important consideration is the tile size!!
+proj_tn = RSForInvt::project_create(
+  dir_las="D:\\Box\\VMARS\\Projects\\DAP_evaluation_Meston\\Data\\Tennessee\\lidar_tiles\\"
+  ,dir_dtm="D:\\Box\\VMARS\\Projects\\DAP_evaluation_Meston\\Data\\Tennessee\\DTM_fusion\\"
+  ,path_gpkg_out="D:\\Box\\VMARS\\Projects\\DAP_evaluation_Meston\\R\\DAP_Lidar_analysis\\RSForInvt\\project\\TNLidar_RSForInvtProject.gpkg"
+  ,layer_project = "RSForInvt_prj"
+  ,layer_config = "RSForInvt_config"
+  ,overwrite_project = T
+  ,project_dtm="lidar_dtm"
+  ,project_las="lidar_las"
+  ,dtm_year="2018"
+  ,las_year="2018"
+  ,do_scan_dtms=F #we already scanned the dtm folder - ok, to rescan, but slower
+  ,do_scan_las=F #we already scanned the las folder - ok, to rescan, but slower
+  ,tile_size=6000
+  ,pixel_size=66
+  #,xmn=561066,xmx=2805066,ymn=33066,ymx=1551066
+  ,proj4 = "+proj=lcc +lat_1=47.33333333333334 +lat_2=45.83333333333334 +lat_0=45.33333333333334 +lon_0=-120.5 +x_0=500000.0001016001 +y_0=0 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=us-ft +no_defs"
+  ,mask=NA
+  ,return=T
+)
+
+#look at project components
+  proj_tn$las_tiles_bfr
+  proj_tn$dtm_tiles_bfr
+  proj_tn$project_plys
+
+```
+
+
+#create gridmetrics output csvs
+```{r }
+
+  #use project tiles, iterate across project, and run FUSIOn gridmetrics.exe for each processing tile
+  #this is essentially what areaprocesser does...
+  gmi=RSForInvt::run_gridmetrics(
+    proj_gpkg_path="D:\\Box\\VMARS\\Projects\\DAP_evaluation_Meston\\R\\DAP_Lidar_analysis\\RSForInvt\\project\\TNLidar_RSForInvtProject.gpkg"
+    ,dir_out="D:\\Box\\VMARS\\Projects\\DAP_evaluation_Meston\\R\\DAP_Lidar_analysis\\RSForInvt\\"
+    ,n_core=4
+   )
+
+
+
+```
+
+
+#load csvs into sqlite database
+```{r }
+
+  #load csvs into sqlite database
+  RSForInvt::csv_to_sqlite(
+      db="D:\\Box\\VMARS\\Projects\\DAP_evaluation_Meston\\R\\DAP_Lidar_analysis\\RSForInvt\\gridmetrics_sqlite\\gridmetrics.sqlite"
+       ,csv_folder = "D:\\Box\\VMARS\\Projects\\DAP_evaluation_Meston\\R\\DAP_Lidar_analysis\\RSForInvt\\gridmetrics_csv"
+       ,tb_summary="gm_summary"
+       ,tb_csv="gm"
+       ,project="TN_2018"
+       ,resolution="66"
+       ,units="feet"
+       ,proj4="+proj=lcc +lat_1=47.33333333333334 +lat_2=45.83333333333334 +lat_0=45.33333333333334 +lon_0=-120.5 +x_0=500000.0001016001 +y_0=0 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=us-ft +no_defs"
+       ,notes=""
+       ,skip_loaded=T
+       ,n_load=NA
+       ,use_col_classes=T
+       )
+
+
+
+```
+
+
+#create rasters from sqlite database
+```{r }
+  library(DBI)
+  library(RSQLite)
+
+  proj4_this = "+proj=lcc +lat_1=47.33333333333334 +lat_2=45.83333333333334 +lat_0=45.33333333333334 +lon_0=-120.5 +x_0=500000.0001016001 +y_0=0 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=us-ft +no_defs"
+
+  #take all fields in sqlite and create a raster
+  #for each field, or provide a subset. colsSomeX is
+  # a subset that I prepared...
+  db_gridmetrics = dbConnect(RSQLite::SQLite(), "D:\\Box\\VMARS\\Projects\\DAP_evaluation_Meston\\R\\DAP_Lidar_analysis\\RSForInvt\\gridmetrics_sqlite\\gridmetrics.sqlite")
+    
+  RSForInvt::sqlite_to_raster(
+    db=db_gridmetrics
+    ,tb_csv="gm"
+    ,colsxy = c("center_x","center_y")
+    ,cols2Raster = colsSomeX()
+    ,format = ".img"
+    ,dirOut = "D:\\Box\\VMARS\\Projects\\DAP_evaluation_Meston\\R\\DAP_Lidar_analysis\\RSForInvt\\gridmetrics_rasters"
+    ,crs = proj4_this
+    ,nProc = 5
+    ,doDebug=F
+    ,doBuild=F
+  
+  )
+
+  dbDisconnect(db_gridmetrics)
+
+```
+
+#a single raster is inefficient for this dataset. The data is composed of a sample of lidar tiles
+#spread across the entire state. Instead we will see how to create rasters from each lidar tile
+#and then glue them together using the gdal .vrt file type (accessible in R with gdalUtils package).
+#first we create views with subsets of the data and convert them to rasters.
+```{r }
+  library(DBI)
+  library(RSQLite)
+  library(gdalUtils)
+
+  proj4_this = "+proj=lcc +lat_1=47.33333333333334 +lat_2=45.83333333333334 +lat_0=45.33333333333334 +lon_0=-120.5 +x_0=500000.0001016001 +y_0=0 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=us-ft +no_defs"
+
+  #take all fields in sqlite and create a raster
+  #for each field, or provide a subset. colsSomeX is
+  # a subset that I prepared...
+  db_gridmetrics = dbConnect(RSQLite::SQLite(), "D:\\Box\\VMARS\\Projects\\DAP_evaluation_Meston\\R\\DAP_Lidar_analysis\\RSForInvt\\gridmetrics_sqlite\\gridmetrics.sqlite")
+    
+  #see if there is an indication of tile in gridmetrics data
+  dbGetQuery(db_gridmetrics, "select * from gm limit 5")
+  
+  #lets use identifier to split data
+  ids = unlist(dbGetQuery(db_gridmetrics, "select distinct identifier from gm"))
+  
+  #create views and rasters
+  for(i in 1:length(ids)){
+    
+    vw_i = paste("vw_gm_id_",ids[i],sep="")
+    qry_vw_id = dbSendQuery(db_gridmetrics, paste("create view if not exists",vw_i,"as select * from gm where identifier = ",ids[i]))
+  
+    RSForInvt::sqlite_to_raster(
+      db=db_gridmetrics
+      ,tb_gm=vw_i
+      ,colsxy = c("center_x","center_y")
+      ,cols2Raster = RSForInvt::colsFewX("6_00")
+      ,format = ".img"
+      ,dirOut = "D:\\Box\\VMARS\\Projects\\DAP_evaluation_Meston\\R\\DAP_Lidar_analysis\\RSForInvt\\gridmetrics_rasters\\TN"
+      ,raster_prefix = paste("TN_id_XXXX_",ids[i],"_",sep="")
+      ,crs = proj4_this
+      ,nProc = 5
+      ,doDebug=F
+      ,doBuild=F
+    )
+
+  }  
+  dbDisconnect(db_gridmetrics)
+  
+  #create .vrt files - a virtual raster format that can "point" to existing rasters
+  gm_nms = colsFewX("6_00")
+  for(i in 1:length(gm_nms)){
+
+    rasters_i = list.files("D:\\Box\\VMARS\\Projects\\DAP_evaluation_Meston\\R\\DAP_Lidar_analysis\\RSForInvt\\gridmetrics_rasters\\TN"
+                           ,pattern = paste(".*",gm_nms[i],".*img$",sep=""),full.names=T)
+    vrt_i = paste("D:/Box/VMARS/Projects/DAP_evaluation_Meston/R/DAP_Lidar_analysis/RSForInvt/gridmetrics_rasters/TN_VRT/",gm_nms[i],".vrt",sep="")
+    gdalUtils::gdalbuildvrt(
+      rasters_i
+      , vrt_i
+    )
+
+  }
+  
+```
+
+
+#create .dtm canopy models
+```{r }
+
+  gmi=RSForInvt::run_canopyModel(
+    proj_gpkg_path="D:\\Box\\VMARS\\Projects\\DAP_evaluation_Meston\\R\\DAP_Lidar_analysis\\RSForInvt\\project\\TNLidar_RSForInvtProject.gpkg"
+    ,dir_out="D:\\Box\\VMARS\\Projects\\DAP_evaluation_Meston\\R\\DAP_Lidar_analysis\\RSForInvt\\"
+    ,n_core=4
+   )
+
+
+
+```
+
+#(optional) convert .dtm canopy models to .img and build composite .vrt files
+```{r }
+
+  paths_dtms = list.files("D:/Box/VMARS/Projects/DAP_evaluation_Meston/R/DAP_Lidar_analysis/RSForInvt/canopymodel/TN/individual_dtm"
+                          ,pattern="[.]dtm$",full.names=T)
+  paths_imgs = file.path("D:/Box/VMARS/Projects/DAP_evaluation_Meston/R/DAP_Lidar_analysis/RSForInvt/canopymodel/TN/individual_img"
+                         ,gsub("[.]dtm$",".img",basename(paths_dtms))
+  )
+  
+  for(i in 1:length(paths_dtms)){
+    
+    dtm_i = RSForInvt::read_dtm(paths_dtms[i])
+    raster::writeRaster(dtm_i,paths_imgs[i])
+    
+  }
+
+  paths_imgs1 = list.files("D:/Box/VMARS/Projects/DAP_evaluation_Meston/R/DAP_Lidar_analysis/RSForInvt/canopymodel/TN/individual_img"
+                         ,pattern="[.]img$",full.names=T)
+  
+  gdalUtils::gdalbuildvrt(
+      paths_imgs1
+      , "D:/Box/VMARS/Projects/DAP_evaluation_Meston/R/DAP_Lidar_analysis/RSForInvt/canopymodel/TN/merged_vrt/tn_dtms.vrt"
+    )
+
+```
+
+#merge .dtm canopy models and create ITD objects - FUSION
+```{r }
+
+csms = list.files("D:\\Box\\VMARS\\Projects\\DAP_evaluation_Meston\\R\\DAP_Lidar_analysis\\RSForInvt\\canopymodel\\individual" ,pattern="[.]dtm" , full.names=T)
+writeLines(csms, "D:\\Box\\VMARS\\Projects\\DAP_evaluation_Meston\\R\\DAP_Lidar_analysis\\RSForInvt\\canopymodel\\individual\\csm_list.txt")
+shell("C:\\FUSION\\mergedtm.exe /disk D:\\Box\\VMARS\\Projects\\DAP_evaluation_Meston\\R\\DAP_Lidar_analysis\\RSForInvt\\canopymodel\\merged\\tn_dsm.dtm D:\\Box\\VMARS\\Projects\\DAP_evaluation_Meston\\R\\DAP_Lidar_analysis\\RSForInvt\\canopymodel\\individual\\csm_list.txt",wait=F)
+
+#fails in this example because extent is too large
+shell("c:\\fusion\\treeseg.exe /shape D:\\Box\\VMARS\\Projects\\DAP_evaluation_Meston\\R\\DAP_Lidar_analysis\\RSForInvt\\canopymodel\\merged\\tn_dsm.dtm 30 D:\\Box\\VMARS\\Projects\\DAP_evaluation_Meston\\R\\DAP_Lidar_analysis\\RSForInvt\\ITD_merged\\tn_ITD.csv",wait=T)
+
+
+```
+
+
+#build canopy models using lidR
+```{r }
+if(F){
+  install.packages("BiocManager")
+  BiocManager::install("EBImage" , update = F)
+  install.packages("ForestTools")
+}
+library(EBImage)
+install.packages("EBImage",type="source")
+csm = raster::raster("D:/Box/VMARS/Projects/DAP_evaluation_Meston/R/DAP_Lidar_analysis/RSForInvt/canopymodel/TN/merged_vrt/tn_dtms.vrt")
+ws1 = lidR::watershed(csm, th = 30)()
+
+
+library("ForestTools")
+library(raster)
+
+csm = raster::raster("D:/Box/VMARS/Projects/DAP_evaluation_Meston/R/DAP_Lidar_analysis/RSForInvt/canopymodel/TN/merged_vrt/tn_dtms.vrt")
+lin <- function(x){x * 0.05 + 0.6}
+ttops <- vwf(CHM = csm, winFun = lin, minHeight = 30)
+crowns <- mcws(treetops = ttops, CHM = csm , minHeight = 6, verbose = FALSE , OSGeoPath = 'C:\\OSGeo4W64')
+
+```
+
+
+
+#segment individual trees for each tile
+```{r }
+
+ RSForInvt::run_treeseg(
+    dir_dtms = "D:\\Box\\VMARS\\Projects\\DAP_evaluation_Meston\\R\\DAP_Lidar_analysis\\RSForInvt\\canopymodel\\individual"
+    ,dtm_paths = NA
+    ,dir_out = "D:\\Box\\VMARS\\Projects\\DAP_evaluation_Meston\\R\\DAP_Lidar_analysis\\RSForInvt\\ITD"
+    ,switches = "/shape"
+    ,treeseg_path = "c:\\fusion\\treeseg.exe"
+    ,ncore = 4
+  )
+
+
+```
+
+
+#clip plots from lidar
+```{r }
+
+#load lidar exents
+
+
+
+#generate pseudo plot locations
+
+
+
+#create FIA plots at sample points
+
+
+
+#clip plots
+
+
+
+
+```
+
+
+#summarize plot clips
+```{r }
+
+
+
+```
+
+
+#interpolate raster data to plot locations (alternative to plot clips)
+```{r }
+
+
+
+```
+

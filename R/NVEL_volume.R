@@ -14,6 +14,7 @@
 #'Revision History
 #' \tabular{ll}{
 #'1.0 \tab 5/19/2020 Implemented \cr
+#'1.1 \tab 5/21/2020 Add biomass and weight factors \cr
 #'}
 #'
 #'@author

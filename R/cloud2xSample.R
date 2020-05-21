@@ -112,7 +112,7 @@ cloud2xSample=function(
   ,proj4A = NA # (optional) see ?? for proj4 strings: https://www.spatialreference.org/
   ,proj4B = NA # (optional) see ?? for proj4 strings: https://www.spatialreference.org/
   ,extentSample = c(llx = NA, lly = NA, ulx = NA, uly = NA) # (optional) alternative to extentPolyA and extentPolyB
-  ,nSample = 500
+  ,nSample = 100
   ,radii = list( feet = c(FtTenthAc = 37.2, FtAcre = 117.8, Ft5Acres = 263.3 ) , meters = c(MtenthAc = 11.3, MAcre = 35.9, M5Acres = 80.3   ) )[[1]]
   ,sampleShape = c("circle","square","userPoly")[1]
   ,sampleType = c("regular","random","hexagonal")
@@ -153,13 +153,13 @@ cloud2xSample=function(
   hasCMSw = nchar(switchesCloudmetrics) > 0
   hasShape = sampleShape[1] %in% c("circle","square","round","userPoly")
   hasType = sampleType[1] %in% c("regular","random","hexagonal")
-  userPly = sampleShape[1] == "userPoly"
+  userPly = tolower(sampleShape[1]) %in% tolower(c( "userPoly" , "userPly" , "usrPly" , "usrPly", "usrPoly"))
 
   #auto assign variables
   date_in = format(Sys.time(), "%Y%b%d%H%M%S")
 
   #override radii if userPly
-  if(userPly) radii = list( feet = c(noBuffer = 30) )
+  if(userPly) radii_in = c(noBuf = 0)
 
   #prepare spatial data for extents
   loadPoly=function(x,proj4){
@@ -256,11 +256,13 @@ cloud2xSample=function(
       if(!is.null(names(radii_in))) pathsOutBHt_in = paste(pathOutB,"/",paste("clipHt",names(radii_in),sep="_"),sep="")
       if(is.null(names(radii_in))) pathsOutBHt_in = paste(pathOutB,"/",paste("clipHt_Rad",radii_in,"Ht",sep=""),sep="")
       sapply(pathsOutBHt_in , function(x,...) if(!dir.exists(x)) dir.create(x,...) , recursive = T)
+
       if(bad_proj){
-        if(!is.null(names(radii_in))) pathsOutBHt_rp_in = paste(pathOutB,"/",paste("reproject_clipHt",names(radii_in),sep="_"),sep="")
-        if(is.null(names(radii_in))) pathsOutBHt_rp_in = paste(pathOutB,"/",paste("reproject_clipHt_Rad",radii_in,"Ht",sep=""),sep="")
+        if(!is.null(names(radii_in))) pathsOutBHt_rp_in = paste(pathOutB,"/",paste("clipHt",names(radii_in),"rp",sep="_"),sep="")
+        if(is.null(names(radii_in))) pathsOutBHt_rp_in = paste(pathOutB,"/",paste("clipHt_Rad",radii_in,"Ht_rp",sep=""),sep="")
         sapply(pathsOutBHt_rp_in , function(x,...) if(!dir.exists(x)) dir.create(x,...) , recursive = T)
       }
+
     }
   }
 
@@ -406,9 +408,9 @@ cloud2xSample=function(
     if(hasPathA){
 
       ctgA_clip = NA
-      for(i in 1:length(radii_in) ){
+      for(i in 1:length(sInBuffA) ){
 
-        print(c("A",i, as.character(Sys.time())))
+        print(paste(c("Clip A, i =",i,"radius =",radii_in[i],"at",as.character(Sys.time()))))
 
         ctgA_clip =
           .clip_las(
@@ -418,7 +420,7 @@ cloud2xSample=function(
             ,patternDTM = patternDTMA
             ,pathOut = pathsOutA_in[i]
             ,pathOutHt = pathsOutAHt_in[i]
-            ,sampleSPDF = if(userPly) try(sInBuffA[[i]]) else sInA
+            ,sampleSPDF = if(userPly) sInBuffA[[i]] else sInA
             ,shape = sampleShape
             ,radius = radii_in[i]
             ,nCore = nCore
@@ -430,9 +432,9 @@ cloud2xSample=function(
     if(hasPathB){
 
 
-      for(i in 1:length(radii_in) ){
+      for(i in 1:length(sInBuffB) ){
 
-        print(c("B",i,as.character(Sys.time())))
+        print(paste(c("Clip B, i =",i,"radius",radii_in[i],"at",as.character(Sys.time()))))
 
         ctgB_clip =
           .clip_las(
@@ -452,13 +454,16 @@ cloud2xSample=function(
         #reproject las files if needed
         if(bad_proj){
 
+          print(paste(c("Reproject clips B, i =",i,"radius =",radii_in[i],"at",as.character(Sys.time()))))
+
           files_lasBHti=list.files(pathsOutBHt_in[i], full.names=T , pattern = ".*[.]la[s|z]{1}$" )
 
           for(j in 1:length(files_lasBHti)){
             lasBHtij = lidR::readLAS(files_lasBHti[j])
-            if(is.na(proj4string(lasBHtij))) proj4string(lasBHtij) = proj4B
-            lasBHtij_tr = lidR::lastransfrom(lasBHtij , proj4B)
-            lidR::writeLAS(lasBHtij_tr,file.path(pathsOutBHt_rp_in,basename(files_lasBHti[j])))
+            if(!is.na(proj4B)) proj4string(lasBHtij) = proj4B
+            lasBHtij_tr = lidR::lastransform(lasBHtij , proj4B)
+            outLasBj = file.path(pathsOutBHt_rp_in,basename(files_lasBHti[j]))
+            lidR::writeLAS(lasBHtij_tr,outLasBj)
           }
 
         }
@@ -591,6 +596,7 @@ cloud2xSample=function(
   #lidR::opt_cores(ctg_in) <- nCore
   lidR::opt_output_files(ctg_in) <- paste0(pathOut, "/clip_{ID}")
   lidR::opt_laz_compression(ctg_in) <- F
+  print("Clip elevations")
   if(shape == "circle") ctg_clip = lidR::lasclipCircle(ctg_in,sampleSPDF@coords[,1],sampleSPDF@coords[,2],radius)
   if(shape == "square") ctg_clip = lidR::lasclipRectangle(ctg_in
                                                           , sampleSPDF@coords[,1] - radius
@@ -600,7 +606,7 @@ cloud2xSample=function(
   if(shape == "userPoly") ctg_clip = lidR::lasclip(ctg_in,sampleSPDF)
 
   if(!is.na(pathDTM)){
-
+    print("subtract ground models")
     dtm_in = .fn_dtm(pathDTM,patternDTM,file.path(temp,"DTMA.vrt"))
 
     lidR::opt_cores(ctg_clip) <- nCore
