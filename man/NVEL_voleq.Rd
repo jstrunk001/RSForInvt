@@ -63,6 +63,11 @@ Revision History
 }
 \examples{
 
+        library(RSForInvt)
+         NVEL_voleq(region = 2, forest = "01",district = "01", spcd=951)
+         NVEL_voleq(region = 2, forest = "01",district = "01", spcd=951)
+         NVEL_voleq(region = 2, forest = "01",district = "01", spcd=rep(c(951,201),2))
+         NVEL_voleq(dfTL=data.frame(region = 6, forest = "01",district = "01", spcd=rep(c(951,201),2)))
 
         #grab list of species
         if(!"dfSpp" \%in\% ls()){
@@ -99,7 +104,7 @@ Revision History
 
 }
 \seealso{
-\code{\link{NVEL_volume}}\cr
+\code{\link{NVEL_volume}}\cr \code{\link{NVEL_biomass}}\cr
 }
 \author{
 Jacob Strunk <Jacob.strunk@usda.gov>

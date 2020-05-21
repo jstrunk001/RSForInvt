@@ -31,8 +31,7 @@ NVEL_volume(
   dll_32 = "lib/vollib-32bits/vollib.dll",
   load_dll = T,
   dll_func_vol = "vollib_r",
-  dll_func_voleq = "getvoleq_r",
-  nclus = 4
+  dll_func_voleq = "getvoleq_r"
 )
 }
 \arguments{
@@ -132,7 +131,7 @@ Revision History
         #grab list of species
         if(!"dfSpp" \%in\% ls()){
           library(RSQLite)
-          db0 = dbConnect(RSQLite::SQLite(), "code/BiomassEqns.db")
+          db0 = dbConnect(RSQLite::SQLite(), system.file("misc/NBEL/BiomassEqns.db", package="RSForInvt"))
           dfSpp = dbGetQuery(db0, paste("select * from tblspp"))
           dfCoeff = dbGetQuery(db0, paste("select * from BM_EQCoefs"))
           dbDisconnect(db0)

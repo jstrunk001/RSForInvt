@@ -30,6 +30,12 @@ There are three ways to provide the input shapes to this function - either as a
  organized by plot_id (3 column data.frame), or as a polygon shapefile (path to shapefile) inwich case
  the plot id field must be specified "id_field_plots".
 
+ This program is free software but it is provided WITHOUT WARRANTY
+ and with ABSOLUTELY NO GUARANTEE of fitness or functionality for any purpose;
+ you can redistribute it and/or modify it under the terms of the GNU
+ General Public License as published by the Free Software Foundation;
+ either version 2 of the License, or (at your option) any later version.
+
 \cr
 Revision History
 \tabular{ll}{

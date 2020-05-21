@@ -65,6 +65,14 @@ a function which computes fitting indices which enable comparison between fitted
 fit multiple pdfs with fit_pdf, and specify the range of possibly y values across with comparisons should be made
 then run pdf_compare to evaluate the relative performance of the fit
 
+
+ This program is free software but it is provided WITHOUT WARRANTY
+ and with ABSOLUTELY NO GUARANTEE of fitness or functionality for any purpose;
+ you can redistribute it and/or modify it under the terms of the GNU
+ General Public License as published by the Free Software Foundation;
+ either version 2 of the License, or (at your option) any later version.
+
+
 \cr
 
 Revision History

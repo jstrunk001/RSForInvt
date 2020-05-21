@@ -165,9 +165,8 @@ NVEL_biomass=function(
   #turn warnings back on
   options(warn = defaultW)
 
-  #merge predictions together and add their names
+  #merge predictions together
   bio_pd0_df = plyr::rbind.fill(bio_pd0 )
-  #names(bio_pd0_df )[1:2] = c("GRNBIOGRN","DRYBIO")
 
   #return formatted tree list with predicted volumes
   data.frame(dfTL0_in,bio_pd0_df )

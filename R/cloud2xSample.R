@@ -9,12 +9,6 @@ NULL
 #'@details
 #'  <Delete and Replace>
 #'
-#'  This program is free software but it is provided WITHOUT WARRANTY
-#'  and with ABSOLUTELY NO GUARANTEE of fitness or functionality for any purpose;
-#'  you can redistribute it and/or modify it under the terms of the GNU
-#'  General Public License as published by the Free Software Foundation;
-#'  either version 2 of the License, or (at your option) any later version.
-#'
 #'\cr
 #'Revision History
 #' \tabular{ll}{
@@ -120,7 +114,7 @@ cloud2xSample=function(
   ,extentSample = c(llx = NA, lly = NA, ulx = NA, uly = NA) # (optional) alternative to extentPolyA and extentPolyB
   ,nSample = 500
   ,radii = list( feet = c(FtTenthAc = 37.2, FtAcre = 117.8, Ft5Acres = 263.3 ) , meters = c(MtenthAc = 11.3, MAcre = 35.9, M5Acres = 80.3   ) )[[1]]
-  ,sampleShape = c("circle","square")[1]
+  ,sampleShape = c("circle","square","userPoly")[1]
   ,sampleType = c("regular","random","hexagonal")
   ,doSteps = c("sample","clip","metrics")
   ,switchesClipdata = "" #optional switches to FUSION's polyclip.exe
@@ -157,11 +151,15 @@ cloud2xSample=function(
   hasExt = !isNA(extentSample[1])
   hasClipSw = nchar(switchesClipdata) > 0
   hasCMSw = nchar(switchesCloudmetrics) > 0
-  hasShape = sampleShape[1] %in% c("circle","square","round")
+  hasShape = sampleShape[1] %in% c("circle","square","round","userPoly")
   hasType = sampleType[1] %in% c("regular","random","hexagonal")
+  userPly = sampleShape[1] == "userPoly"
 
   #auto assign variables
   date_in = format(Sys.time(), "%Y%b%d%H%M%S")
+
+  #override radii if userPly
+  if(userPly) radii = list( feet = c(noBuffer = 30) )
 
   #prepare spatial data for extents
   loadPoly=function(x,proj4){
@@ -258,12 +256,17 @@ cloud2xSample=function(
       if(!is.null(names(radii_in))) pathsOutBHt_in = paste(pathOutB,"/",paste("clipHt",names(radii_in),sep="_"),sep="")
       if(is.null(names(radii_in))) pathsOutBHt_in = paste(pathOutB,"/",paste("clipHt_Rad",radii_in,"Ht",sep=""),sep="")
       sapply(pathsOutBHt_in , function(x,...) if(!dir.exists(x)) dir.create(x,...) , recursive = T)
+      if(bad_proj){
+        if(!is.null(names(radii_in))) pathsOutBHt_rp_in = paste(pathOutB,"/",paste("reproject_clipHt",names(radii_in),sep="_"),sep="")
+        if(is.null(names(radii_in))) pathsOutBHt_rp_in = paste(pathOutB,"/",paste("reproject_clipHt_Rad",radii_in,"Ht",sep=""),sep="")
+        sapply(pathsOutBHt_rp_in , function(x,...) if(!dir.exists(x)) dir.create(x,...) , recursive = T)
+      }
     }
   }
 
   #intersect extents
-  if(polyAExt) extInA = gIntersection(extentPolyA_in, extentPoly_in)
-  if(polyAB) extInA = gIntersection(extentPolyA_in, extentPolyB_in)
+  if(polyAExt) extInA = rgeos::gIntersection(extentPolyA_in, extentPoly_in)
+  if(polyAB) extInA = rgeos::gIntersection(extentPolyA_in, extentPolyB_in)
   if(polyAOnly) extInA = extentPolyA_in
   if(extOnly) extInA = extentPoly_in
 
@@ -274,37 +277,71 @@ cloud2xSample=function(
   if(!inherits(sampleShpA_in,"Spatial")){
 
     sInA = spsample( extInA , n = nSample , type = sampleType[1] )
-    sInDFA = SpatialPointsDataFrame(sInA, data.frame(id=1:nrow(sInA@coords)))
+    sInDFA = SpatialPointsDataFrame(sInA, data.frame(id=1:nrow(sInA@coords)), match.ID = F)
     sInBuffA = lapply(radii_in, .fn_buff, sInDFA , sampleShape)
 
-  }else{
-
-    #use existing sample
-    sInA = sampleShpA_in
+  }
+  #browser()
+  #use existing sample
+  if(inherits(sampleShpA_in,"Spatial")){
 
     #get correct data type
-    if(class(sInA) == "SpatialPoints"){
-      sInDFA = SpatialPointsDataFrame(sInA, data.frame(id=1:nrow(sInA@coords)))
-    }else{
-      sInDFA = sInA
-    }
-
-    #buffer as needed
-    if(class(sInDFA) == "SpatialPointsDataFrame"){
+    if(class(sampleShpA_in) == "SpatialPoints"){
+      sInA = sampleShpA_in
+      sInDFA = SpatialPointsDataFrame(sInA, data.frame(id=1:nrow(sInA@coords)), match.ID = F)
       sInBuffA = lapply(radii_in, .fn_buff, sInDFA , sampleShape)
-    }else{
-      sInBuffA = sInDFA
+    }
+    if(class(sampleShpA_in) == "SpatialPointsDataFrame"){
+      sInA = data.frame(coordinates(sampleShpA_in))
+      names(sInA) = c("x","y")
+      sInDFA = sampleShpA_in
+      sInBuffA = lapply(radii_in, .fn_buff, sInDFA , sampleShape)
+    }
+    if(class(sampleShpA_in) == "SpatialPolygons" & userPly){
+      sInA = data.frame(getSpPPolygonsLabptSlots(sampleShpA_in))
+      names(sInA) = c("x","y")
+      coordinates(sInA) = ~x+y
+      sInDFA = SpatialPointsDataFrame(sInA, data.frame(id=1:nrow(sInA@coords)), match.ID = F)
+      sInBuffA = list(userPly = SpatialPolygonsDataFrame(sampleShpA_in, data.frame(id=1:length(sampleShpA_in))), match.ID = F)
+    }
+    if(class(sampleShpA_in) == "SpatialPolygons" & !userPly){
+      sInA = data.frame(getSpPPolygonsLabptSlots(sampleShpA_in))
+      names(sInA) = c("x","y")
+      coordinates(sInA) = ~x+y
+      sInDFA = SpatialPointsDataFrame(sInA, data.frame(id=1:nrow(sInA@coords)), match.ID = F)
+      sInBuffA = lapply(radii_in, .fn_buff, sampleShpA_in, sampleShape)
+    }
+    if(class(sampleShpA_in) == "SpatialPolygonsDataFrame" & userPly){
+      sInA = data.frame(getSpPPolygonsLabptSlots(sampleShpA_in))
+      names(sInA) = c("x","y")
+      coordinates(sInA) = ~x+y
+      sInDFA = SpatialPointsDataFrame(sInA, data.frame(id=1:nrow(sInA@coords)), match.ID = F)
+      sInBuffA = list( userPly = sampleShpA_in )
+    }
+    if(class(sampleShpA_in) == "SpatialPolygonsDataFrame" & !userPly){
+      sInA = data.frame(getSpPPolygonsLabptSlots(sampleShpA_in))
+      names(sInA) = c("x","y")
+      coordinates(sInA) = ~x+y
+      sInDFA = SpatialPointsDataFrame(sInA, data.frame(id=1:nrow(sInA@coords)), match.ID = F)
+      sInBuffA = lapply(radii_in, .fn_buff, sampleShpA_in, sampleShape)
     }
 
   }
 
 
   #reproject spatial data for project B or extent - if necessary
+
+  proj4string(sInA) = proj4A
+  if(!is.null(extInA)) proj4string(extInA) = proj4A
+  proj4string(sInDFA) = proj4A
+  sInBuffA = lapply( sInBuffA , function(x,proj4){ proj4string(x) = proj4 ; x } , proj4A)
+
   if(polyAB){
     if(bad_proj & hasCRSPolyB){
+
       sInB = spTransform(sInA , sp::proj4string(extentPolyB_in))
-      extInB = spTransform(extInA , sp::proj4string(extentPolyB_in))
-      sInDFB = spTransform(sInBuffA , sp::proj4string(extentPolyB_in))
+      if(!is.null(extInA)) extInB = spTransform(extInA , sp::proj4string(extentPolyB_in))
+      sInDFB = spTransform(sInDFA , sp::proj4string(extentPolyB_in))
       sInBuffB = sapply(sInBuffA , spTransform, sp::proj4string(extentPolyB_in))
 
     }else{
@@ -318,8 +355,8 @@ cloud2xSample=function(
   if(polyAExt){
     if(bad_proj & hasProj4B){
       sInB = spTransform(sInA , proj4B)
-      extInB = spTransform(extInA , proj4B)
-      sInDFB = spTransform(sInBuffA , proj4B)
+      if(!is.null(extInA)) extInB = spTransform(extInA , proj4B)
+      sInDFB = spTransform(sInDFA , proj4B)
       sInBuffB = sapply(sInBuffA , spTransform, proj4B)
 
     }else{
@@ -381,7 +418,7 @@ cloud2xSample=function(
             ,patternDTM = patternDTMA
             ,pathOut = pathsOutA_in[i]
             ,pathOutHt = pathsOutAHt_in[i]
-            ,sampleSPDF = sInA
+            ,sampleSPDF = if(userPly) try(sInBuffA[[i]]) else sInA
             ,shape = sampleShape
             ,radius = radii_in[i]
             ,nCore = nCore
@@ -405,19 +442,33 @@ cloud2xSample=function(
             ,patternDTM = patternDTMB
             ,pathOut = pathsOutB_in[i]
             ,pathOutHt = pathsOutBHt_in[i]
-            ,sampleSPDF = sInB
+            ,sampleSPDF = if(userPly) sInBuffB[[i]] else sInB
             ,shape = sampleShape
             ,radius = radii_in[i]
             ,nCore = nCore
             ,temp = temp
           )
 
+        #reproject las files if needed
+        if(bad_proj){
+
+          files_lasBHti=list.files(pathsOutBHt_in[i], full.names=T , pattern = ".*[.]la[s|z]{1}$" )
+
+          for(j in 1:length(files_lasBHti)){
+            lasBHtij = lidR::readLAS(files_lasBHti[j])
+            if(is.na(proj4string(lasBHtij))) proj4string(lasBHtij) = proj4B
+            lasBHtij_tr = lidR::lastransfrom(lasBHtij , proj4B)
+            lidR::writeLAS(lasBHtij_tr,file.path(pathsOutBHt_rp_in,basename(files_lasBHti[j])))
+          }
+
+        }
+
+
       }
 
     }
 
 
-    #reproject coordinates if needed
 
 
     #compute plot metrics
@@ -537,7 +588,7 @@ cloud2xSample=function(
   las_paths = list.files(pathLAS,full.names=T,pattern=patternLAS,recursive=T)
   ctg_in <- lidR::catalog(las_paths)
 
-  lidR::opt_cores(ctg_in) <- nCore
+  #lidR::opt_cores(ctg_in) <- nCore
   lidR::opt_output_files(ctg_in) <- paste0(pathOut, "/clip_{ID}")
   lidR::opt_laz_compression(ctg_in) <- F
   if(shape == "circle") ctg_clip = lidR::lasclipCircle(ctg_in,sampleSPDF@coords[,1],sampleSPDF@coords[,2],radius)
@@ -546,6 +597,7 @@ cloud2xSample=function(
                                                           , sampleSPDF@coords[,2] - radius
                                                           , sampleSPDF@coords[,1] + radius
                                                           , sampleSPDF@coords[,2] + radius)
+  if(shape == "userPoly") ctg_clip = lidR::lasclip(ctg_in,sampleSPDF)
 
   if(!is.na(pathDTM)){
 
@@ -665,19 +717,10 @@ cloud2xSample=function(
 .fn_buff = function(r, x, shape){
   if(shape == "circle" | shape == "round") res = rgeos::gBuffer( x , width= r ,capStyle="round" , byid=T)
   if(shape == "square") res = rgeos::gBuffer(x,width=r,capStyle="square" , byid=T)
-  SpatialPolygonsDataFrame(res, data.frame(id=1:length(res@polygons)))
+  SpatialPolygonsDataFrame(res, data.frame(id=1:length(res@polygons)), match.ID = F)
 }
 
 isNA <- function(x){
   is.atomic(x) && length(x) == 1 && is.na(x)
 }
-
-
-rTenthAcreFt = sqrt(43560/10/pi)
-rAcreFt = sqrt(43560/pi)
-r5AcresFt = sqrt(5*43560/pi)
-
-rTenthAcreM = sqrt(43560/10/pi) * 0.3048
-rAcreM = sqrt(43560/pi) * 0.3048
-r5AcresM = sqrt(5*43560/pi) * 0.3048
 
