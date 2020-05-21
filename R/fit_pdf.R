@@ -1,16 +1,16 @@
 
 ##Header for DNR remote sensing inventory project
-#'@name 
+#'@name
 #'fit_pdf
 #'
-#'@title 
+#'@title
 #'fit and compare pdfs
 #'
-#'@description 
+#'@description
 #' fit and compare pdfs, three indices are reported which are similar to R-square, RMSE, and standard error
 #' for the comparisons. One of the fits, the baseline, is treated as the population pdf (much like the population
 #' mean when computing r-squared).
-#' 
+#'
 #' a pdf fitting function is specialized to enable comparison across a desired range
 #' a function which computes fitting indices which enable comparison between fitted pdfs
 #'
@@ -18,6 +18,14 @@
 #'
 #'fit multiple pdfs with fit_pdf, and specify the range of possibly y values across with comparisons should be made
 #'then run pdf_compare to evaluate the relative performance of the fit
+#'
+#'
+#'  This program is free software but it is provided WITHOUT WARRANTY
+#'  and with ABSOLUTELY NO GUARANTEE of fitness or functionality for any purpose;
+#'  you can redistribute it and/or modify it under the terms of the GNU
+#'  General Public License as published by the Free Software Foundation;
+#'  either version 2 of the License, or (at your option) any later version.
+#'
 #'
 #'\cr
 #'
@@ -28,7 +36,7 @@
 #'
 #'
 #'@author
-#'Jacob Strunk <Jacob.strunk@@dnr.wa.gov> 
+#'Jacob Strunk <Jacob.strunk@@dnr.wa.gov>
 #'
 #'@param y vector of respone values
 #'@param wts optional vector of weights for each y
@@ -41,7 +49,7 @@
 #'@param fit_pdf1 first pdf to use in comparison - object returned by fit_pdf()
 #'@param fit_pdf2 second pdf to use in comparison - object returned by fit_pdf()
 #'@param plot T/F plot two histograms?
-#'@param add T/F histogram to existing plot? - in the case of multiple comparisons... 
+#'@param add T/F histogram to existing plot? - in the case of multiple comparisons...
 #'@param ... additional arguments to plot
 
 #'
@@ -86,21 +94,21 @@ fit_pdf=function(
                   require(plotrix)
 
                   if(!is.na(bins[1])){
-                    
+
                     bins=sort(bins)
                     bw=abs(bins[2]-bins[1])
                     breaks=c(bins-bw/2,max(bins)+bw/2)
-                  
+
                   }
 
                   if(!is.na(bins[1])){
-                    
+
                     breaks=sort(breaks)
                     bw=abs(breaks[2]-breaks[1])
                     bins=bins[-length(breaks)]+bw/2
-                  
+
                   }
-  
+
                   if(length(y)==0 ){
 
                        warning("empty y vector, pdf values set to zero")
@@ -118,26 +126,26 @@ fit_pdf=function(
 
                   if(!is.na(wts[1])) {
                     h_in=weighted.hist(y,w=wts,breaks=breaks,plot=FALSE)
-                  }else{               
+                  }else{
                     h_in=hist(y,breaks=breaks,plot=FALSE)
                   }
-                  
+
                 # browser()
 
                   if(MA ){
-                    
+
                     #moving average
                     require(TTR)
                     sma_c=c(rep(0,MA_n-1),SMA(h_in[["counts"]],MA_n)[-(1:(MA_n-1))])
                     sma_c[(1:(MA_n-1))]=sma_c[MA_n]
                     sma_d=c(rep(0,MA_n-1),SMA(h_in[["density"]],MA_n)[-(1:(MA_n-1))])
                     sma_d[(1:(MA_n-1))]=sma_d[MA_n]
-                    
+
                     h_in[["counts"]]=sma_c
                     h_in[["density"]]=sma_d
-                    
+
                     if(plot) lines(bins,sma_c,col="red",lwd=2)
-                    
+
                   }
 
                  return(

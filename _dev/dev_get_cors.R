@@ -6,11 +6,28 @@
 #'  either version 2 of the License, or (at your option) any later version.
 #'
 #'
-merge_las=function(list_las, keep_1st_header=T){
+#cors KMZ: https://www.ngs.noaa.gov/CORS_Map/corsdownload?id=kmz
 
-      require(lidR)
-      points_merge = do.call(rbind,lapply(list_las,function(x)x@data))
-      if(keep_1st_header) return(LAS(points_merge,list_las[[1]]@header))
-      if(!keep_1st_header) return(LAS(points_merge))
+get_base=function(from,to,xy,n=1,ftp="",download = F,cors_kmz ="" ,get=c(".gz",".Z")){
 
-  }
+
+  library(maptools)
+  cds = getKMLcoordinates(textConnection(system("unzip -p /Users/foo/test.kmz", intern = TRUE)))
+
+
+}
+.download_base=function(){
+
+
+
+}
+
+.choose_nearest=function(xy,ftp){
+
+
+
+
+
+}
+
+
