@@ -32,8 +32,7 @@
 #'@param out_type character string ".las" or ".laz"
 #'@param proj4from (optional) only optional if input las/laz
 #'@param proj4to (required) character string proj4 string to translate
-#'@param zFrom (optional) specify vertical units in
-#'@param zTo (optional) specify vertical units out
+#'@param zMult specify multiplier for vertical units to go e.g. from feet to meters
 #'@param return T/F return translated object?
 #'@param doWriteLAS T/F write translated object to disk
 #'
@@ -122,6 +121,7 @@ translateLAS = function(
           ,proj4to = NA
           ,zFrom = c("ft","m")
           ,zTo = c("ft","m")
+          ,zMult = c(1.0 , .3048 , 1/ .3048)[1]
           ,return=F
           ,doWriteLAS=T
           ){
@@ -148,8 +148,8 @@ translateLAS = function(
     if(is.na(dir_out) & is.na(las_out_path)) dir_out = paste(dirname(las_in_path),"/translate/")
     if(is.na(dir_out)) dir_out = dirname(las_out_path)
     if(!dir.exists(dir_out)) dir.create(dir_out)
-    if(!is.na(las_out_path)) las_out_path = paste(dir_out,out_prefix,gsub("[.]la.$","",basename(las_out_path)),out_suffix,out_type[1],sep="")
-    if(is.na(las_out_path) & !is.na(las_in_path)) las_out_path = paste(dir_out,out_prefix,gsub("[.]la.$","",basename(las_in_path)),out_suffix,out_type[1],sep="")
+    if(!is.na(las_out_path)) las_out_path = paste(dir_out,"/",out_prefix,gsub("[.]la.$","",basename(las_out_path)),out_suffix,out_type[1],sep="")
+    if(is.na(las_out_path) & !is.na(las_in_path)) las_out_path = paste(dir_out,"/",out_prefix,gsub("[.]la.$","",basename(las_in_path)),out_suffix,out_type[1],sep="")
   }
   #translate xy data
   xy_in = las_in@data[,c("X","Y")]
@@ -161,8 +161,7 @@ translateLAS = function(
   las_in@data[,c("X","Y")] = as.data.frame(coordinates(xy_in1))
 
   #translate vertical coordinates
-  if(zFrom[1] == "ft" & zTo[1] == "m") las_in@data[,c("Z")] = las_in@data[,c("Z")] * .3048
-  if(zFrom[1] == "m" & zTo[1] == "ft") las_in@data[,c("Z")] = las_in@data[,c("Z")] / .3048
+  las_in@data[,c("Z")] = las_in@data[,c("Z")] * zMult
 
   #update header
   las_in@header@VLR$GeoKeyDirectoryTag = NULL
@@ -179,7 +178,7 @@ translateLAS = function(
   proj4string(las_in) = proj4to
   options(warn = defaultW)
 
-  if(doWriteLAS) writeLAS(las_in,las_out_path)
+  if(doWriteLAS) lidR::writeLAS(las_in,las_out_path)
 
   if(return) return(las_in)
 }
@@ -213,8 +212,7 @@ if(F){
     ,out_type=".laz"
     ,proj4from = NA
     ,proj4to = "+proj=utm +zone=10 +ellps=GRS80 +datum=NAD83 +units=m +no_defs"
-    ,zFrom = c("ft")
-    ,zTo = c("m")
+    ,zMult =  .3048
   )
 
   #provide path to las file
@@ -230,8 +228,7 @@ if(F){
     ,out_type=".laz"
     ,proj4from = NA
     ,proj4to = "+proj=utm +zone=10 +ellps=GRS80 +datum=NAD83 +units=m +no_defs"
-    ,zFrom = c("ft")
-    ,zTo = c("m")
+    ,zMult =.3048
     ,return = T
     ,doWriteLAS = F
   )

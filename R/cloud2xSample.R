@@ -34,6 +34,8 @@ NULL
 #'@param sampleShpA (Optional) use an existing shapefile with plot locations
 #'@param proj4A (Optional) Provide proj4 strings if projects A and B are in different projections but do not contain projection information (e.g. missing .prj files)
 #'@param proj4B (Optional) Provide proj4 strings if projects A and B are in different projections but do not contain projection information (e.g. missing .prj files)
+#'@param zFrom (optional) specify vertical units in
+#'@param zTo (optional) specify vertical units out
 #'@param extentSample (Optional) If the overlap between projects A and B is known, you can provide it here
 #'@param nSample number of plots to sample
 #'@param radii a vector of plot radii to use in clipping plots
@@ -111,6 +113,8 @@ cloud2xSample=function(
   ,sampleShpA = NA # (optional) provide shapefile of target sample locations - assumed to be in projection of A or extent
   ,proj4A = NA # (optional) see ?? for proj4 strings: https://www.spatialreference.org/
   ,proj4B = NA # (optional) see ?? for proj4 strings: https://www.spatialreference.org/
+  ,zFrom = c("ft","m")
+  ,zTo = c("ft","m")
   ,extentSample = c(llx = NA, lly = NA, ulx = NA, uly = NA) # (optional) alternative to extentPolyA and extentPolyB
   ,nSample = 100
   ,radii = list( feet = c(FtTenthAc = 37.2, FtAcre = 117.8, Ft5Acres = 263.3 ) , meters = c(MtenthAc = 11.3, MAcre = 35.9, M5Acres = 80.3   ) )[[1]]
@@ -248,21 +252,28 @@ cloud2xSample=function(
     }
   }
   if(hasOutB ){
+
+    #create output elevation folders for project B
     if(!is.null(names(radii_in))) pathsOutB_in = paste(pathOutB,"/",paste("clipElev",names(radii_in),sep="_"),sep="")
     if(is.null(names(radii_in))) pathsOutB_in = paste(pathOutB,"/",paste("clipElev_Rad",radii_in,sep=""),sep="")
     sapply(pathsOutB_in ,function(x,...) if(!dir.exists(x)) dir.create(x,...) , recursive = T)
 
+    #create output height folders for project B
     if(hasPathDTMB & procMethod=="lidR"){
       if(!is.null(names(radii_in))) pathsOutBHt_in = paste(pathOutB,"/",paste("clipHt",names(radii_in),sep="_"),sep="")
       if(is.null(names(radii_in))) pathsOutBHt_in = paste(pathOutB,"/",paste("clipHt_Rad",radii_in,"Ht",sep=""),sep="")
       sapply(pathsOutBHt_in , function(x,...) if(!dir.exists(x)) dir.create(x,...) , recursive = T)
-
-      if(bad_proj){
-        if(!is.null(names(radii_in))) pathsOutBHt_rp_in = paste(pathOutB,"/",paste("clipHt",names(radii_in),"rp",sep="_"),sep="")
-        if(is.null(names(radii_in))) pathsOutBHt_rp_in = paste(pathOutB,"/",paste("clipHt_Rad",radii_in,"Ht_rp",sep=""),sep="")
-        sapply(pathsOutBHt_rp_in , function(x,...) if(!dir.exists(x)) dir.create(x,...) , recursive = T)
-      }
-
+    }
+    #create reprojection folder(s) for project B
+    if(hasPathDTMB & procMethod=="lidR" & bad_proj){
+      if(!is.null(names(radii_in))) pathsOutB_rp_in = paste(pathOutB,"/",paste("clipHt",names(radii_in),"rp",sep="_"),sep="")
+      if(is.null(names(radii_in))) pathsOutB_rp_in = paste(pathOutB,"/",paste("clipHt_Rad",radii_in,"Ht_rp",sep=""),sep="")
+      sapply(pathsOutB_rp_in , function(x,...) if(!dir.exists(x)) dir.create(x,...) , recursive = T)
+    }
+    if(!hasPathDTMB & procMethod=="lidR" & bad_proj){
+      if(!is.null(names(radii_in))) pathsOutB_rp_in = paste(pathOutB,"/",paste("clipElev",names(radii_in),"rp",sep="_"),sep="")
+      if(is.null(names(radii_in))) pathsOutB_rp_in = paste(pathOutB,"/",paste("clipElev_Rad",radii_in,"Ht_rp",sep=""),sep="")
+      sapply(pathsOutB_rp_in , function(x,...) if(!dir.exists(x)) dir.create(x,...) , recursive = T)
     }
   }
 
@@ -456,16 +467,13 @@ cloud2xSample=function(
 
           print(paste(c("Reproject clips B, i =",i,"radius =",radii_in[i],"at",as.character(Sys.time()))))
 
-          files_lasBHti=list.files(pathsOutBHt_in[i], full.names=T , pattern = ".*[.]la[s|z]{1}$" )
+          if(hasPathDTMB) files_lasBi=list.files(pathsOutBHt_in[i], full.names=T , pattern = ".*[.]la[s|z]{1}$" )
+          if(!hasPathDTMB) files_lasBi=list.files(pathsOutB_in[i], full.names=T , pattern = ".*[.]la[s|z]{1}$" )
 
-          for(j in 1:length(files_lasBHti)){
-            lasBHtij = lidR::readLAS(files_lasBHti[j])
-            if(!is.na(proj4B)) proj4string(lasBHtij) = proj4B
-            lasBHtij_tr = lidR::lastransform(lasBHtij , proj4B)
-            outLasBj = file.path(pathsOutBHt_rp_in,basename(files_lasBHti[j]))
-            lidR::writeLAS(lasBHtij_tr,outLasBj)
+          for(j in 1:length(files_lasBi)){
+            outLASj = file.path(pathsOutB_rp_in,basename(files_lasBi[j]))
+            translateLAS(las_in_path = files_lasBi[j], las_out_path = outLASj , proj4from = proj4B, proj4to = proj4A  ,zMult=zMult[1] , doWriteLAS = T)
           }
-
         }
 
 

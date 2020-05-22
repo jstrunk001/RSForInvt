@@ -43,7 +43,7 @@
 #'@param fclassNm (optional) column name in DFTL: Girard’s form class.  Diameter at the top of the first log given as a percent of DBH.
 #'@param dbtbhNm  (optional) column name in DFTL: Double bark thickness at breast height in inches
 #'@param btrNm  (optional) column name in DFTL: Bark thickness ratio given as the percent of diameter inside bark to diameter outside bark.  (dib/dob *100).
-#'@vol2biomass T/F Compute total drye and green biomass in lbs using weight factors and append weight factors (lbs / cubic foot)
+#'@param vol2biomass T/F Compute total drye and green biomass in lbs using weight factors and append weight factors (lbs / cubic foot)
 #'@param dll_64  path to 64bit dll
 #'@param dll_32  path to 64bit dll
 #'@param load_dll T/F should dll be loaded (in case it is already loaded)

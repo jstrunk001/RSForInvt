@@ -262,7 +262,7 @@ output: html_document
 ```{r }
 
 	library(lidR)
-	library(cloudSampleR)
+	library(RSForInvt)
 
   dir_proj = "D:\\Box\\VMARS\\Projects\\DAP_evaluation_Meston"
 	dir_tn_dat = file.path(dir_proj,"Data\\Tennessee")
@@ -338,8 +338,8 @@ output: html_document
 		,pathOutB = "d:/temp/tennessee/clip_dap/"
 		,pathLasA = dir_tn_las
 		,pathLasB = dir_tn_dap
-		,pathDTMA = out_dtm_tn_las
-		,pathDTMB = out_dtm_tn_dap
+		#,pathDTMA = out_dtm_tn_las
+		#,pathDTMB = out_dtm_tn_dap
 		,extentPolyA = border_las
 		,extentPolyB = border_dap
 		,nCore = 3
@@ -350,7 +350,7 @@ output: html_document
 		,sampleShape = "userPoly"
 		,proj4A ="+proj=lcc +lat_1=36.41666666666666 +lat_2=35.25 +lat_0=34.33333333333334 +lon_0=-86 +x_0=600000 +y_0=0 +ellps=GRS80 +units=us-ft +vunits=us-ft +no_defs"
     ,proj4B = "+proj=utm +zone=16 +ellps=GRS80 +units=m +no_defs"
-  
+		,zMult = 1/.3048
 	)
 	
 	
@@ -358,20 +358,20 @@ output: html_document
 	las3_lid = readLAS("D:/temp/tennessee/clip_las/clipHt_noBuf/clip_3.las")
 	las3_dap = readLAS("D:/temp/tennessee/clip_dap/clipHt_noBuf/clip_3.las")
 
-	plot(las3_lid)
-	plot(las3_dap)
-	proj_las = "+proj=lcc +lat_1=35.25 +lat_2=36.41666666666666 +lat_0=34.33333333333334 +lon_0=-86 +x_0=600000.0000000001 +y_0=0 +ellps=GRS80 +datum=NAD83 +to_meter=0.3048006096012192 +no_defs"
-	proj4string(las3_lid) = proj_las
-	proj4string(las3_lid) = sp::CRS("+init=epsg:102736")
-	proj4string(las3_dap) = "+proj=utm +zone=16 +ellps=GRS80 +units=m +no_defs" 
-	las3_dap_rp = lidR::lastransform(las3_dap,proj_las)
-	
-	lidR::epsg(las3_lid) = 102736
-	epsg(las3_dap)
-	rgdal::checkCRSArgs("+EPSG:102736")
-	rgdal::checkCRSArgs("+proj=lcc +lat_1=35.25 +lat_2=36.41666666666666 +lat_0=34.33333333333334 +lon_0=-86 +x_0=600000.0000000001 +y_0=0 +ellps=GRS80 +datum=NAD83 +to_meter=0.3048006096012192 +no_defs")
-	rgdal::checkCRSArgs("+init=epsg:102736")
-	
-	sp::CRS("+init=epsg:102736")
+	# plot(las3_lid)
+	# plot(las3_dap)
+	# proj_las = "+proj=lcc +lat_1=35.25 +lat_2=36.41666666666666 +lat_0=34.33333333333334 +lon_0=-86 +x_0=600000.0000000001 +y_0=0 +ellps=GRS80 +datum=NAD83 +to_meter=0.3048006096012192 +no_defs"
+	# proj4string(las3_lid) = proj_las
+	# proj4string(las3_lid) = sp::CRS("+init=epsg:102736")
+	# proj4string(las3_dap) = "+proj=utm +zone=16 +ellps=GRS80 +units=m +no_defs" 
+	# las3_dap_rp = lidR::lastransform(las3_dap,proj_las)
+	# 
+	# lidR::epsg(las3_lid) = 102736
+	# epsg(las3_dap)
+	# rgdal::checkCRSArgs("+EPSG:102736")
+	# rgdal::checkCRSArgs("+proj=lcc +lat_1=35.25 +lat_2=36.41666666666666 +lat_0=34.33333333333334 +lon_0=-86 +x_0=600000.0000000001 +y_0=0 +ellps=GRS80 +datum=NAD83 +to_meter=0.3048006096012192 +no_defs")
+	# rgdal::checkCRSArgs("+init=epsg:102736")
+	# 
+	# sp::CRS("+init=epsg:102736")
 
 ```

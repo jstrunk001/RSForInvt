@@ -27,6 +27,7 @@ NVEL_volume(
   fclassNm = c("fclass"),
   dbtbhNm = c("dbtbh"),
   btrNm = c("btr"),
+  vol2biomass = T,
   dll_64 = "lib/vollib-64bits/vollib.dll",
   dll_32 = "lib/vollib-32bits/vollib.dll",
   load_dll = T,
@@ -79,6 +80,8 @@ NVEL_volume(
 
 \item{btrNm}{(optional) column name in DFTL: Bark thickness ratio given as the percent of diameter inside bark to diameter outside bark.  (dib/dob *100).}
 
+\item{vol2biomass}{T/F Compute total drye and green biomass in lbs using weight factors and append weight factors (lbs / cubic foot)}
+
 \item{dll_64}{path to 64bit dll}
 
 \item{dll_32}{path to 64bit dll}
@@ -124,6 +127,7 @@ Predict volume using National Volume Estimator Library (NVEL)
 Revision History
 \tabular{ll}{
 1.0 \tab 5/19/2020 Implemented \cr
+1.1 \tab 5/21/2020 Add biomass and weight factors \cr
 }
 }
 \examples{

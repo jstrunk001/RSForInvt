@@ -23,7 +23,7 @@ cloud2xSample(
   proj4A = NA,
   proj4B = NA,
   extentSample = c(llx = NA, lly = NA, ulx = NA, uly = NA),
-  nSample = 500,
+  nSample = 100,
   radii = list(feet = c(FtTenthAc = 37.2, FtAcre = 117.8, Ft5Acres = 263.3), meters =
     c(MtenthAc = 11.3, MAcre = 35.9, M5Acres = 80.3))[[1]],
   sampleShape = c("circle", "square", "userPoly")[1],
