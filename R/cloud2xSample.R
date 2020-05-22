@@ -34,8 +34,7 @@ NULL
 #'@param sampleShpA (Optional) use an existing shapefile with plot locations
 #'@param proj4A (Optional) Provide proj4 strings if projects A and B are in different projections but do not contain projection information (e.g. missing .prj files)
 #'@param proj4B (Optional) Provide proj4 strings if projects A and B are in different projections but do not contain projection information (e.g. missing .prj files)
-#'@param zFrom (optional) specify vertical units in
-#'@param zTo (optional) specify vertical units out
+#'@param zMult specify multiplier for vertical units to go e.g. from feet to meters
 #'@param extentSample (Optional) If the overlap between projects A and B is known, you can provide it here
 #'@param nSample number of plots to sample
 #'@param radii a vector of plot radii to use in clipping plots
@@ -113,8 +112,7 @@ cloud2xSample=function(
   ,sampleShpA = NA # (optional) provide shapefile of target sample locations - assumed to be in projection of A or extent
   ,proj4A = NA # (optional) see ?? for proj4 strings: https://www.spatialreference.org/
   ,proj4B = NA # (optional) see ?? for proj4 strings: https://www.spatialreference.org/
-  ,zFrom = c("ft","m")
-  ,zTo = c("ft","m")
+  ,zMult = c(1.0 , .3048 , 1/ .3048)[1]
   ,extentSample = c(llx = NA, lly = NA, ulx = NA, uly = NA) # (optional) alternative to extentPolyA and extentPolyB
   ,nSample = 100
   ,radii = list( feet = c(FtTenthAc = 37.2, FtAcre = 117.8, Ft5Acres = 263.3 ) , meters = c(MtenthAc = 11.3, MAcre = 35.9, M5Acres = 80.3   ) )[[1]]
@@ -475,7 +473,6 @@ cloud2xSample=function(
             translateLAS(las_in_path = files_lasBi[j], las_out_path = outLASj , proj4from = proj4B, proj4to = proj4A  ,zMult=zMult[1] , doWriteLAS = T)
           }
         }
-
 
       }
 

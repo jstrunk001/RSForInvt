@@ -22,6 +22,8 @@ cloud2xSample(
   sampleShpA = NA,
   proj4A = NA,
   proj4B = NA,
+  zFrom = c("ft", "m"),
+  zTo = c("ft", "m"),
   extentSample = c(llx = NA, lly = NA, ulx = NA, uly = NA),
   nSample = 100,
   radii = list(feet = c(FtTenthAc = 37.2, FtAcre = 117.8, Ft5Acres = 263.3), meters =
@@ -64,6 +66,10 @@ cloud2xSample(
 \item{proj4A}{(Optional) Provide proj4 strings if projects A and B are in different projections but do not contain projection information (e.g. missing .prj files)}
 
 \item{proj4B}{(Optional) Provide proj4 strings if projects A and B are in different projections but do not contain projection information (e.g. missing .prj files)}
+
+\item{zFrom}{(optional) specify vertical units in}
+
+\item{zTo}{(optional) specify vertical units out}
 
 \item{extentSample}{(Optional) If the overlap between projects A and B is known, you can provide it here}
 

@@ -16,6 +16,7 @@ translateLAS(
   proj4to = NA,
   zFrom = c("ft", "m"),
   zTo = c("ft", "m"),
+  zMult = c(1, 0.3048, 1/0.3048)[1],
   return = F,
   doWriteLAS = T
 )
@@ -39,9 +40,7 @@ translateLAS(
 
 \item{proj4to}{(required) character string proj4 string to translate}
 
-\item{zFrom}{(optional) specify vertical units in}
-
-\item{zTo}{(optional) specify vertical units out}
+\item{zMult}{specify multiplier for vertical units to go e.g. from feet to meters}
 
 \item{return}{T/F return translated object?}
 
