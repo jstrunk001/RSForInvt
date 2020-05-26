@@ -161,7 +161,7 @@ translateLAS = function(
   las_in@data[,c("X","Y")] = as.data.frame(coordinates(xy_in1))
 
   #translate vertical coordinates
-  las_in@data[,c("Z")] = las_in@data[,c("Z")] * zMult
+  las_in@data[,c("Z")] = las_in@data[,c("Z")] * zMult[1]
 
   #update header
   las_in@header@VLR$GeoKeyDirectoryTag = NULL

@@ -291,18 +291,18 @@ output: html_document
 	#extract polygon of tile extents
 	ply_tn_dap = SpatialPolygons(ctg_tn_dap@polygons)
 	df_ply_tn_dap = SpatialPolygonsDataFrame(ply_tn_dap,data.frame(files_tn_dap))
-	border_dap = buffer(df_ply_tn_dap,5)
+	border_dap = gBuffer(df_ply_tn_dap,width=-75)
 		
 	#fix bad proj4 string - correct zone is 16 NOT zone 19 ....
 	proj4string(df_ply_tn_dap) = "+proj=utm +zone=16 +ellps=GRS80 +units=m +no_defs"
 	
 	#sample lidar strips
 	set.seed(55)
-	samp_pts_tn = sp::spsample(ply_tn_las,10,"random")
+	samp_pts_tn = sp::spsample(ply_tn_las,100,"hexagonal")
 	
 	#build sample strips polygons - these are in the same projection as ctg_tn_las, the lidar data
 	xoff = 50
-	yoff = 2
+	yoff = 3.3
 	strip_0 = SpatialPolygons(list(Polygons(list(Polygon(data.frame(x=c(-xoff,xoff,xoff,-xoff,-xoff),y=c(-yoff,-yoff,yoff,yoff,-yoff)))) , ID = 1)))
 	cds_samp = sp::coordinates(samp_pts_tn)
 	samp_strips = do.call(bind,mapply( raster::shift , dx=cds_samp[,1] , dy = cds_samp[,2] , MoreArgs = list(x=strip_0) ))
@@ -322,13 +322,14 @@ output: html_document
 	if(!file.exists(out_dtm_tn_dap)){
 		try(dir.create(dirname(out_dtm_tn_dap)))
 	  for(i in 1:length(files_dtm_tn_las)){
-	  	rasteri = raster::raster(files_dtm_tn_las[[i]])
+	  	rasteri = raster::raster(files_dtm_tn_las[[i]]) * 0.3048
 	  	outi = file.path(dir_proj,"Data\\Tennessee\\DTM_dap",basename(files_dtm_tn_las[[i]]))
-	  	if(!file.exists(outi)) raster::projectRaster(from = rasteri, crs= CRS("+proj=utm +zone=16 +ellps=GRS80 +units=m +no_defs") , filename = outi)
+	  	if(!file.exists(outi)) 
+	  	  raster::projectRaster(from = rasteri, crs= CRS("+proj=utm +zone=16 +ellps=GRS80 +units=m +no_defs") , filename = outi, overwrite=TRUE )
 	  }
 	  #build .vrt for reprojected lidar dtms - a virtual mosaic so that we can poitn to a single file
 	  files_dtm_tn_dap = list.files(dir_tn_dtm_dap , pattern="[.]img$",full.names=T)
-	  gdalUtils::gdalbuildvrt( files_dtm_tn_dap, out_dtm_tn_dap)
+	  gdalUtils::gdalbuildvrt( files_dtm_tn_dap, out_dtm_tn_dap, overwrite=TRUE )
 	}
 
 	#single buffer and bring in existing points - process with R
@@ -354,4 +355,7 @@ output: html_document
 	)
 	
 
+	las1 = readLAS("D:\\temp\\tennessee\\clip_las\\clipHt_noBuf\\clip_1.las")
+	plot(las1)
+	
 ```
