@@ -36,7 +36,15 @@ Revision History
 }
 }
 \examples{
- <Delete and Replace>
+
+ #fit model using one set of responses
+ yaimod1 = yaImpute::yai( x = dat6[,c(vEnvironment1)	], y = dat6[,vBA1] , method = "gnn" )
+
+ #impute a second set
+ imp1 = impute(yaimod3,dat6[,vResp3])
+
+ #compute R2
+ yai_r2(imp1)
 
 
 }

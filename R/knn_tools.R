@@ -166,7 +166,9 @@ newtargets_id=function(
 	yai_mod
 	,idNm
 	,data
+	,k=NULL
 	,ann = NULL
+
 ){
 
 	require(yaImpute)
@@ -175,7 +177,7 @@ newtargets_id=function(
 	row.names(data)=data[,idNm]
 
 	#get new targets
-	yai_in=newtargets(yai_mod,data,ann)
+	yai_in=newtargets(object=yai_mod,newdata=data,k=k,ann=ann)
 
 	yai_in$update_id=idNm
 
