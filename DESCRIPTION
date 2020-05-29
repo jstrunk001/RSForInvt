@@ -1,11 +1,14 @@
 Package: RSForInvt
 Type: Package
-Title: What the Package Does (Title Case)
-Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
+Title: Remote Sensing FORest INVenTory related analysis tasks, especially FUSION, lidR, NVEL 
+Version: 1.0.0
+Author: Jacob Strunk
+Maintainer: Jacob Strunk <Jacob.strunk@usda.gov>
+Description: A hodgepodge of data processing tools, primarily motivated by FORest INVentory and related Remote Sensing (RS) operations. 
+Notable functionality is running FUSION lidar proecessing tools especially raster <-> .dtm (FUSION raster), gridmetrics, treeseg, canopyModel, and a package
+specific project format that manages lidar tile overlap with .dtm files for large areas. This functionality is similar to areaprocessor (FUSION) or
+projects (lidR) but works with FUSION and can handle huge areas. The package also includes wrappers for select functions in the dll for the Nationval 
+Volume Estimator Library (NVEL) . There is also some developing functionality for field data compilation.
 License: GPL 2 or 3 at users discretion
 Encoding: UTF-8
 LazyData: true
@@ -24,6 +27,7 @@ Imports:
         ,rgdal
         ,rgeos
         ,sf
+        ,sp
         ,uuid
 
         
