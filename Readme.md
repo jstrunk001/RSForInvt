@@ -1,29 +1,23 @@
-You will need Rtools to install this package
+You will likely need Rtools for this package's installation. Make sure you match the version of rtools to the version of R that you have. The latest version of rtools does not work for R installations before version 4.0!
 
 **Windows**: [Rtools.exe](https://cran.r-project.org/bin/windows/Rtools/). 
 
 #RSForInvt
-Install the latest version from github with devtools. You may have to manually install a few packages that aren't brought in by the package for some reason. Lubridate was an example package that wouldn't import with the package.
-
-Install from githup
+Install the latest version of RSForInvt from github with devtools. You may have to manually install a few packages that aren't brought in by the package for some reason. Lubridate was an example package that wouldn't import with the package.
 ```r
-
-#wonky package that e.g. won't load automajically
+install.packages("devtools")
+install.packages("remotes)
 install.packages("lubridate")
-
-install.packages("remotes")
 remotes::install_github("jstrunk001/RSForInvt")
-
 ```
 
+#Manual way to install this package:
 
+Download this git repository to a local directory, zip the repository (file folder named "RSForInvt" -> "RSForInvt.zip"), and then use the R remotes::install_local to install from .zip package file.
 
-
-Donwload zipped file from github and install from local directory. I also renamed to "RSForInvt.zip", the downloaded version was named RSForInvt-master.zip, which doesn't seem to load correctly.
 ```r
-
-install.packages("remotes")
+install.packages("remotes)
+#your path will vary here!
 remotes::install_local("c:\\temp\\RSForInvt.zip")
 
 ```
-
