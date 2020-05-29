@@ -56,7 +56,7 @@
 #'@return
 #'fit_pdf: a pdf specially prepared to be handled by pdf_compare
 #'
-#'@import spatstat TTR
+#'@import spatstat TTR plotrix
 #'
 #'@examples
 #'
@@ -89,9 +89,9 @@ fit_pdf=function(
                  ,MA_n=3
                  ,plot=F
                  ){
-                  require(spatstat)
-                  require(TTR)
-                  require(plotrix)
+                  requireNamespace(spatstat)
+                  requireNamespace(TTR)
+                  requireNamespace(plotrix)
 
                   if(!is.na(bins[1])){
 
@@ -135,7 +135,6 @@ fit_pdf=function(
                   if(MA ){
 
                     #moving average
-                    require(TTR)
                     sma_c=c(rep(0,MA_n-1),SMA(h_in[["counts"]],MA_n)[-(1:(MA_n-1))])
                     sma_c[(1:(MA_n-1))]=sma_c[MA_n]
                     sma_d=c(rep(0,MA_n-1),SMA(h_in[["density"]],MA_n)[-(1:(MA_n-1))])

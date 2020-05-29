@@ -22,6 +22,7 @@ Imports:
         ,lidR
         ,rlas
         ,parallel
+        ,plotrix
         ,plyr 
         ,randomForest
         ,raster
@@ -30,7 +31,7 @@ Imports:
         ,rgeos
         ,sf
         ,sp
-        ,TTR
+        ,spatstat
         ,uuid
 
         
