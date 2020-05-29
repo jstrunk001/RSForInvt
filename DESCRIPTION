@@ -30,6 +30,7 @@ Imports:
         ,rgeos
         ,sf
         ,sp
+        ,TTR
         ,uuid
 
         
