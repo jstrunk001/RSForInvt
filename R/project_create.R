@@ -102,14 +102,14 @@ project_create=function(
   options(stringsAsFactors = F)
   this_time = Sys.time()
 
-  require("DBI")
-  require("RSQLite")
-  require("data.table")
-  library("rgdal")
-  require("rgeos")
-  require("sp")
-  require("raster")
-  require("plyr")
+  requireNamespace("DBI")
+  requireNamespace("RSQLite")
+  requireNamespace("data.table")
+  requireNamespace("rgdal")
+  requireNamespace("rgeos")
+  requireNamespace("sp")
+  requireNamespace("raster")
+  requireNamespace("plyr")
 
   warning("UPDATE ME!!! Allow me to 'update' intersections without complete reset")
 

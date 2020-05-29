@@ -21,7 +21,7 @@ yai_id(
   ...
 )
 
-newtargets_id(yai_mod, idNm, data, ann = NULL)
+newtargets_id(yai_mod, idNm, data, k = NULL, ann = NULL)
 
 impute_id(newtargs_id, ...)
 
@@ -76,6 +76,8 @@ yai_cv(
 
 \item{yai_mod}{model returned by yai_id}
 
+\item{k}{?number of neighbors?}
+
 \item{ann}{T/Fsee yai documentation
 
 \cr\cr
@@ -100,8 +102,6 @@ yai_cv(
 \item{yNm}{?names of response fields}
 
 \item{iter_max}{number of iterations max}
-
-\item{k}{?number of neighbors?}
 
 \item{method}{? distance approach?}
 

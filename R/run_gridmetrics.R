@@ -103,9 +103,9 @@ run_gridmetrics=function(
 
   options(scipen = 999)
 
-  require("parallel")
-  require("raster")
-  require("rgdal")
+  requireNamespace("parallel")
+  requireNamespace("raster")
+  requireNamespace("rgdal")
 
   gridmetrics_type=gridmetrics_type[1]
   do_fusion = T

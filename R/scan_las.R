@@ -62,10 +62,10 @@ scan_las=function(
     ,return = F
     ){
 
-  require(uuid)
-  require(RSQLite)
-  require(lidR)
-  library(sf)
+  requireNamespace(uuid)
+  requireNamespace(RSQLite)
+  requireNamespace(lidR)
+  requireNamespace(sf)
 
 
   proc_date=Sys.time()

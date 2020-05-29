@@ -61,12 +61,6 @@
 #
 #
 
-# x = function(x){}
-
-#copy function arguments and use this code to format arguments
-##writeClipboard(paste(gsub("^[[:space:]]*[,]*","#'@param ",gsub("=.*"," ",readClipboard())),collapse="\n"))
-
-
 experimental_metrics = function(
   x=NA
   ,y=NA
@@ -111,8 +105,8 @@ experimental_metrics = function(
 
   if(!is.na(x[1]) & !is.na(y[1]) & !is.na(z[1])){
 
-    library(plyr)
-    library(raster)
+    requireNamespace(plyr)
+    requireNamespace(raster)
 
     x1 = x[z >= htcover]
     y1 = y[z >= htcover]

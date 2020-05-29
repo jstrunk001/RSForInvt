@@ -128,7 +128,7 @@ yai_id=function(
 ){
 
 
-	require(yaImpute)
+	requireNamespace(yaImpute)
 	if(is.null(xNms)){ stop("xNms is required")}
 	if(is.null(yNms)){ stop("yNms is required")}
 	if(is.null(idNm)){ stop("idNm is required")}
@@ -171,7 +171,7 @@ newtargets_id=function(
 
 ){
 
-	require(yaImpute)
+	requireNamespace(yaImpute)
 
 	#update column names with idNm column
 	row.names(data)=data[,idNm]
@@ -193,7 +193,7 @@ impute_id = function(
 	,...
 ){
 
-	require(yaImpute)
+	requireNamespace(yaImpute)
 
 	#update column names with idNm column
 	imp_in=data.frame(cbind(names_in=newtargs_id[["trgRows"]],impute(newtargs_id,...)))
@@ -272,8 +272,8 @@ tl_impute = function(
 	,sort_targets = F
 	,debug=F
 ){
-	require(data.table)
-	library(reshape2)
+	requireNamespace(data.table)
+  requireNamespace(reshape2)
 	if(debug) browser()
 
 	#prepare imputed tree list
@@ -305,9 +305,9 @@ tl_impute_2 = function(
 	,trees #tree list with idNm matching wts idNm
 	,debug=F
 ){
-	require(data.table)
-	library(reshape2)
-	require(dplyr)
+	requireNamespace(data.table)
+	requireNamespace(reshape2)
+	requireNamespace(dplyr)
 
 	if(debug) browser()
 
@@ -348,8 +348,8 @@ yai_cv=function(
 	#make sure that there are a minimum number of observations
 	if(!is.null(data))if(nrow(data)>min_rows){
 
-		require(plyr)
-		if(method=="rf") require(randomForest)
+		requireNamespace(plyr)
+		if(method=="rf") requireNamespace(randomForest)
 
 		#remove plots with duplicate ids
 		if(sum(duplicated(data[,idNm]))>0){
@@ -365,25 +365,24 @@ yai_cv=function(
 
 		.fn_cv=function(xNm,yNm,k,idNm,data,method,samp,method_impute){
 
+		  #fit model without cv observations
 			yai_i=yai_id(xNm=xNm,yNm=yNm,k=k,idNm=idNm,data=data[samp[["rows_keep"]],],method=method)
+
+			#impute to holdout observations
 			targs_i=newtargets_id(yai_i,data=data[samp[["rows_omit"]],],idNm=idNm,k=k)
 			preds=impute_id(targs_i,observed=F,k=k,method=method_impute)
 
-			yai_i=yai(xNm=xNm,yNm=yNm,k=k,data=data[samp[["rows_keep"]],],method=method)
-			targs_i=newtargets(yai_i,newdata=data[samp[["rows_omit"]],],k=6)
-			preds_i=impute( targs_i,k=6,method=method_impute)
-
-			#browser()
+			#prepare outputs
 			names_y=names(yai_i$yRefs)
 			obs=data[data[,idNm] %in% preds[,idNm],c(idNm,names_y)]
-			names(obs)[-1]=paste(names_y,"_ob",sep="")
-			#names(preds)[-1]=paste(names_y,"_pd",sep="")
+			names(obs)[-1]=paste(names_y,".o",sep="")
+
 			merge(obs,preds,idNm)
 		}
 
 		cv_df=plyr::rbind.fill(mapply(.fn_cv,samp=samples_in,MoreArgs = list(xNm=xNm,yNm=yNm,k=k,idNm=idNm,data=data,method=method,method_impute=method_impute),SIMPLIFY = F))
-		nm_obs=grep("_ob$",names(cv_df),value=T)
-		nm_pred=gsub("_ob$","",nm_obs)
+		nm_obs=grep(".o$",names(cv_df),value=T)
+		nm_pred=gsub(".o$","",nm_obs)
 
 		fn_err=function(
 			i
@@ -396,7 +395,7 @@ yai_cv=function(
 			y0=yy0[,nms_y0[i]]
 			ei=y-y0
 			table_y=table(yy0[,idNm])
-			p_i=(table_y/sum(table_y))[yy0[,idNm]]/sum((table_y/sum(table_y))[yy0[,idNm]])
+			p_i=(table_y/sum(table_y))[as.character(yy0[,idNm])]/sum((table_y/sum(table_y))[as.character(yy0[,idNm])])
 
 			data.frame(
 				varb=nms_y[i]
