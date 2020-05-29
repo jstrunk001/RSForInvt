@@ -22,6 +22,8 @@ Imports:
         ,gdalUtils
         ,leaps
         ,lidR
+        ,maptools
+        ,odbc
         ,rlas
         ,parallel
         ,plotrix
