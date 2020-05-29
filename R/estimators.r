@@ -129,7 +129,6 @@ estimate=function(
     #hansen-herwitz estimator
     v_t_rs = var(x[,resp_nm] * x[,wt_nm]) / n
     t_rs = sum(x[,resp_nm] * x[,wt_nm] ) / n
-
   }
 
   if(var_type[1]=="bs"){
