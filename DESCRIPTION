@@ -20,7 +20,7 @@ Imports:
         ,dplyr
         ,gdalUtils
         ,lidR
-        ,lasR
+        ,rlas
         ,parallel
         ,plyr 
         ,randomForest
