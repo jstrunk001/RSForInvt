@@ -34,6 +34,8 @@ Imports:
         ,reshape2
         ,rgdal
         ,rgeos
+        ,RODBC
+        ,RSQLite
         ,sf
         ,sp
         ,spatstat
