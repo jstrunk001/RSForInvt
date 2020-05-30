@@ -15,7 +15,7 @@ remotes::install_github("jstrunk001/RSForInvt")
 
 #Manual way to install this package:
 
-Download this git repository to a local directory, zip the repository (file folder named "RSForInvt" -> "RSForInvt.zip"), and then use the R remotes::install_local to install from .zip package file.
+Download this git repository to a local zip file, rename "RSForInvt-master.zip" -> "RSForInvt.zip", and then use the R remotes::install_local to install from .zip package file.
 
 ```r
 install.packages("remotes)
