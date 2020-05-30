@@ -4,7 +4,7 @@ Title: Remote Sensing FORest INVenTory related analysis tasks, especially FUSION
 Version: 1.0.0
 Author: Jacob Strunk
 Maintainer: Jacob Strunk <Jacob.strunk@usda.gov>
-Description: A hodgepodge of data processing tools, primarily motivated by FORest INVentory and related Remote Sensing operations. 
+Description: A hodgepodge of data processing tools, primarily motivated by Remote Sensing FORest INVentory related operations. 
         Notable functionality is running FUSION lidar proecessing tools especially raster <-> .dtm (FUSION raster), gridmetrics, 
         treeseg, canopyModel, and a package specific project format that manages lidar tile overlap with .dtm files for 
         large areas. This functionality is similar to areaprocessor (FUSION) or projects (lidR) but works with FUSION and
