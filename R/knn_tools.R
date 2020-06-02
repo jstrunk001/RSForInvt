@@ -335,6 +335,7 @@ yai_cv=function(
 	,idNm
 	,xNm
 	,yNm
+	,pdNm = NA
 	,data
 	,iter_max=500
 	,k=5
@@ -344,6 +345,8 @@ yai_cv=function(
 	,method_impute=c("closest","mean","median","dstWeighted")
 	,...
 ){
+
+  if(is.na(pdNm)) pdNm = yNm
 
 	#make sure that there are a minimum number of observations
 	if(!is.null(data))if(nrow(data)>min_rows){
@@ -363,13 +366,13 @@ yai_cv=function(
 		nrows_in=nrow(data)
 		samples_in=mapply(function(x,size,replace){z=list(rows_omit=sample(x,size,replace));z[["rows_keep"]]=(1:x)[-z[[1]]];z},x=rep(nrows_in,iter_max),size=omit,replace=F,SIMPLIFY = F)
 
-		.fn_cv=function(xNm,yNm,k,idNm,data,method,samp,method_impute){
+		.fn_cv=function(xNm,yNm,pdNm,k,idNm,data,method,samp,method_impute){
 
 		  #fit model without cv observations
 			yai_i=yai_id(xNm=xNm,yNm=yNm,k=k,idNm=idNm,data=data[samp[["rows_keep"]],],method=method)
 
 			#impute to holdout observations
-			targs_i=newtargets_id(yai_i,data=data[samp[["rows_omit"]],],idNm=idNm,k=k)
+			targs_i=newtargets_id(yai_i,data=data[samp[["rows_omit"]],pdNm],idNm=idNm,k=k)
 			preds=impute_id(targs_i,observed=F,k=k,method=method_impute)
 
 			#prepare outputs
@@ -380,7 +383,7 @@ yai_cv=function(
 			merge(obs,preds,idNm)
 		}
 
-		cv_df=plyr::rbind.fill(mapply(.fn_cv,samp=samples_in,MoreArgs = list(xNm=xNm,yNm=yNm,k=k,idNm=idNm,data=data,method=method,method_impute=method_impute),SIMPLIFY = F))
+		cv_df=plyr::rbind.fill(mapply(.fn_cv,samp=samples_in,MoreArgs = list(xNm=xNm,yNm=yNm,pdNm=pdNm,k=k,idNm=idNm,data=data,method=method,method_impute=method_impute),SIMPLIFY = F))
 		nm_obs=grep(".o$",names(cv_df),value=T)
 		nm_pred=gsub(".o$","",nm_obs)
 
