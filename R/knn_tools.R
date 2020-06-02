@@ -128,7 +128,7 @@ yai_id=function(
 ){
 
 
-	requireNamespace(yaImpute)
+	requireNamespace("yaImpute")
 	if(is.null(xNms)){ stop("xNms is required")}
 	if(is.null(yNms)){ stop("yNms is required")}
 	if(is.null(idNm)){ stop("idNm is required")}
@@ -171,7 +171,7 @@ newtargets_id=function(
 
 ){
 
-	requireNamespace(yaImpute)
+	requireNamespace("yaImpute")
 
 	#update column names with idNm column
 	row.names(data)=data[,idNm]
@@ -193,7 +193,7 @@ impute_id = function(
 	,...
 ){
 
-	requireNamespace(yaImpute)
+	requireNamespace("yaImpute")
 
 	#update column names with idNm column
 	imp_in=data.frame(cbind(names_in=newtargs_id[["trgRows"]],impute(newtargs_id,...)))
@@ -272,8 +272,8 @@ tl_impute = function(
 	,sort_targets = F
 	,debug=F
 ){
-	requireNamespace(data.table)
-  requireNamespace(reshape2)
+	requireNamespace("data.table")
+  requireNamespace("reshape2")
 	if(debug) browser()
 
 	#prepare imputed tree list
@@ -305,9 +305,9 @@ tl_impute_2 = function(
 	,trees #tree list with idNm matching wts idNm
 	,debug=F
 ){
-	requireNamespace(data.table)
-	requireNamespace(reshape2)
-	requireNamespace(dplyr)
+	requireNamespace("data.table")
+	requireNamespace("reshape2")
+	requireNamespace("dplyr")
 
 	if(debug) browser()
 
@@ -351,8 +351,8 @@ yai_cv=function(
 	#make sure that there are a minimum number of observations
 	if(!is.null(data))if(nrow(data)>min_rows){
 
-		requireNamespace(plyr)
-		if(method=="rf") requireNamespace(randomForest)
+		requireNamespace("plyr")
+		if(method=="rf") requireNamespace("randomForest")
 
 		#remove plots with duplicate ids
 		if(sum(duplicated(data[,idNm]))>0){
@@ -376,6 +376,7 @@ yai_cv=function(
 			preds=impute_id(targs_i,observed=F,k=k,method=method_impute)
 
 			#prepare outputs
+			browser()
 			names_y=names(yai_i$yRefs)
 			obs=data[data[,idNm] %in% preds[,idNm],c(idNm,names_y)]
 			names(obs)[-1]=paste(names_y,".o",sep="")

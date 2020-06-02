@@ -63,7 +63,7 @@
 xy2FIApoly=function(idxy,names=c(plot="plot",x="x",y="y"),create_polys=T){
 
   # sqrt((120*cos(pi/6))^2+(120*sin(pi/6))^2)
-  requireNamespace(plyr)
+  requireNamespace("plyr")
 
   names["subplot"]="subplot"
   idxy[,names["subplot"]]=1
@@ -87,9 +87,9 @@ xy2FIApoly=function(idxy,names=c(plot="plot",x="x",y="y"),create_polys=T){
 
   if(create_polys){
 
-    requireNamespace(raster)
-    requireNamespace(sp)
-    requireNamespace(rgeos)
+    requireNamespace("raster")
+    requireNamespace("sp")
+    requireNamespace("rgeos")
 
     datin0=df_all
     coordinates(datin0)=datin0[,names[c("x","y")]]

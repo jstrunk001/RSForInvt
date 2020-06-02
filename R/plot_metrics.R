@@ -11,14 +11,14 @@ plot_metrics=function(
   ,...
 ){
 
-  requireNamespace(lidR)
-  requireNamespace(data.table)
+  requireNamespace("lidR")
+  requireNamespace("data.table")
   if(!is.na(dir_las)) las_files=list.files(dir_las,pattern="[.]las*z*",full.names=T)
   if(n_core<2){
     res=rbindlist(mapply(.proc_plot,las_files,SIMPLIFY=F,MoreArgs=list(fun=fun,...)))
   }
   if(n_core>1){
-    requireNamespace(parallel)
+    requireNamespace("parallel")
     clus=makeCluster(n_core)
     res=rbindlist(clusterMap(clus,.proc_plot,las_files,SIMPLIFY=F,MoreArgs=list(fun=fun,...)))
     stopCluster(clus)
@@ -116,7 +116,7 @@ plot_metrics=function(
 
 
   .proc_plot = function(LASFile,fun,...){
-    requireNamespace(lidR)
+    requireNamespace("lidR")
 
     # Load the data
     lidar = readLAS(LASFile)

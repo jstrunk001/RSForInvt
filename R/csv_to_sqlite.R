@@ -83,7 +83,7 @@ csv_to_sqlite=function(
   if(class(db_csvOut) == "SQLiteConnection") db_in = db_csvOut
   if(class(db_csvOut) == "character") db_in = dbConnect( RSQLite::SQLite(), db_csvOut )
 
-  if(interactive()) requireNamespace(RSQLite)
+  if(interactive()) requireNamespace("RSQLite")
 
   csv_files=list.files(csv_folder,full.names=T,pattern="[.]csv")
 
