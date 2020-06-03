@@ -55,6 +55,7 @@ yai_cv(
   idNm,
   xNm,
   yNm,
+  pdNm = NA,
   data,
   iter_max = 500,
   k = 5,

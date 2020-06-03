@@ -194,7 +194,7 @@ impute_id = function(
 ){
 
 	requireNamespace("yaImpute")
-
+browser()
 	#update column names with idNm column
 	imp_in=data.frame(cbind(names_in=newtargs_id[["trgRows"]],impute(newtargs_id,...)))
 	names(imp_in)[1]=newtargs_id[["update_id"]]
@@ -346,7 +346,7 @@ yai_cv=function(
 	,...
 ){
 
-  if(is.na(pdNm)) pdNm = yNm
+  if(is.na(pdNm[1])) pdNm = yNm
 
 	#make sure that there are a minimum number of observations
 	if(!is.null(data))if(nrow(data)>min_rows){
@@ -366,25 +366,24 @@ yai_cv=function(
 		nrows_in=nrow(data)
 		samples_in=mapply(function(x,size,replace){z=list(rows_omit=sample(x,size,replace));z[["rows_keep"]]=(1:x)[-z[[1]]];z},x=rep(nrows_in,iter_max),size=omit,replace=F,SIMPLIFY = F)
 
-		.fn_cv=function(xNm,yNm,pdNm,k,idNm,data,method,samp,method_impute){
+		.fn_cv=function(xNm,yNm,pdNm,k,idNm,dat_cv,method,samp,method_impute){
 
 		  #fit model without cv observations
-			yai_i=yai_id(xNm=xNm,yNm=yNm,k=k,idNm=idNm,data=data[samp[["rows_keep"]],],method=method)
+		  fx = as.formula(paste("~",paste(xNm,collapse = " + ")))
+		  fy = as.formula(paste("~",paste(yNm,collapse = " + ")))
+			yai_i = yai( x = fx , y = fy , data = dat_cv[samp[["rows_keep"]],]  , k=k ,method=method)
 
 			#impute to holdout observations
-			targs_i=newtargets_id(yai_i,data=data[samp[["rows_omit"]],pdNm],idNm=idNm,k=k)
-			preds=impute_id(targs_i,observed=F,k=k,method=method_impute)
+			dati_o = dat_cv[samp[["rows_omit"]],]
+			targs_i = newtargets( yai_i , newdata = dati_o , k=k , ann=T )
+			preds = impute(targs_i, ancillaryData = dat_cv[,pdNm] ,observed=T,k=k,method=method_impute)
+      preds[,idNm] = dat_cv[samp[["rows_omit"]],idNm]
 
-			#prepare outputs
-			browser()
-			names_y=names(yai_i$yRefs)
-			obs=data[data[,idNm] %in% preds[,idNm],c(idNm,names_y)]
-			names(obs)[-1]=paste(names_y,".o",sep="")
-
-			merge(obs,preds,idNm)
+			preds
 		}
 
-		cv_df=plyr::rbind.fill(mapply(.fn_cv,samp=samples_in,MoreArgs = list(xNm=xNm,yNm=yNm,pdNm=pdNm,k=k,idNm=idNm,data=data,method=method,method_impute=method_impute),SIMPLIFY = F))
+		data_in = data.frame(data,row.names = 1:nrow(data))
+		cv_df=plyr::rbind.fill(mapply(.fn_cv,samp=samples_in,MoreArgs = list(xNm=xNm,yNm=yNm,pdNm=pdNm,k=k,idNm=idNm,dat_cv=data_in,method=method,method_impute=method_impute),SIMPLIFY = F))
 		nm_obs=grep(".o$",names(cv_df),value=T)
 		nm_pred=gsub(".o$","",nm_obs)
 
