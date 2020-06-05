@@ -35,7 +35,10 @@ spplot(pts_df,zcol="z")
 
 ```
 
-Add projection to pts_df and write to a shapefile. You will need to figure out your projection string if you don't already have it e.g. you can search here https://www.spatialreference.org/ I have selected this projection for this toy example https://www.spatialreference.org/ref/epsg/3692/proj4/
+Add projection to pts_df and write to a shapefile. You will need to figure out your projection string if you don't already have it e.g. you can search here https://www.spatialreference.org/ 
+
+I have selected this projection for this toy example https://www.spatialreference.org/ref/epsg/3692/proj4/
+
 See here for more details on projections in R: https://www.nceas.ucsb.edu/sites/default/files/2020-04/OverviewCoordinateReferenceSystems.pdf
 ```{r, message=FALSE, warning=FALSE}
 some_proj4 = "+proj=lcc +lat_1=47.33333333333334 +lat_2=45.83333333333334 +lat_0=45.33333333333334 +lon_0=-120.5 +x_0=500000.0001016001 +y_0=0 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +to_meter=0.3048006096012192 +no_defs"
@@ -86,6 +89,7 @@ bf1
 ```
 
 Making a SpatialPolygonsDataFrame manually is a lot of work
+
  1. create single polygon objects sp::Polygon(coords, hole=as.logical(NA))
  2. make a list of polygon objects and combine polygons sp::Polygons(srl, ID)
  3. combine list of Polygons  sp::SpatialPolygons(Srl, pO, proj4string=CRS(as.character(NA)))

@@ -26,12 +26,12 @@ pts_df
 
     ## class       : SpatialPointsDataFrame 
     ## features    : 50 
-    ## extent      : 9998285, 10002026, 9997617, 10002091  (xmin, xmax, ymin, ymax)
+    ## extent      : 9997984, 10001852, 9998127, 10002096  (xmin, xmax, ymin, ymax)
     ## crs         : NA 
     ## variables   : 4
     ## names       : id,                x,                y,                 z 
-    ## min values  :  1, 9998285.01098995, 9997616.59055556, -3.09538571551972 
-    ## max values  : 50, 10002025.8798875, 10002091.2699813,   1.5570974895967
+    ## min values  :  1, 9997984.41027698, 9998126.72078958, -2.35571324691835 
+    ## max values  : 50, 10001852.4602494, 10002095.6994395,  2.27684755563907
 
 ``` r
 plot(pts_df)
@@ -47,10 +47,12 @@ spplot(pts_df,zcol="z")
 
 Add projection to pts\_df and write to a shapefile. You will need to
 figure out your projection string if you don’t already have it e.g. you
-can search here <https://www.spatialreference.org/> I have selected this
-projection for this toy example
-<https://www.spatialreference.org/ref/epsg/3692/proj4/> See here for
-more details on projections in R:
+can search here <https://www.spatialreference.org/>
+
+I have selected this projection for this toy example
+<https://www.spatialreference.org/ref/epsg/3692/proj4/>
+
+See here for more details on projections in R:
 <https://www.nceas.ucsb.edu/sites/default/files/2020-04/OverviewCoordinateReferenceSystems.pdf>
 
 ``` r
@@ -117,16 +119,16 @@ knitr::kable(tail(pts_df_sf3,10))
 
 |  id |        x |        y |           z | geom                                  |
 | --: | -------: | -------: | ----------: | :------------------------------------ |
-|  91 |  9999414 | 10001557 | \-1.4595434 | c(9999414.04700753, 10001557.1365606) |
-|  92 | 10000429 | 10000437 |   0.5722351 | c(10000428.8416258, 10000436.964889)  |
-|  93 |  9999117 |  9998967 |   1.0501996 | c(9999117.24538207, 9998967.25172398) |
-|  94 | 10001590 |  9999770 |   1.1175232 | c(10001589.9282678, 9999770.00705002) |
-|  95 | 10000681 |  9998141 |   0.7169341 | c(10000681.0917206, 9998140.57344528) |
-|  96 | 10002026 | 10001224 | \-0.3941971 | c(10002025.8798875, 10001224.0407698) |
-|  97 | 10000364 | 10001058 | \-0.2907666 | c(10000363.7089478, 10001058.1739811) |
-|  98 |  9999313 | 10001898 |   0.6855996 | c(9999313.2620974, 10001898.0015291)  |
-|  99 | 10000336 |  9999873 | \-0.2435500 | c(10000335.9842157, 9999872.97254523) |
-| 100 | 10000748 |  9999882 |   0.8211040 | c(10000747.6798099, 9999882.26440262) |
+|  91 | 10001836 | 10000850 |   0.5230587 | c(10001835.5248805, 10000849.8098901) |
+|  92 | 10000196 | 10001391 |   0.4044145 | c(10000196.2468382, 10001391.0639922) |
+|  93 |  9999515 |  9999271 |   0.3180471 | c(9999514.55360924, 9999270.85250652) |
+|  94 | 10000145 |  9999145 | \-0.8426701 | c(10000144.6427581, 9999144.91457721) |
+|  95 |  9998958 | 10001604 | \-1.2854673 | c(9998958.03162424, 10001603.9169134) |
+|  96 | 10000266 |  9998748 |   1.3701244 | c(10000266.3213565, 9998747.71445456) |
+|  97 |  9999504 |  9999852 | \-0.1164864 | c(9999504.25057151, 9999851.52824152) |
+|  98 | 10000067 |  9999796 | \-1.3871063 | c(10000066.603716, 9999795.92690404)  |
+|  99 |  9999057 |  9999115 |   0.6286760 | c(9999056.72463724, 9999115.36243029) |
+| 100 |  9999647 | 10001475 |   0.7904661 | c(9999646.67910557, 10001475.3238518) |
 
 ``` r
 #DT::datatable(pts_df_sf3)
@@ -142,19 +144,23 @@ bf1
 
     ## class       : SpatialPolygonsDataFrame 
     ## features    : 50 
-    ## extent      : 9998284, 10002027, 9997616, 10002092  (xmin, xmax, ymin, ymax)
+    ## extent      : 9997983, 10001853, 9998126, 10002097  (xmin, xmax, ymin, ymax)
     ## crs         : +proj=lcc +lat_0=45.3333333333333 +lon_0=-120.5 +lat_1=47.3333333333333 +lat_2=45.8333333333333 +x_0=500000.0001016 +y_0=0 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=us-ft +no_defs 
     ## variables   : 4
     ## names       : id,                x,                y,                 z 
-    ## min values  :  1, 9998285.01098995, 9997616.59055556, -3.09538571551972 
-    ## max values  : 50, 10002025.8798875, 10002091.2699813,   1.5570974895967
+    ## min values  :  1, 9997984.41027698, 9998126.72078958, -2.35571324691835 
+    ## max values  : 50, 10001852.4602494, 10002095.6994395,  2.27684755563907
 
-Making a SpatialPolygonsDataFrame manually is a lot of work 1. create
-single polygon objects sp::Polygon(coords, hole=as.logical(NA)) 2. make
-a list of polygon objects and combine polygons sp::Polygons(srl, ID) 3.
-combine list of Polygons sp::SpatialPolygons(Srl, pO,
-proj4string=CRS(as.character(NA))) 4. finally, merge spatial data with
-data frame sp::SpatialPolygonsDataFrame(Sr, data, match.ID = TRUE)
+Making a SpatialPolygonsDataFrame manually is a lot of work
+
+1.  create single polygon objects sp::Polygon(coords,
+    hole=as.logical(NA))
+2.  make a list of polygon objects and combine polygons
+    sp::Polygons(srl, ID)
+3.  combine list of Polygons sp::SpatialPolygons(Srl, pO,
+    proj4string=CRS(as.character(NA)))
+4.  finally, merge spatial data with data frame
+    sp::SpatialPolygonsDataFrame(Sr, data, match.ID = TRUE)
 
 now lets make a circle
 
@@ -333,8 +339,8 @@ buffer lines to make polygons
     ## crs         : NA 
     ## variables   : 2
     ## names       : id,             someY 
-    ## min values  :  a, 0.235655449790582 
-    ## max values  :  b,  1.49752103707727
+    ## min values  :  a, 0.391637205985057 
+    ## max values  :  b, 0.725868369157742
 
 ``` r
   par(mfrow=c(1,2))
