@@ -11,7 +11,8 @@ output:
 
 You can find a more complete demonstration of working with spatial object in R here: https://mgimond.github.io/Spatial/reading-and-writing-spatial-data-in-r.html
 
-Dealing with points is relatively easy compared to polygons
+**Build SpatialPointsDataframe**
+Dealing with points is relatively easy compared to polygons or lines
 ```{r, message=FALSE, warning=FALSE}
 
 library(raster)
@@ -35,7 +36,9 @@ spplot(pts_df,zcol="z")
 
 ```
 
-Add projection to pts_df and write to a shapefile. You will need to figure out your projection string if you don't already have it e.g. you can search here https://www.spatialreference.org/ 
+** Add projection to pts_df and write to a shapefile. **
+
+You will need to figure out your projection string if you don't already have it e.g. you can search here https://www.spatialreference.org/ 
 
 I have selected this projection for this toy example https://www.spatialreference.org/ref/epsg/3692/proj4/
 
@@ -79,7 +82,7 @@ knitr::kable(tail(pts_df_sf3,10))
 ```
 
 
-buffer some Points >> polygons
+** buffer points to create polygons**
 this is an easy way to make a SpatialPolygonsDataFrame
 ```{r, message=FALSE, warning=FALSE}
 
@@ -87,6 +90,8 @@ bf1 = raster::buffer(pts_df , dissolve=FALSE)
 bf1
 
 ```
+
+**Create SpatialPolygonsDataFrame**
 
 Making a SpatialPolygonsDataFrame manually is a lot of work
 
@@ -139,7 +144,10 @@ now lets make a circle
   
 ```
 
-Lines and polygons are pretty tedious to build by hand in R
+**Create SpatialLinesDataFrame**
+
+Lines use a similar process to polygons. I have taken a shortcut here and based my example on the sp vignette.
+
 ```{r}
 
   # based on example from the sp vignette:

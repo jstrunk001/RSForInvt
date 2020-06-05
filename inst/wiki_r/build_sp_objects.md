@@ -4,7 +4,8 @@ You can find a more complete demonstration of working with spatial
 object in R here:
 <https://mgimond.github.io/Spatial/reading-and-writing-spatial-data-in-r.html>
 
-Dealing with points is relatively easy compared to polygons
+**Build SpatialPointsDataframe** Dealing with points is relatively easy
+compared to polygons or lines
 
 ``` r
 library(raster)
@@ -26,12 +27,12 @@ pts_df
 
     ## class       : SpatialPointsDataFrame 
     ## features    : 50 
-    ## extent      : 9997984, 10001852, 9998127, 10002096  (xmin, xmax, ymin, ymax)
+    ## extent      : 9997817, 10002085, 9996822, 10002057  (xmin, xmax, ymin, ymax)
     ## crs         : NA 
     ## variables   : 4
     ## names       : id,                x,                y,                 z 
-    ## min values  :  1, 9997984.41027698, 9998126.72078958, -2.35571324691835 
-    ## max values  : 50, 10001852.4602494, 10002095.6994395,  2.27684755563907
+    ## min values  :  1, 9997816.67226889, 9996821.57556506, -1.62692054132175 
+    ## max values  : 50, 10002084.7571761, 10002057.0077936,  1.72937583825549
 
 ``` r
 plot(pts_df)
@@ -45,9 +46,10 @@ spplot(pts_df,zcol="z")
 
 ![](build_sp_objects_files/figure-gfm/unnamed-chunk-1-2.png)<!-- -->
 
-Add projection to pts\_df and write to a shapefile. You will need to
-figure out your projection string if you don’t already have it e.g. you
-can search here <https://www.spatialreference.org/>
+\*\* Add projection to pts\_df and write to a shapefile. \*\*
+
+You will need to figure out your projection string if you don’t already
+have it e.g. you can search here <https://www.spatialreference.org/>
 
 I have selected this projection for this toy example
 <https://www.spatialreference.org/ref/epsg/3692/proj4/>
@@ -119,22 +121,22 @@ knitr::kable(tail(pts_df_sf3,10))
 
 |  id |        x |        y |           z | geom                                  |
 | --: | -------: | -------: | ----------: | :------------------------------------ |
-|  91 | 10001836 | 10000850 |   0.5230587 | c(10001835.5248805, 10000849.8098901) |
-|  92 | 10000196 | 10001391 |   0.4044145 | c(10000196.2468382, 10001391.0639922) |
-|  93 |  9999515 |  9999271 |   0.3180471 | c(9999514.55360924, 9999270.85250652) |
-|  94 | 10000145 |  9999145 | \-0.8426701 | c(10000144.6427581, 9999144.91457721) |
-|  95 |  9998958 | 10001604 | \-1.2854673 | c(9998958.03162424, 10001603.9169134) |
-|  96 | 10000266 |  9998748 |   1.3701244 | c(10000266.3213565, 9998747.71445456) |
-|  97 |  9999504 |  9999852 | \-0.1164864 | c(9999504.25057151, 9999851.52824152) |
-|  98 | 10000067 |  9999796 | \-1.3871063 | c(10000066.603716, 9999795.92690404)  |
-|  99 |  9999057 |  9999115 |   0.6286760 | c(9999056.72463724, 9999115.36243029) |
-| 100 |  9999647 | 10001475 |   0.7904661 | c(9999646.67910557, 10001475.3238518) |
+|  91 |  9998938 |  9998481 | \-1.2236453 | c(9998938.14482203, 9998481.40337359) |
+|  92 |  9998950 | 10000648 |   1.7293758 | c(9998950.33234319, 10000647.9258047) |
+|  93 | 10000523 | 10000279 | \-0.6348512 | c(10000523.0655949, 10000278.7992963) |
+|  94 | 10000501 | 10000537 |   0.4877401 | c(10000500.6143778, 10000537.2479593) |
+|  95 |  9998096 |  9999289 | \-0.4760096 | c(9998095.64539971, 9999289.40211879) |
+|  96 |  9999569 | 10002057 | \-0.1011775 | c(9999569.01906272, 10002057.0077936) |
+|  97 |  9999608 |  9999820 |   0.0907292 | c(9999608.34978395, 9999820.18597659) |
+|  98 |  9998834 |  9999482 |   0.8604712 | c(9998833.8037794, 9999481.8751414)   |
+|  99 |  9999673 |  9998526 | \-0.6683756 | c(9999673.09227062, 9998526.03367687) |
+| 100 |  9999528 | 10001361 | \-0.4358499 | c(9999527.80034536, 10001361.0445843) |
 
 ``` r
 #DT::datatable(pts_df_sf3)
 ```
 
-buffer some Points \>\> polygons this is an easy way to make a
+\*\* buffer points to create polygons\*\* this is an easy way to make a
 SpatialPolygonsDataFrame
 
 ``` r
@@ -144,12 +146,14 @@ bf1
 
     ## class       : SpatialPolygonsDataFrame 
     ## features    : 50 
-    ## extent      : 9997983, 10001853, 9998126, 10002097  (xmin, xmax, ymin, ymax)
+    ## extent      : 9997816, 10002086, 9996821, 10002058  (xmin, xmax, ymin, ymax)
     ## crs         : +proj=lcc +lat_0=45.3333333333333 +lon_0=-120.5 +lat_1=47.3333333333333 +lat_2=45.8333333333333 +x_0=500000.0001016 +y_0=0 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=us-ft +no_defs 
     ## variables   : 4
     ## names       : id,                x,                y,                 z 
-    ## min values  :  1, 9997984.41027698, 9998126.72078958, -2.35571324691835 
-    ## max values  : 50, 10001852.4602494, 10002095.6994395,  2.27684755563907
+    ## min values  :  1, 9997816.67226889, 9996821.57556506, -1.62692054132175 
+    ## max values  : 50, 10002084.7571761, 10002057.0077936,  1.72937583825549
+
+**Create SpatialPolygonsDataFrame**
 
 Making a SpatialPolygonsDataFrame manually is a lot of work
 
@@ -263,7 +267,10 @@ now lets make a circle
   #pretty interesting, in the second approach, R interprets the overlap as void...
 ```
 
-Lines and polygons are pretty tedious to build by hand in R
+**Create SpatialLinesDataFrame**
+
+Lines use a similar process to polygons. I have taken a shortcut here
+and based my example on the sp vignette.
 
 ``` r
   # based on example from the sp vignette:
@@ -338,9 +345,9 @@ buffer lines to make polygons
     ## extent      : 0.5055763, 3.55, 0.5055763, 3.543844  (xmin, xmax, ymin, ymax)
     ## crs         : NA 
     ## variables   : 2
-    ## names       : id,             someY 
-    ## min values  :  a, 0.391637205985057 
-    ## max values  :  b, 0.725868369157742
+    ## names       : id,              someY 
+    ## min values  :  a, -0.682495193464782 
+    ## max values  :  b, -0.540171410426587
 
 ``` r
   par(mfrow=c(1,2))
