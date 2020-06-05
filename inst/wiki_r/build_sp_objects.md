@@ -26,12 +26,12 @@ pts_df
 
     ## class       : SpatialPointsDataFrame 
     ## features    : 50 
-    ## extent      : 9998502, 10003409, 9998580, 10002177  (xmin, xmax, ymin, ymax)
+    ## extent      : 9998285, 10002026, 9997617, 10002091  (xmin, xmax, ymin, ymax)
     ## crs         : NA 
     ## variables   : 4
     ## names       : id,                x,                y,                 z 
-    ## min values  :  1, 9998501.90037496, 9998579.56033341, -2.24575271890711 
-    ## max values  : 50, 10003408.9687739, 10002176.5075187,  1.77801619720755
+    ## min values  :  1, 9998285.01098995, 9997616.59055556, -3.09538571551972 
+    ## max values  : 50, 10002025.8798875, 10002091.2699813,   1.5570974895967
 
 ``` r
 plot(pts_df)
@@ -59,7 +59,7 @@ some_proj4 = "+proj=lcc +lat_1=47.33333333333334 +lat_2=45.83333333333334 +lat_0
 proj4string(pts_df) = some_proj4
 
 #shapefiles are not great, but they are the most common spatial objects (field name restrictions, file size limitations, proprietary, etc.)
-unlink("c:/temp/example_pts.shp",force=T)
+if(file.exists("c:/temp/example_pts.shp")) unlink("c:/temp/example_pts.shp",force=T)
 rgdal::writeOGR(pts_df,dsn="c:/temp","example_pts1", driver = "ESRI Shapefile", overwrite_layer = T)
 
 #A better option is the open source geopackage (it's like an ESRI file geodatabase). Unfortunately rgdal has pretty lousy support for geopackages as far as I can tell, e.g it cannot append. 
@@ -70,10 +70,11 @@ rgdal::writeOGR(pts_df,dsn="c:/temp/demo_geopackage.gpkg","example_pts1", driver
 pts_df_sf = sf::st_as_sf(pts_df)
 
 #this add a new layer to the geopackage - not possible with rgdal (for geopackages)
-sf::st_write(pts_df_sf,dsn="c:/temp/demo_geopackage.gpkg", "example_pts2", driver="GPKG") 
+if(file.exists("c:/temp/demo_geopackage1.gpkg")) try(unlink("c:/temp/demo_geopackage1.gpkg",force=T))
+sf::st_write(pts_df_sf,dsn="c:/temp/demo_geopackage1.gpkg", "example_pts2", driver="GPKG") 
 ```
 
-    ## Writing layer `example_pts2' to data source `c:/temp/demo_geopackage.gpkg' using driver `GPKG'
+    ## Writing layer `example_pts2' to data source `c:/temp/demo_geopackage1.gpkg' using driver `GPKG'
     ## Writing 50 features with 4 fields and geometry type Point.
 
 ``` r
@@ -81,16 +82,16 @@ sf::st_write(pts_df_sf,dsn="c:/temp/demo_geopackage.gpkg", "example_pts2", drive
 pts_df_sf2 = pts_df_sf  
 row.names(pts_df_sf2 ) = as.numeric(row.names(pts_df_sf )) + max(as.numeric(row.names(pts_df_sf ))) 
 pts_df_sf2$id = pts_df_sf$id + max(pts_df_sf$id)
-sf::st_write(pts_df_sf,dsn="c:/temp/demo_geopackage.gpkg", "example_pts2", driver="GPKG",append=T) 
+sf::st_write(pts_df_sf2,dsn="c:/temp/demo_geopackage1.gpkg", "example_pts2", driver="GPKG",append=T) 
 ```
 
-    ## Updating layer `example_pts2' to data source `c:/temp/demo_geopackage.gpkg' using driver `GPKG'
+    ## Updating layer `example_pts2' to data source `c:/temp/demo_geopackage1.gpkg' using driver `GPKG'
     ## Updating existing layer example_pts2
     ## Writing 50 features with 4 fields and geometry type Point.
 
 ``` r
 #verify that append works
-pts_df_sf3 = sf::read_sf(dsn="c:/temp/demo_geopackage.gpkg", "example_pts2")
+pts_df_sf3 = sf::read_sf(dsn="c:/temp/demo_geopackage1.gpkg", "example_pts2")
 
 #notice that pts_df_sf3 has npts*2 records ...
 nrow(pts_df_sf)
@@ -114,18 +115,18 @@ nrow(pts_df_sf3)
 knitr::kable(tail(pts_df_sf3,10))
 ```
 
-| id |        x |        y |           z | geom                                  |
-| -: | -------: | -------: | ----------: | :------------------------------------ |
-| 41 | 10000083 | 10001878 | \-0.2641901 | c(10000082.5287758, 10001878.3257069) |
-| 42 |  9999869 | 10002177 | \-0.5712012 | c(9999869.41650754, 10002176.5075187) |
-| 43 | 10001170 |  9998982 | \-0.0229456 | c(10001169.8617742, 9998982.225098)   |
-| 44 |  9999474 | 10000408 |   0.4109328 | c(9999474.10450373, 10000408.1953688) |
-| 45 |  9998820 |  9999003 |   0.9831910 | c(9998819.94338477, 9999003.13287313) |
-| 46 |  9998717 | 10001527 |   1.1176797 | c(9998717.27689959, 10001527.4185959) |
-| 47 | 10000485 | 10001187 |   0.4044550 | c(10000485.0201541, 10001187.2510326) |
-| 48 |  9998947 | 10000445 |   0.2827498 | c(9998946.61801462, 10000445.4673575) |
-| 49 | 10000050 | 10001279 |   0.1083914 | c(10000050.0647547, 10001279.2655068) |
-| 50 | 10002006 | 10001119 | \-1.5334392 | c(10002005.644174, 10001119.3838204)  |
+|  id |        x |        y |           z | geom                                  |
+| --: | -------: | -------: | ----------: | :------------------------------------ |
+|  91 |  9999414 | 10001557 | \-1.4595434 | c(9999414.04700753, 10001557.1365606) |
+|  92 | 10000429 | 10000437 |   0.5722351 | c(10000428.8416258, 10000436.964889)  |
+|  93 |  9999117 |  9998967 |   1.0501996 | c(9999117.24538207, 9998967.25172398) |
+|  94 | 10001590 |  9999770 |   1.1175232 | c(10001589.9282678, 9999770.00705002) |
+|  95 | 10000681 |  9998141 |   0.7169341 | c(10000681.0917206, 9998140.57344528) |
+|  96 | 10002026 | 10001224 | \-0.3941971 | c(10002025.8798875, 10001224.0407698) |
+|  97 | 10000364 | 10001058 | \-0.2907666 | c(10000363.7089478, 10001058.1739811) |
+|  98 |  9999313 | 10001898 |   0.6855996 | c(9999313.2620974, 10001898.0015291)  |
+|  99 | 10000336 |  9999873 | \-0.2435500 | c(10000335.9842157, 9999872.97254523) |
+| 100 | 10000748 |  9999882 |   0.8211040 | c(10000747.6798099, 9999882.26440262) |
 
 ``` r
 #DT::datatable(pts_df_sf3)
@@ -141,12 +142,12 @@ bf1
 
     ## class       : SpatialPolygonsDataFrame 
     ## features    : 50 
-    ## extent      : 9998501, 10003410, 9998579, 10002178  (xmin, xmax, ymin, ymax)
+    ## extent      : 9998284, 10002027, 9997616, 10002092  (xmin, xmax, ymin, ymax)
     ## crs         : +proj=lcc +lat_0=45.3333333333333 +lon_0=-120.5 +lat_1=47.3333333333333 +lat_2=45.8333333333333 +x_0=500000.0001016 +y_0=0 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=us-ft +no_defs 
     ## variables   : 4
     ## names       : id,                x,                y,                 z 
-    ## min values  :  1, 9998501.90037496, 9998579.56033341, -2.24575271890711 
-    ## max values  : 50, 10003408.9687739, 10002176.5075187,  1.77801619720755
+    ## min values  :  1, 9998285.01098995, 9997616.59055556, -3.09538571551972 
+    ## max values  : 50, 10002025.8798875, 10002091.2699813,   1.5570974895967
 
 Making a SpatialPolygonsDataFrame manually is a lot of work 1. create
 single polygon objects sp::Polygon(coords, hole=as.logical(NA)) 2. make
@@ -331,9 +332,9 @@ buffer lines to make polygons
     ## extent      : 0.5055763, 3.55, 0.5055763, 3.543844  (xmin, xmax, ymin, ymax)
     ## crs         : NA 
     ## variables   : 2
-    ## names       : id,              someY 
-    ## min values  :  a, 0.0302675192490316 
-    ## max values  :  b,  0.750515888447334
+    ## names       : id,             someY 
+    ## min values  :  a, 0.235655449790582 
+    ## max values  :  b,  1.49752103707727
 
 ``` r
   par(mfrow=c(1,2))

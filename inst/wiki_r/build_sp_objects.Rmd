@@ -43,7 +43,7 @@ some_proj4 = "+proj=lcc +lat_1=47.33333333333334 +lat_2=45.83333333333334 +lat_0
 proj4string(pts_df) = some_proj4
 
 #shapefiles are not great, but they are the most common spatial objects (field name restrictions, file size limitations, proprietary, etc.)
-unlink("c:/temp/example_pts.shp",force=T)
+if(file.exists("c:/temp/example_pts.shp")) unlink("c:/temp/example_pts.shp",force=T)
 rgdal::writeOGR(pts_df,dsn="c:/temp","example_pts1", driver = "ESRI Shapefile", overwrite_layer = T)
 
 #A better option is the open source geopackage (it's like an ESRI file geodatabase). Unfortunately rgdal has pretty lousy support for geopackages as far as I can tell, e.g it cannot append. 
@@ -54,16 +54,17 @@ rgdal::writeOGR(pts_df,dsn="c:/temp/demo_geopackage.gpkg","example_pts1", driver
 pts_df_sf = sf::st_as_sf(pts_df)
 
 #this add a new layer to the geopackage - not possible with rgdal (for geopackages)
-sf::st_write(pts_df_sf,dsn="c:/temp/demo_geopackage.gpkg", "example_pts2", driver="GPKG") 
+if(file.exists("c:/temp/demo_geopackage1.gpkg")) try(unlink("c:/temp/demo_geopackage1.gpkg",force=T))
+sf::st_write(pts_df_sf,dsn="c:/temp/demo_geopackage1.gpkg", "example_pts2", driver="GPKG") 
 
 #we can even append new rows to an existing object using sf - definitely not possible with rgdal (for geopackages)
 pts_df_sf2 = pts_df_sf  
 row.names(pts_df_sf2 ) = as.numeric(row.names(pts_df_sf )) + max(as.numeric(row.names(pts_df_sf ))) 
 pts_df_sf2$id = pts_df_sf$id + max(pts_df_sf$id)
-sf::st_write(pts_df_sf,dsn="c:/temp/demo_geopackage.gpkg", "example_pts2", driver="GPKG",append=T) 
+sf::st_write(pts_df_sf2,dsn="c:/temp/demo_geopackage1.gpkg", "example_pts2", driver="GPKG",append=T) 
 
 #verify that append works
-pts_df_sf3 = sf::read_sf(dsn="c:/temp/demo_geopackage.gpkg", "example_pts2")
+pts_df_sf3 = sf::read_sf(dsn="c:/temp/demo_geopackage1.gpkg", "example_pts2")
 
 #notice that pts_df_sf3 has npts*2 records ...
 nrow(pts_df_sf)
