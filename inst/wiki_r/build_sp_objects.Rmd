@@ -1,0 +1,46 @@
+---
+title: "build some sp objects manually"
+author: "Jacob Strunk"
+date: "6/5/2020"
+output:
+  md_document:
+    variant: markdown_github
+---
+
+# This example demonstrates creation of some sp objects
+
+working with points
+```{r}
+npts = 50
+pts_df = data.frame(id=1:npts,x=rnorm(npts)*1000+10e6, y=rnorm(npts)*1000+10e6 , z=rnorm(npts))
+
+```
+
+
+buffer some Points >> polygons
+```{r}
+
+
+
+```
+
+working with lines
+```{r}
+
+
+
+```
+
+buffer some lines >> polygons
+```{r}
+
+
+
+```
+
+working with polygons
+```{r}
+
+
+
+```
