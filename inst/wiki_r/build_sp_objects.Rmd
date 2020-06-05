@@ -29,7 +29,6 @@ pts_df = data.frame(id=1:npts,x=rnorm(npts)*1000+10e6, y=rnorm(npts)*1000+10e6 ,
 coordinates(pts_df) = pts_df[,c("x","y")]
 
 pts_df
-
 plot(pts_df)
 spplot(pts_df,zcol="z")
 
@@ -71,8 +70,8 @@ nrow(pts_df_sf)
 nrow(pts_df_sf2)
 nrow(pts_df_sf3)
 
-knitr::kable(pts_df_sf3)
-
+knitr::kable(tail(pts_df_sf3,10))
+#DT::datatable(pts_df_sf3)
 ```
 
 
