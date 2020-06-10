@@ -73,7 +73,7 @@
 #@import reshape2
 #'
 
-#@seealso \code{\link{reshape2::dcast}}\cr \code{\link{reshape2::melt}}\cr
+#@seealso \code{\link{dcast}}\cr \code{\link{melt}}\cr
 
 #updates to do:
 #
@@ -146,9 +146,9 @@ dbclY = function(x,trID,dbclNm,dbclY,...){
   for(i in 1:length(dbclY)){
 
     #cross dbcl with response attributes
-    mi = melt(x_in[,c(trID,dbclNm,dbclY[i])],id.vars=c(trID,dbclNm) )
+    mi = reshape2::melt(x_in[,c(trID,dbclNm,dbclY[i])],id.vars=c(trID,dbclNm) )
     fi = as.formula(paste("variable +",trID,"~",dbclNm))
-    dfi = dcast(mi, formula =  fi)[,-1]
+    dfi = reshape2::dcast(mi, formula =  fi)[,-1]
     names(dfi)[-1] = paste(dbclY[i], paste(dbclNm,names(dfi)[-1],sep=""),sep="_")
 
     #merge back in
@@ -167,9 +167,9 @@ sppY = function(x,trID,sppY,sppNm,...){
   for(i in 1:length(sppY)){
 
     #cross dbcl with response attributes
-    mi = melt(x_in[,c(trID,sppNm,sppY[i])],id.vars=c(trID,sppNm) )
+    mi = reshape2::melt(x_in[,c(trID,sppNm,sppY[i])],id.vars=c(trID,sppNm) )
     fi = as.formula(paste("variable +",trID,"~",sppNm))
-    dfi = dcast(mi, formula =  fi)[,-1]
+    dfi = reshape2::dcast(mi, formula =  fi)[,-1]
     names(dfi)[-1] = paste(sppY[i], paste(sppNm,names(dfi)[-1],sep="_"),sep="_")
 
     #merge back in
@@ -188,7 +188,7 @@ dbclSppY = function(x,trID,sppY,dbclNm,sppNm,...){
   for(i in 1:length(sppY)){
 
     #cross dbcl with response attributes
-    mi = melt(x_in[,c(trID,sppNm,dbclNm,sppY[i])],id.vars=c(trID,sppNm,dbclNm) )
+    mi = reshape2::melt(x_in[,c(trID,sppNm,dbclNm,sppY[i])],id.vars=c(trID,sppNm,dbclNm) )
 
     #append spp and dbcl to improve readability of final columns
     mi[,sppNm] = paste(sppNm,mi[,sppNm],sep="_")
@@ -196,7 +196,7 @@ dbclSppY = function(x,trID,sppY,dbclNm,sppNm,...){
 
     #merge data
     fi = as.formula(paste("variable +",trID,"~",sppNm,"+",dbclNm))
-    dfi = dcast(mi, formula =  fi)[,-1]
+    dfi = reshape2::dcast(mi, formula =  fi)[,-1]
 
     #merge back in
     x_in = merge(x_in, dfi,  by = trID)
