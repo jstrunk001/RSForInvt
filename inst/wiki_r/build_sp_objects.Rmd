@@ -12,7 +12,9 @@ output:
 You can find a more complete demonstration of working with spatial object in R here: https://mgimond.github.io/Spatial/reading-and-writing-spatial-data-in-r.html
 
 **Build SpatialPointsDataframe**
+
 Dealing with points is relatively easy compared to polygons or lines
+
 ```{r, message=FALSE, warning=FALSE}
 
 library(raster)

@@ -1,4 +1,4 @@
-#'@name compiletlDFees
+#'@name compileTrees
 #'@title
 #'  Compile individual tlDFee attlDFibutes
 #'
@@ -26,15 +26,11 @@
 #'Jacob StlDFunk <JstlDFunk@@fs.fed.us>
 #'
 #'@param tlDF data frame of tlDFee records
-#'@param dir_out where to place compiled plots
-#'@param dbcl breaks to use in computing diameter classes
-#'@param dbclY variables to cross with dbcl otherwise blank or NA
-#'@param sppY variables to cross with spp otherwise blank or NA
-#'@param sppDbclY which fields should be crossed with spp and dbcl
-#'@param return T/F
-#'@param sql_filter sql code to use in subsetting observations
-#'@param ba_spp_dbcl (deprecated) -> tlDFansition to "spp_dbcl"
-#'@param spp_dbcl which fields should be crossed with spp_dbcl
+#'@param fnCompute sequential list of functions to
+#'apply to tree data, earlier results (e.g. ba) are available to later
+#'functions. Every function should accept an elipsis
+#'@param ... arguments to functions in fnCompute
+
 #'
 #'
 #'@return
@@ -84,7 +80,7 @@
 #
 
 #'@export
-#'@rdname compiletlDFees
+#'@rdname compileTrees
 compileTrees=function(
 
   tlDF
@@ -175,7 +171,7 @@ sppY = function(x,trID,sppY,sppNm,...){
     mi = melt(x_in[,c(trID,sppNm,sppY[i])],id.vars=c(trID,sppNm) )
     fi = as.formula(paste("variable +",trID,"~",sppNm))
     dfi = dcast(mi, formula =  fi)[,-1]
-    names(dfi)[-1] = paste(sppY[i], paste(sppNm,names(dfi)[-1],sep=""),sep="_")
+    names(dfi)[-1] = paste(sppY[i], paste(sppNm,names(dfi)[-1],sep="_"),sep="_")
 
     #merge back in
     x_in = merge(x_in, dfi,  by = trID)
@@ -193,13 +189,15 @@ dbclSppY = function(x,trID,sppY,dbclNm,sppNm,...){
   for(i in 1:length(sppY)){
 
     #cross dbcl with response attributes
-
     mi = melt(x_in[,c(trID,sppNm,dbclNm,sppY[i])],id.vars=c(trID,sppNm,dbclNm) )
 
+    #append spp and dbcl to improve readability of final columns
+    mi[,sppNm] = paste(sppNm,mi[,sppNm],sep="_")
+    mi[,dbclNm] = paste(dbclNm,mi[,dbclNm],sep="_")
 
+    #merge data
     fi = as.formula(paste("variable +",trID,"~",sppNm,"+",dbclNm))
     dfi = dcast(mi, formula =  fi)[,-1]
-    names(dfi)[-1] = paste(sppNm,dbclNm,names(dfi)[-1],sep="_")
 
     #merge back in
     x_in = merge(x_in, dfi,  by = trID)
@@ -212,7 +210,7 @@ if(F){
 
   set.seed=111
   nfake=50
-  df_fake = data.frame(tlDFid=1:50
+  df_fake = data.frame(trid=1:50
                        ,db=10*abs(rnorm(nfake))
                        ,ht=100*abs(rnorm(nfake))
                        ,spp = sample(c("a","b","c","d") , nfake , T)
@@ -241,6 +239,7 @@ if(F){
         )
     )
 
+    test
 
 }
 
