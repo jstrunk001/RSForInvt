@@ -95,16 +95,17 @@ compileTrees=function(
 
 
   ,fnCompute = list(
-
-    ba_ft
-
+      tpa
+      ,ba_ft
+      ,dbcl
+      ,dbclY
+      ,sppY
+      ,dbclSppY
   )
 
   ,...
 
 ){
-
-
 
   tlDF_in = tlDF
 
@@ -125,6 +126,16 @@ compileTrees=function(
 #'@export
 #'@rdname compileTrees
 ba_ft = function(x,dbNm,...) data.frame(x, ba_ft = 0.005454 * (x[,dbNm]^2))
+
+tpa = function(x,acresNm,nTreesNm,...){
+  if(is.na(nTreesNm))  data.frame(x, TPA = 1 / x[,acresNm])
+  if(!is.na(nTreesNm))  data.frame(x, TPA = x[,nTreesNm]  / x[,acresNm] )
+}
+
+tph = function(x,haNm,nTreesNm,...){
+  if(is.na(nTreesNm))  data.frame(x, TPH = 1 / x[,haNm])
+  if(!is.na(nTreesNm))  data.frame(x, TPH = x[,nTreesNm]  /x[,acresNm] )
+}
 
 #'@export
 #'@rdname compileTrees
@@ -230,7 +241,8 @@ if(F){
 
       ,fnCompute =
         list(
-          ba_ft
+          tpa
+          ,ba_ft
           ,dbcl
           ,dbclY
           ,sppY
