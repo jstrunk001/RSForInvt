@@ -1,6 +1,6 @@
 #'@name compileTrees
 #'@title
-#'  Compile individual tlDFee attlDFibutes
+#'  Facilitate computation of tree level attributes (ba, volume, etc.)
 #'
 #'@description
 #'  <Delete and Replace>
@@ -17,15 +17,14 @@
 #'\cr
 #'Revision History
 #' \tabular{ll}{
-#'1.0 \tab date and revisions.. \cr
-#'1.1 \tab date and revisions.. \cr
+#'1.0 \tab 6/10/2020 Created  \cr
 #'}
 #'
 #'@author
 #'
-#'Jacob StlDFunk <JstlDFunk@@fs.fed.us>
+#'Jacob Strunk <Jstrunk@@fs.fed.us>
 #'
-#'@param tlDF data frame of tlDFee records
+#'@param tlDF data frame of tree records
 #'@param fnCompute sequential list of functions to
 #'apply to tree data, earlier results (e.g. ba) are available to later
 #'functions. Every function should accept an elipsis
@@ -71,10 +70,10 @@
 #'         )
 #'     )
 #'
-#@import some_package,some_package2
+#@import reshape2
 #'
 
-#@seealso \code{\link{another_function}}\cr \code{\link{yet_another_function}}\cr
+#@seealso \code{\link{reshape2::dcast}}\cr \code{\link{reshape2::melt}}\cr
 
 #updates to do:
 #
