@@ -127,11 +127,15 @@ compileTrees=function(
 #'@rdname compileTrees
 ba_ft = function(x,dbNm,...) data.frame(x, ba_ft = 0.005454 * (x[,dbNm]^2))
 
+#'@export
+#'@rdname compileTrees
 tpa = function(x,acresNm,nTreesNm,...){
   if(is.na(nTreesNm))  data.frame(x, TPA = 1 / x[,acresNm])
   if(!is.na(nTreesNm))  data.frame(x, TPA = x[,nTreesNm]  / x[,acresNm] )
 }
 
+#'@export
+#'@rdname compileTrees
 tph = function(x,haNm,nTreesNm,...){
   if(is.na(nTreesNm))  data.frame(x, TPH = 1 / x[,haNm])
   if(!is.na(nTreesNm))  data.frame(x, TPH = x[,nTreesNm]  /x[,acresNm] )

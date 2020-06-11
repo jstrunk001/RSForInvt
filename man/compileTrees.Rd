@@ -9,7 +9,11 @@
 \alias{dbclSppY}
 \title{Facilitate computation of tree level attributes (ba, volume, etc.)}
 \usage{
-compileTrees(tlDF, fnCompute = list(ba_ft), ...)
+compileTrees(
+  tlDF,
+  fnCompute = list(tpa, ba_ft, dbcl, dbclY, sppY, dbclSppY),
+  ...
+)
 
 ba_ft(x, dbNm, ...)
 
