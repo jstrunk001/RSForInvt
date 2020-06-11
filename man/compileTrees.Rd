@@ -3,6 +3,8 @@
 \name{compileTrees}
 \alias{compileTrees}
 \alias{ba_ft}
+\alias{tpa}
+\alias{tph}
 \alias{dbcl}
 \alias{dbclY}
 \alias{sppY}
@@ -16,6 +18,10 @@ compileTrees(
 )
 
 ba_ft(x, dbNm, ...)
+
+tpa(x, acresNm, nTreesNm, ...)
+
+tph(x, haNm, nTreesNm, ...)
 
 dbcl(x, dbNm = "dbh", dbcl = c(seq(0, 32, 4), 50, 1000), dbclNm = "dbcl", ...)
 

@@ -114,7 +114,7 @@ compileTrees=function(
 
     fni = fnCompute[[i]]
     tlDF_in = fni(tlDF_in,...)
-    if(class(tlDF_in) != "data.frame") stop("All functions provided in 'fnsCompute = list()' argument must return a dataframe composed of tlDF and any new columns created.")
+    if(class(tlDF_in) != "data.frame" & class(tlDF_in) != "data.table") stop("All functions provided in 'fnsCompute = list()' argument must return a dataframe composed of tlDF and any new columns created.")
 
   }
 
@@ -129,16 +129,20 @@ ba_ft = function(x,dbNm,...) data.frame(x, ba_ft = 0.005454 * (x[,dbNm]^2))
 
 #'@export
 #'@rdname compileTrees
-tpa = function(x,acresNm,nTreesNm,...){
-  if(is.na(nTreesNm))  data.frame(x, TPA = 1 / x[,acresNm])
-  if(!is.na(nTreesNm))  data.frame(x, TPA = x[,nTreesNm]  / x[,acresNm] )
+tpa = function(x,acresNm=NA,nTreesNm=NA,...){
+  if(is.na(acresNm)) stop("acresNm not provided when using RSForInvt::tpa probably from compileTrees" )
+  if(is.na(nTreesNm))  res_df = data.frame(x, TPA = 1 / x[,acresNm])
+  if(!is.na(nTreesNm))  res_df = data.frame(x, TPA = x[,nTreesNm]  / x[,acresNm] )
+  return(res_df)
 }
 
 #'@export
 #'@rdname compileTrees
-tph = function(x,haNm,nTreesNm,...){
-  if(is.na(nTreesNm))  data.frame(x, TPH = 1 / x[,haNm])
-  if(!is.na(nTreesNm))  data.frame(x, TPH = x[,nTreesNm]  /x[,acresNm] )
+tph = function(x,haNm=NA,nTreesNm=NA,...){
+  if(is.na(acresNm)) stop("haNm not provided when using RSForInvt::tph probably from compileTrees" )
+  if(is.na(nTreesNm))  res_df = data.frame(x, TPH = 1 / x[,haNm])
+  if(!is.na(nTreesNm))  res_df = data.frame(x, TPH = x[,nTreesNm]  /x[,acresNm] )
+  return(res_df)
 }
 
 #'@export
