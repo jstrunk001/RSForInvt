@@ -11,7 +11,6 @@ Description: A collection of data processing tools and helpers primarily motivat
         can handle huge areas. The package also includes wrappers for a subset of functions in the dll for the Nationval Volume 
         Estimator Library (NVEL) . There is also some developing functionality for field data compilation including compileTree
         and compilePlot (rudimentary). 
-        
         This set of tools is free to use but it is provided WITHOUT WARRANTY and with 
         ABSOLUTELY NO GUARANTEE of fitness or functionality for any purpose; you can redistribute it and/or modify it 
         under the terms of the GNU General Public License as published by the Free Software Foundation;either version 2 
