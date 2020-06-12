@@ -85,7 +85,7 @@
 #'       ,acresNm = "acres"
 #'       ,nTreesNm = NA
 #'
-#'       #custom functions to run against tree data
+#'       #optional functions to run against tree data
 #'       #must accept ...
 #'       ,fnCompute =
 #'         list(
@@ -114,7 +114,6 @@
 
 #'@export
 #'@rdname compileTrees
-#'Function to compile trees
 compileTrees=function(
 
   tlDF
@@ -147,12 +146,11 @@ compileTrees=function(
 
 }
 
-#'Optional compilation function to be supplied in fnCompute list argument: fnCompute = list(ba_ft,...)
 #'@export
 #'@rdname compileTrees
 ba_ft = function(x,dbNm,...) data.frame(x, ba_ft = 0.005454 * (x[,dbNm]^2))
 
-#'Optional compilation function to be supplied in fnCompute list argument: fnCompute = list(ba_ft,...)
+
 #'@export
 #'@rdname compileTrees
 tpa = function(x,acresNm=NA,nTreesNm=NA,...){
@@ -172,7 +170,7 @@ tph = function(x,haNm=NA,nTreesNm=NA,...){
   return(res_df)
 }
 
-#'Optional compilation function to be supplied in fnCompute list argument: fnCompute = list(ba_ft,...)
+
 #'@export
 #'@rdname compileTrees
 dbcl = function(x , dbNm="dbh" , dbcl=c(seq(0,32,4),50,1000) , dbclNm = "dbcl", ...){
@@ -183,7 +181,7 @@ dbcl = function(x , dbNm="dbh" , dbcl=c(seq(0,32,4),50,1000) , dbclNm = "dbcl", 
   return(res_df)
 }
 
-#'Optional compilation function to be supplied in fnCompute list argument: fnCompute = list(ba_ft,...)
+
 #'@export
 #'@rdname compileTrees
 dbclY = function(x,trID,dbclNm,dbclY,...){
@@ -205,7 +203,7 @@ dbclY = function(x,trID,dbclNm,dbclY,...){
   return(x_in)
 }
 
-#'Optional compilation function to be supplied in fnCompute list argument: fnCompute = list(ba_ft,...)
+
 #'@export
 #'@rdname compileTrees
 sppY = function(x,trID,sppY,sppNm,...){
@@ -227,7 +225,6 @@ sppY = function(x,trID,sppY,sppNm,...){
   return(x_in)
 }
 
-#'Optional compilation function to be supplied in fnCompute list argument: fnCompute = list(ba_ft,...)
 #'@export
 #'@rdname compileTrees
 dbclSppY = function(x,trID,sppY,dbclNm,sppNm,...){
