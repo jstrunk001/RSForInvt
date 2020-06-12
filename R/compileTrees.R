@@ -1,9 +1,9 @@
 #'@name compileTrees
 #'@title
-#'  Facilitate computation of tree level attributes (ba, volume, etc.)
+#'  Facilitate computation of tree level attributes
 #'
 #'@description
-#'  <Delete and Replace>
+#'  Compute tree level attributes using optional and custom functions, e.g., ba, volume, Lorey's height
 #'
 #'@details
 #'  <Delete and Replace>

@@ -116,7 +116,7 @@
 #'
 #'@import plyr parallel sqldf
 #'
-#'@seealso \code{\link{treeCompile}}\cr \code{\link{parLapplyLB}}\cr
+#'@seealso \code{\link{compileTrees}}\cr \code{\link{parLapplyLB}}\cr
 
 #updates to do:
 #	write FIA data processing wrappers
@@ -407,7 +407,7 @@ plotWtMn_B = function(
 
 
 #test this code with fake trees
-if(T){
+if(F){
 
   set.seed=111
   nfake=50

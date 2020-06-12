@@ -43,6 +43,7 @@ Imports:
         ,sf
         ,sp
         ,spatstat
+        ,sqldf
         ,Thermimage
         ,uuid
         ,lubridate

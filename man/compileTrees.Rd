@@ -63,20 +63,27 @@ Revision History
 }
 \examples{
 
-    #create a fake dataset
-    set.seed=111
-    nfake=50
-    df_fake = data.frame(trID=1:50
-                       ,db=10*abs(rnorm(nfake))
-                       ,ht=100*abs(rnorm(nfake))
-                       ,spp = sample(c("a","b","c","d") , nfake , T)
-    )
 
-   #compile fake datase
-    test =
+  set.seed=111
+  nfake=50
+  dbh_fk = 10*abs(rnorm(nfake))
+  df_fake = data.frame(
+    pltId = sample((1:7),nfake,replace=T)
+    ,trid=1:50
+    ,db= dbh_fk
+    ,ht=75*dbh_fk + rnorm(nfake)*10
+    ,spp = sample(c("df","wh","cw","ra") , nfake , T)
+    ,acres = 0.1
+    ,trees = round(1+ abs(rnorm(nfake)/3))
+
+  )
+
+  testTL =
     compileTrees(
       df_fake
-      ,trID = "trID"
+
+      #arguments to fnCompute functions
+      ,trID = "trid"
       ,sppNm = "spp"
       ,dbNm = "db"
       ,htNm = "ht"
@@ -85,18 +92,31 @@ Revision History
       ,dbclY = c("ba_ft")
       ,sppY = c("ba_ft")
       ,sppDbclY = c("ba_ft")
+      ,acresNm = "acres"
+      ,nTreesNm = NA
 
+      #custom functions to run against tree data
+      #must accept ...
       ,fnCompute =
         list(
-          ba_ft
+          tpa
+          ,ba_ft
           ,dbcl
           ,dbclY
           ,sppY
           ,dbclSppY
         )
+
     )
 
+  testTL
 
+
+
+}
+\seealso{
+\code{\link{dcast}}\cr \code{\link{melt}}\cr
+Function to compile trees
 }
 \author{
 Jacob Strunk <Jstrunk@fs.fed.us>
