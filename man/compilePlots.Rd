@@ -147,7 +147,7 @@ Revision History
 
 }
 \seealso{
-\code{\link{treeCompile}}\cr \code{\link{parLapplyLB}}\cr
+\code{\link{compileTrees}}\cr \code{\link{parLapplyLB}}\cr
 }
 \author{
 Jacob Strunk <Jstrunk@fs.fed.us>

@@ -9,7 +9,7 @@
 \alias{dbclY}
 \alias{sppY}
 \alias{dbclSppY}
-\title{Facilitate computation of tree level attributes (ba, volume, etc.)}
+\title{Facilitate computation of tree level attributes}
 \usage{
 compileTrees(
   tlDF,
@@ -44,10 +44,20 @@ functions. Every function should accept an elipsis}
 <Delete and Replace>
 }
 \description{
-<Delete and Replace>
+Compute tree level attributes using optional and custom functions, e.g., ba, volume, Lorey's height
 }
 \details{
-<Delete and Replace>
+Accepts a list of trees and a series of functions (some provides them) and additively applies the
+ functions to the tree list. Something like computeVolume(computeBA(computeTPA(treeList))) ... A number
+ of functions are provided - feel free to modify or update them to meet your needs
+
+ ba_ft(x, dbNm, ...)
+ tpa(x, acresNm = NA, nTreesNm = NA, ...)
+ tph(x, haNm = NA, nTreesNm = NA, ...)
+ dbcl(x, dbNm = "dbh", dbcl = c(seq(0, 32, 4), 50, 1000), dbclNm = "dbcl", ...)
+ dbclY(x, trID, dbclNm, dbclY, ...)
+ sppY(x, trID, sppY, sppNm, ...)
+ dbclSppY(x, trID, sppY, dbclNm, sppNm, ...)
 
  This program is free software but it is provided WITHOUT WARRANTY
  and with ABSOLUTELY NO GUARANTEE of fitness or functionality for any purpose;
