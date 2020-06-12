@@ -29,7 +29,6 @@
 #'apply to tree data, earlier results (e.g. ba) are available to later
 #'functions. Every function should accept an elipsis
 #'@param ... arguments to functions in fnCompute
-
 #'
 #'
 #'@return
@@ -37,20 +36,27 @@
 #'
 #'@examples
 #'
-#'     #create a fake dataset
-#'     set.seed=111
-#'     nfake=50
-#'     df_fake = data.frame(trID=1:50
-#'                        ,db=10*abs(rnorm(nfake))
-#'                        ,ht=100*abs(rnorm(nfake))
-#'                        ,spp = sample(c("a","b","c","d") , nfake , T)
-#'     )
 #'
-#'    #compile fake datase
-#'     test =
+#'   set.seed=111
+#'   nfake=50
+#'   dbh_fk = 10*abs(rnorm(nfake))
+#'   df_fake = data.frame(
+#'     pltId = sample((1:7),nfake,replace=T)
+#'     ,trid=1:50
+#'     ,db= dbh_fk
+#'     ,ht=75*dbh_fk + rnorm(nfake)*10
+#'     ,spp = sample(c("df","wh","cw","ra") , nfake , T)
+#'     ,acres = 0.1
+#'     ,trees = round(1+ abs(rnorm(nfake)/3))
+#'
+#'   )
+#'
+#'   testTL =
 #'     compileTrees(
 #'       df_fake
-#'       ,trID = "trID"
+#'
+#'       #arguments to fnCompute functions
+#'       ,trID = "trid"
 #'       ,sppNm = "spp"
 #'       ,dbNm = "db"
 #'       ,htNm = "ht"
@@ -59,41 +65,41 @@
 #'       ,dbclY = c("ba_ft")
 #'       ,sppY = c("ba_ft")
 #'       ,sppDbclY = c("ba_ft")
+#'       ,acresNm = "acres"
+#'       ,nTreesNm = NA
 #'
+#'       #custom functions to run against tree data
+#'       #must accept ...
 #'       ,fnCompute =
 #'         list(
-#'           ba_ft
+#'           tpa
+#'           ,ba_ft
 #'           ,dbcl
 #'           ,dbclY
 #'           ,sppY
 #'           ,dbclSppY
 #'         )
+#'
 #'     )
 #'
-#@import reshape2
+#'   testTL
+#'
+#'
+#'
+#'@import reshape2
 #'
 
-#@seealso \code{\link{dcast}}\cr \code{\link{melt}}\cr
+#'@seealso \code{\link{dcast}}\cr \code{\link{melt}}\cr
 
 #updates to do:
 #
 
+#'Function to compile trees
 #'@export
 #'@rdname compileTrees
 compileTrees=function(
 
   tlDF
-  # ,trID = "CN"
-  # ,sppNm = "SPGRPCD"
-  # ,dbNm = "DIA"
-  # ,htNm = "HT"
-  # ,dbclNm = "dbcl"
-  # ,dbcl = c(seq(0,32,4),50,1000)
-  # ,dbclY = c("ba_ft")
-  # ,sppY = c("ba_ft")
-  # ,sppDbclY = c("ba_ft")
-
-
   ,fnCompute = list(
       tpa
       ,ba_ft
@@ -123,10 +129,12 @@ compileTrees=function(
 
 }
 
+#'Optional compilation function to be supplied in fnCompute list argument: fnCompute = list(ba_ft,...)
 #'@export
 #'@rdname compileTrees
 ba_ft = function(x,dbNm,...) data.frame(x, ba_ft = 0.005454 * (x[,dbNm]^2))
 
+#'Optional compilation function to be supplied in fnCompute list argument: fnCompute = list(ba_ft,...)
 #'@export
 #'@rdname compileTrees
 tpa = function(x,acresNm=NA,nTreesNm=NA,...){
@@ -136,6 +144,7 @@ tpa = function(x,acresNm=NA,nTreesNm=NA,...){
   return(res_df)
 }
 
+#'Optional compilation function to be supplied in fnCompute list argument: fnCompute = list(ba_ft,...)
 #'@export
 #'@rdname compileTrees
 tph = function(x,haNm=NA,nTreesNm=NA,...){
@@ -145,6 +154,7 @@ tph = function(x,haNm=NA,nTreesNm=NA,...){
   return(res_df)
 }
 
+#'Optional compilation function to be supplied in fnCompute list argument: fnCompute = list(ba_ft,...)
 #'@export
 #'@rdname compileTrees
 dbcl = function(x , dbNm="dbh" , dbcl=c(seq(0,32,4),50,1000) , dbclNm = "dbcl", ...){
@@ -155,6 +165,7 @@ dbcl = function(x , dbNm="dbh" , dbcl=c(seq(0,32,4),50,1000) , dbclNm = "dbcl", 
   return(res_df)
 }
 
+#'Optional compilation function to be supplied in fnCompute list argument: fnCompute = list(ba_ft,...)
 #'@export
 #'@rdname compileTrees
 dbclY = function(x,trID,dbclNm,dbclY,...){
@@ -176,6 +187,7 @@ dbclY = function(x,trID,dbclNm,dbclY,...){
   return(x_in)
 }
 
+#'Optional compilation function to be supplied in fnCompute list argument: fnCompute = list(ba_ft,...)
 #'@export
 #'@rdname compileTrees
 sppY = function(x,trID,sppY,sppNm,...){
@@ -197,6 +209,7 @@ sppY = function(x,trID,sppY,sppNm,...){
   return(x_in)
 }
 
+#'Optional compilation function to be supplied in fnCompute list argument: fnCompute = list(ba_ft,...)
 #'@export
 #'@rdname compileTrees
 dbclSppY = function(x,trID,sppY,dbclNm,sppNm,...){
@@ -210,7 +223,7 @@ dbclSppY = function(x,trID,sppY,dbclNm,sppNm,...){
     mi = reshape2::melt(x_in[,c(trID,sppNm,dbclNm,sppY[i])],id.vars=c(trID,sppNm,dbclNm) )
 
     #append spp and dbcl to improve readability of final columns
-    mi[,sppNm] = paste(sppNm,mi[,sppNm],sep="_")
+    mi[,sppNm] = paste(sppY[i],sppNm,mi[,sppNm],sep="_")
     mi[,dbclNm] = paste(dbclNm,mi[,dbclNm],sep="_")
 
     #merge data
@@ -228,13 +241,19 @@ if(F){
 
   set.seed=111
   nfake=50
-  df_fake = data.frame(trid=1:50
-                       ,db=10*abs(rnorm(nfake))
-                       ,ht=100*abs(rnorm(nfake))
-                       ,spp = sample(c("a","b","c","d") , nfake , T)
-                      )
+  dbh_fk = 10*abs(rnorm(nfake))
+  df_fake = data.frame(
+    pltId = sample((1:7),nfake,replace=T)
+    ,trid=1:50
+    ,db= dbh_fk
+    ,ht=75*dbh_fk + rnorm(nfake)*10
+    ,spp = sample(c("df","wh","cw","ra") , nfake , T)
+    ,acres = 0.1
+    ,trees = round(1+ abs(rnorm(nfake)/3))
 
-    test =
+  )
+
+  testTL =
     compileTrees(
       df_fake
       ,trID = "trid"
@@ -246,6 +265,8 @@ if(F){
       ,dbclY = c("ba_ft")
       ,sppY = c("ba_ft")
       ,sppDbclY = c("ba_ft")
+      ,acresNm = "acres"
+      ,nTreesNm = NA
 
       ,fnCompute =
         list(
@@ -258,7 +279,7 @@ if(F){
         )
     )
 
-    test
+  testTL
 
 }
 

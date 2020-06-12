@@ -19,9 +19,9 @@ compileTrees(
 
 ba_ft(x, dbNm, ...)
 
-tpa(x, acresNm, nTreesNm, ...)
+tpa(x, acresNm = NA, nTreesNm = NA, ...)
 
-tph(x, haNm, nTreesNm, ...)
+tph(x, haNm = NA, nTreesNm = NA, ...)
 
 dbcl(x, dbNm = "dbh", dbcl = c(seq(0, 32, 4), 50, 1000), dbclNm = "dbcl", ...)
 
