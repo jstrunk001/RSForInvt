@@ -132,7 +132,7 @@ Revision History
 
 }
 \seealso{
-\code{\link{dcast}}\cr \code{\link{melt}}\cr
+\code{\link{dcast}}\cr \code{\link{melt}}\cr \code{\link{compilePlots}}\cr
 }
 \author{
 Jacob Strunk <Jstrunk@fs.fed.us>

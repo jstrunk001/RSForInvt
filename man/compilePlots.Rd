@@ -54,7 +54,7 @@ plotWtMn(trs, trNms, ...)
 \item{...}{additional arguments provided to fnCompute e.g textString="hello" argument in silly function someFun = function(tl,tlNms,textString){data.frame(note=textString)}}
 }
 \value{
-NULL or a data.frame of plot attributes
+NULL (return=F) or a data.frame of plot attributes (return=T)
 }
 \description{
 Supply data.frame of tree data with plot ids a data.frame of plots. The function works by iterating through the tree
