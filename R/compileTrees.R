@@ -106,10 +106,10 @@
 #'@import reshape2
 #'
 
-#'@seealso \code{\link{dcast}}\cr \code{\link{melt}}\cr
+#'@seealso \code{\link{dcast}}\cr \code{\link{melt}}\cr \code{\link{compilePlots}}\cr
 
 #updates to do:
-#
+# more examples
 
 
 #'@export

@@ -42,7 +42,7 @@
 #'@param doDebug stop and debug function
 #'
 #'@return
-#'  NULL or a data.frame of plot attributes
+#'  NULL (return=F) or a data.frame of plot attributes (return=T)
 #'
 #'@examples
 #'

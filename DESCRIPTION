@@ -1,19 +1,21 @@
 Package: RSForInvt
 Type: Package
 Title: Remote Sensing FORest INVenTory related analysis tasks, especially FUSION, lidR, NVEL 
-Version: 1.0.0
+Version: 1.1.0
 Author: Jacob Strunk
 Maintainer: Jacob Strunk <Jacob.strunk@usda.gov>
-Description: A hodgepodge of data processing tools, primarily motivated by Remote Sensing FORest INVentory related operations. 
+Description: A collection of data processing tools and helpers primarily motivated by Remote Sensing FORest INVenTory related operations. 
         Notable functionality is running FUSION lidar proecessing tools especially raster <-> .dtm (FUSION raster), gridmetrics, 
         treeseg, canopyModel, and a package specific project format that manages lidar tile overlap with .dtm files for 
-        large areas. This functionality is similar to areaprocessor (FUSION) or projects (lidR) but works with FUSION and
-        can handle huge areas. The package also includes wrappers for select functions in the dll for the Nationval Volume 
-        Estimator Library (NVEL) . There is also some developing functionality for field data compilation. 
-        This set of tools is free to use but it is provided WITHOUT WARRANTY and with ABSOLUTELY NO GUARANTEE
-        of fitness or functionality for any purpose; you can redistribute it and/or modify it under the terms of the GNU
-        General Public License as published by the Free Software Foundation;either version 2 of the License, or 
-        (at your option) any later version.
+        large areas. This functionality is similar to areaprocessor (FUSION) or catalogs (lidR) but works with FUSION and
+        can handle huge areas. The package also includes wrappers for a subset of functions in the dll for the Nationval Volume 
+        Estimator Library (NVEL) . There is also some developing functionality for field data compilation including compileTree
+        and compilePlot (rudimentary). 
+        
+        This set of tools is free to use but it is provided WITHOUT WARRANTY and with 
+        ABSOLUTELY NO GUARANTEE of fitness or functionality for any purpose; you can redistribute it and/or modify it 
+        under the terms of the GNU General Public License as published by the Free Software Foundation;either version 2 
+        of the License, or (at your option) any later version: https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html
 License: GPL 2 or later at users discretion
 Encoding: UTF-8
 LazyData: true
