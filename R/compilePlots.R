@@ -230,6 +230,7 @@ compilePlots=function(
 		#process plots
 		res_i = parallel::parLapplyLB(clus_in , spl_IDs , .compile_1plot , trs = dat_in,  trNms = dfTreeNms , plotIDs = plotIDs_in, fnCompute = fnCompute ,... )
 
+		stopCluster(clus_in)
 		closeAllConnections()
 	}
 
