@@ -228,9 +228,9 @@ compilePlots=function(
 		parallel::clusterEvalQ(clus_in,{gc()})
 
 		#process plots
-		res_i = parallel::parLapplyLB(clus_in , spl_IDs , .compile_1plot , trs = dat_in,  trNms = dfTreeNms , plotIDs = plotIDs_in, fnCompute = fnCompute ,... )
+		res_i = parallel::parLapplyLB(clus_in , spl_IDs , .compile_1plot , trs = dat_in,  trNms = dfTreeNms , plotNms = dfPlotNms, fnCompute = fnCompute , ... )
 
-		stopCluster(clus_in)
+		parallel::stopCluster(clus_in)
 		closeAllConnections()
 	}
 
@@ -267,8 +267,8 @@ compilePlots=function(
   #iterate through compute functions and append dataframes horizontally
   for(i in 1:length(fnCompute)){
     fni = fnCompute[[i]]
-    #if(nrow(trs_i) > 1 ) browser()
-    resi = try(fni(trs=trs_i, trNms = trNms , ... ))
+    if(nrow(trs_i) > 0 ) browser()
+    resi = try(fni(trs_i, trNms = trNms , ... ))
     if(class(resi) == "try-error") return(NULL)
     if(i==1) res_in = data.frame(trs_ID, resi)
     if(i>1) res_in = data.frame(res_in, resi)
@@ -373,38 +373,138 @@ plotWtMn = function(
 	return( wtmn )
 
 }
+#'
+#' #@export
+#' #'@rdname compilePlots
+#' plotSppDom = function(
+#'   trs
+#'   ,trNms
+#'   ,...
+#' ){
+#'
+#'   #remove trees without ID fields
+#'   bad_ids = is.na(trs[,trNms[["plotIDs"]]])
+#'   tr_in = trs[!bad_ids,]
+#'
+#'   #correct for NA weights
+#'   tr_in[is.na(tr_in[,trNms[["dbh"]]]),] = 0
+#'   tr_in[is.na(tr_in[,trNms[["trWt"]]]),] = 0
+#'
+#'   if(nrow(tr_in) > 0){
+#'
+#'     wtmn = data.frame(
+#'       ntree = nrow(tr_in)
+#'       ,ba_ftac = sum(.005454*tr_in[,trNms[["dbh"]]]^2*tr_in[,trNms[["trWt"]]],na.rm=T)
+#'       ,ba_ftac_ge3 = sum((.005454*tr_in[,trNms[["dbh"]]]^2*tr_in[,trNms[["trWt"]]])[tr_in[,trNms[["dbh"]]] > 3],na.rm=T)
+#'       ,ba_m3ha_ge3 = sum((.005454*tr_in[,trNms[["dbh"]]]^2*tr_in[,trNms[["trWt"]]])[tr_in[,trNms[["dbh"]]] > 3],na.rm=T)*(0.3048^2)/0.404686
+#'       ,qmd = sqrt(sum(tr_in[,trNms[["trWt"]]]*tr_in[,trNms[["dbh"]]]^2,na.rm=T) / sum(tr_in[,trNms[["trWt"]]],na.rm=T))
+#'       ,lorht = sum(tr_in[,trNms[["ht"]]] * tr_in[,trNms[["dbh"]]]^2,na.rm=T)/ sum(tr_in[,trNms[["dbh"]]]^2,na.rm=T)
+#'     )
+#'
+#'   }else{
+#'
+#'     wtmn = data.frame(ntree = 0, ba_ftac = 0, ba_ftac_ge3 = 0, ba_mh_ge3 = 0, qmd = NA, lorht = NA)
+#'
+#'   }
+#'
+#'   return( wtmn )
+#'
+#' }
 
 
-plotWtMn_B = function(
-	trs
-	,trNms
-	,fnArg
-	,...
-){
+# plotWtMn_B = function(
+# 	trs
+# 	,trNms
+# 	,fnArg
+# 	,...
+# ){
+#
+# 	if(nrow(trs)>1)browser()
+# 	bad_ids = is.na(trs[,trNms[["id"]]])
+# 	tr_in = trs[!bad_ids,]
+#
+# 	wtmn = data.frame(
+#
+# 		ntree = nrow(tr_in)
+# 		,ba_ftac = sum(.005454*tr_in[,trNms[["dbh"]]]^2*tr_in[,trNms[["trWt"]]],na.rm=T)
+# 		,ba_ftac_ge3 = sum((.005454*tr_in[,trNms[["dbh"]]]^2*tr_in[,trNms[["trWt"]]])[tr_in[,trNms[["dbh"]]] > 3],na.rm=T)
+# 		,ba_m3ha_ge3 = sum((.005454*tr_in[,trNms[["dbh"]]]^2*tr_in[,trNms[["trWt"]]])[tr_in[,trNms[["dbh"]]] > 3],na.rm=T)*(0.3048^2)/0.404686
+# 		,qmd = sqrt(sum(tr_in[,trNms[["trWt"]]]*tr_in[,trNms[["dbh"]]]^2,na.rm=T) / sum(tr_in[,trNms[["trWt"]]],na.rm=T))
+# 		,lorht = sum(tr_in[,trNms[["ht"]]] * tr_in[,trNms[["dbh"]]]^2,na.rm=T)/ sum(tr_in[,trNms[["dbh"]]]^2,na.rm=T)
+#
+# 	)
+#
+# 	if(nrow(tr_in) > 0){
+# 	}else{
+# 		wtmn = data.frame(ntree = 0, ba_ftac = 0, ba_ftac_ge3 = 0, ba_mh_ge3 = 0, qmd = NA, lorht = NA)
+# 	}
+#
+# 	return( wtmn )
+#
+# }
 
-	if(nrow(trs)>1)browser()
-	bad_ids = is.na(trs[,trNms[["id"]]])
-	tr_in = trs[!bad_ids,]
 
-	wtmn = data.frame(
+#'@export
+#'@rdname compileTrees
+sppYplot = function(x,ID,sppY,sppNm,wtNm,...){
 
-		ntree = nrow(tr_in)
-		,ba_ftac = sum(.005454*tr_in[,trNms[["dbh"]]]^2*tr_in[,trNms[["trWt"]]],na.rm=T)
-		,ba_ftac_ge3 = sum((.005454*tr_in[,trNms[["dbh"]]]^2*tr_in[,trNms[["trWt"]]])[tr_in[,trNms[["dbh"]]] > 3],na.rm=T)
-		,ba_m3ha_ge3 = sum((.005454*tr_in[,trNms[["dbh"]]]^2*tr_in[,trNms[["trWt"]]])[tr_in[,trNms[["dbh"]]] > 3],na.rm=T)*(0.3048^2)/0.404686
-		,qmd = sqrt(sum(tr_in[,trNms[["trWt"]]]*tr_in[,trNms[["dbh"]]]^2,na.rm=T) / sum(tr_in[,trNms[["trWt"]]],na.rm=T))
-		,lorht = sum(tr_in[,trNms[["ht"]]] * tr_in[,trNms[["dbh"]]]^2,na.rm=T)/ sum(tr_in[,trNms[["dbh"]]]^2,na.rm=T)
+  require("reshape2")
+  res_in = x[1,ID,drop=F]
+  x_in = x
 
-	)
+  for(i in 1:length(sppY)){
 
-	if(nrow(tr_in) > 0){
-	}else{
-		wtmn = data.frame(ntree = 0, ba_ftac = 0, ba_ftac_ge3 = 0, ba_mh_ge3 = 0, qmd = NA, lorht = NA)
-	}
+    #compute weighted values
+    x_in[,sppY[i]] = x[,sppY[i]] * x[,wtNm]
 
-	return( wtmn )
+    #cast and aggregate
+    mi = reshape2::melt( x_in[,c(ID,sppNm,sppY[i]) ] , id.vars = c(ID,sppNm) )
+    fi = as.formula(paste("variable  + ", ID," ~ ",sppNm , sep=""))
+    dfi = reshape2::dcast( mi , formula =  fi , fun.aggregate = sum )[,-1]
 
+    #get dominant species by y
+    yMaxID = names(dfi)[-1][which.max(unlist(dfi[,-1]))]
+    nmMx = paste("Dom", sppNm, sppY[i], sep="_")
+
+    #add useful name to dfi
+    names(dfi)[-1] = paste(sppY[i], paste(sppNm,names(dfi)[-1],sep="_"),sep="_")
+
+    #add in dominant species after rename
+    dfi[, nmMx ] = yMaxID
+
+    #merge data
+    res_in = merge(res_in, dfi, by=ID)
+
+  }
+  return(res_in)
 }
+
+#' #'@export
+#' #'@rdname compileTrees
+#' dbclSppY_id = function(x,ID,sppY,dbclNm,sppNm,...){
+#'
+#'   require("reshape2")
+#'   x_in = x
+#'
+#'   for(i in 1:length(sppY)){
+#'
+#'     #cross dbcl with response attributes
+#'     mi = reshape2::melt(x_in[,c(ID,sppNm,dbclNm,sppY[i])],id.vars=c(ID,sppNm,dbclNm) )
+#'
+#'     #append spp and dbcl to improve readability of final columns
+#'     mi[,sppNm] = paste(sppY[i],sppNm,mi[,sppNm],sep="_")
+#'     mi[,dbclNm] = paste(dbclNm,mi[,dbclNm],sep="_")
+#'
+#'     #merge data
+#'     fi = as.formula(paste("variable +",ID,"~",sppNm,"+",dbclNm))
+#'     dfi = reshape2::dcast(mi, formula =  fi)[,-1]
+#'
+#'     #merge back in
+#'     x_in = merge(x_in, dfi,  by = ID)
+#'   }
+#'   return(x_in)
+#' }
+
 
 
 #test this code with fake trees
