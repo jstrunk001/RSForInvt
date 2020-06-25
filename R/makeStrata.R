@@ -1,5 +1,5 @@
 #'@title
-#'  Make and assign strata based on two input columns. At least one column should be numeric, otherwise use expand.gri
+#'  Make and assign strata based on two input columns, typically at least one is numeric
 #'
 #'
 #'@description
@@ -13,34 +13,113 @@
 #'Revision History
 #' \tabular{ll}{
 #'1.0 \tab 2019 01 24 created \cr
-#'1.1 \tab date and revisions.. \cr
+#'1.1 \tab 2020 06 25 updated to allow more complex inputs \cr
 #'}
 #'
 #'@author
 #'
 #'Jacob Strunk <Jstrunk@@fs.fed.us>
 #'
+#'@param data input data
 #'@param x1 name of input x field
 #'@param x2 name of input y field
-#'@param split_x1 ?
-#'@param split_x2 ?
-#'@param  nest_x2  ?
-#'@param  n1  ?
-#'@param  n2  ?
-#'@param  type_x1  ?
-#'@param  type_x2 ?
-#'@param  minRecs  ?
-#'@param  precision  ?
+#'@param split_x1 how to split - equal interval or quantile based
+#'@param split_x2 how to split - equal interval or quantile based
+#'@param  nest_x2  should x2 be nested in x1, or should x1 and x2 be split independently
+#'@param  n1  number of strata for x1
+#'@param  n2  number of strata for x2
+#'@param  type_x1  is x1 numeric or factor
+#'@param  type_x2 is x2 numeric or factor
+#'@param  minRecs what is the minimum number of records in a stratum before collapse
+#'@param  precision  what precision is retained for cutting numeric values into strata
 #'
-#'@param  strata
-#'@param data
 #'
 #'@return
 #'  makeStrata returns a data.frame of strata boundaries
-#'  assignStrata takes a data.frame and appends a column wiht the stratum name for each record
+#'  assignStrata takes a data.frame and appends a column with the stratum name for each record
 #'
 #'@examples
-#'  <Delete and Replace>
+#'
+#'
+#'
+#'       #prepare pseudo data
+#'       n=500
+#'       hts = sample(1:150,n,T)
+#'       dbhs = abs(hts/5 + rnorm(#' )*2)
+#'       dat_test = data.frame(height = hts , dbh = dbhs, height_cat = cut(hts,10) , dbh_cat = cut(dbhs,10))
+#'       plot(dbhs,hts)
+#'
+#'       #example 1 factor and numeric
+#'       str_test = makeStrata(
+#'         dat_test
+#'         , x1="height_cat"
+#'         , x2="dbh"
+#'         , split_x1 =c("qt","eq")[1]
+#'         , split_x2 =c("qt","eq")[1]
+#'         , nest_x2 =  T
+#'         , n1 = 10
+#'         , n2 = 10
+#'         , type_x1 = "factor"
+#'         , type_x2 = "numeric"
+#'         , minRecs = 7
+#'         , precision = 0
+#'       )
+#'
+#'
+#'       res = assignStrata(
+#'        str_test
+#'         ,dat_test
+#'       )
+#'
+#'       res$stratum
+#'
+#'       summary(lm(height ~ dbh , data = res))
+#'       summary(lm(height ~ dbh_cat , data = res))
+#'       summary(lm(height ~ stratum , data = res))
+#'
+#'       #example 2 numeric and numeric
+#'       str_test1 = makeStrata(
+#'         dat_test
+#'         , x1="height"
+#'         , x2="dbh"
+#'         , split_x1 =c("qt","eq")[1]
+#'         , split_x2 =c("qt","eq")[1]
+#'         , nest_x2 =  T
+#'         , n1 = 10
+#'         , n2 = 10
+#'         , type_x1 = "numeric"
+#'         , type_x2 = "numeric"
+#'         , minRecs = 7
+#'         , precision = 0
+#'       )
+#'
+#'       res1 = assignStrata(
+#'         str_test1
+#'         ,dat_test
+#'       )
+#'
+#'       #example 3 numeric and factor
+#'       str_test2 = makeStrata(
+#'         dat_test
+#'         , x1="height"
+#'         , x2="dbh_cat"
+#'         , split_x1 =c("qt","eq")[1]
+#'         , split_x2 =c("qt","eq")[1]
+#'         , nest_x2 =  T
+#'         , n1 = 10
+#'         , n2 = 10
+#'         , type_x1 = "numeric"
+#'         , type_x2 = "factor"
+#'         , minRecs = 7
+#'         , precision = 0
+#'       )
+#'
+#'       res2 = assignStrata(
+#'         str_test2
+#'         ,dat_test
+#'       )
+#'
+#'
 #'
 #'
 #'@export
@@ -194,7 +273,6 @@ makeStrata = function(
 }
 
 #'@export
-
 assignStrata = function(strata,data){
 
   x1numeric = !is.na(strata[1,"x1.from"])
