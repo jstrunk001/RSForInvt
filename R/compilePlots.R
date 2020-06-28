@@ -1,6 +1,6 @@
 #'@name compilePlots
-#'@title
-#'  Compile tree data by plot
+#'
+#'@title Compile tree data by plot
 #'
 #'@description
 #'  Supply data.frame of tree data with plot ids a data.frame of plots. The function works by iterating through the tree
@@ -9,7 +9,6 @@
 #'  is mean to work hand in hand with compileTrees() but is still a work in progress.
 #'
 #'@details
-#'
 #'  This program is free software but it is provided WITHOUT WARRANTY
 #'  and with ABSOLUTELY NO GUARANTEE of fitness or functionality for any purpose;
 #'  you can redistribute it and/or modify it under the terms of the GNU
@@ -374,8 +373,8 @@ plotWtMn = function(
 
 }
 #'
-#' #@export
-#' #'@rdname compilePlots
+##@export
+##@rdname compilePlots
 #' plotSppDom = function(
 #'   trs
 #'   ,trNms
@@ -445,7 +444,7 @@ plotWtMn = function(
 
 
 #'@export
-#'@rdname compileTrees
+#'@rdname compilePlots
 sppYplot = function(x,ID,sppY,sppNm,wtNm,...){
 
   require("reshape2")
@@ -479,8 +478,8 @@ sppYplot = function(x,ID,sppY,sppNm,wtNm,...){
   return(res_in)
 }
 
-#' #'@export
-#' #'@rdname compileTrees
+##@export
+##@rdname compileTrees
 #' dbclSppY_id = function(x,ID,sppY,dbclNm,sppNm,...){
 #'
 #'   require("reshape2")
@@ -506,183 +505,183 @@ sppYplot = function(x,ID,sppY,sppNm,wtNm,...){
 #' }
 
 
-
-#test this code with fake trees
-if(F){
-
-  set.seed=111
-  nfake=50
-  dbh_fk = 10*abs(rnorm(nfake))
-  df_fake = data.frame(
-                        pltId = sample((1:7),nfake,replace=T)
-                       ,trid=1:50
-                       ,db= dbh_fk
-                       ,ht=75*dbh_fk + rnorm(nfake)*10
-                       ,spp = sample(c("df","wh","cw","ra") , nfake , T)
-                       ,acres = 0.1
-                       ,trees = round(1+ abs(rnorm(nfake)/3))
-
-  )
-
-  testTL =
-    compileTrees(
-      df_fake
-      ,trID = "trid"
-      ,sppNm = "spp"
-      ,dbNm = "db"
-      ,htNm = "ht"
-      ,dbclNm = "dbcl"
-      ,dbcl = c(seq(0,32,4),50,1000)
-      ,dbclY = c("ba_ft")
-      ,sppY = c("ba_ft")
-      ,sppDbclY = c("ba_ft")
-      ,acresNm = "acres"
-      ,nTreesNm = NA
-
-      ,fnCompute =
-        list(
-          tpa
-          ,ba_ft
-          ,dbcl
-          ,dbclY
-          ,sppY
-          ,dbclSppY
-        )
-    )
-
-  testTL
-
-   res_pl =   compilePlots(
-
-      dfTree = testTL
-      ,dfTreeNms = c(plotIDs = c("pltId") , trIDs = c("trid") , dbh = "db" , ht = "ht" , spcd = "spp" , trWt = "TPA" )
-      ,dir_out= file.path("c:/temp/RSForInvt/Compile",format(Sys.Date()))
-      ,fnCompute = list(
-        plotWtMn
-        ,plotWtSum
-      )
-
-      ,return = T
-      ,doDebug = F
-
-      ,nclus = 1
-
-      #arguments to custom functions
-      ,vSumNm = c("TPA",grep("^ba",names(testTL),value=T))
-
-    )
-
-}
-
-
+#
+# #test this code with fake trees
+# if(F){
+#
+#   set.seed=111
+#   nfake=50
+#   dbh_fk = 10*abs(rnorm(nfake))
+#   df_fake = data.frame(
+#                         pltId = sample((1:7),nfake,replace=T)
+#                        ,trid=1:50
+#                        ,db= dbh_fk
+#                        ,ht=75*dbh_fk + rnorm(nfake)*10
+#                        ,spp = sample(c("df","wh","cw","ra") , nfake , T)
+#                        ,acres = 0.1
+#                        ,trees = round(1+ abs(rnorm(nfake)/3))
+#
+#   )
+#
+#   testTL =
+#     compileTrees(
+#       df_fake
+#       ,trID = "trid"
+#       ,sppNm = "spp"
+#       ,dbNm = "db"
+#       ,htNm = "ht"
+#       ,dbclNm = "dbcl"
+#       ,dbcl = c(seq(0,32,4),50,1000)
+#       ,dbclY = c("ba_ft")
+#       ,sppY = c("ba_ft")
+#       ,sppDbclY = c("ba_ft")
+#       ,acresNm = "acres"
+#       ,nTreesNm = NA
+#
+#       ,fnCompute =
+#         list(
+#           tpa
+#           ,ba_ft
+#           ,dbcl
+#           ,dbclY
+#           ,sppY
+#           ,dbclSppY
+#         )
+#     )
+#
+#   testTL
+#
+#    res_pl =   compilePlots(
+#
+#       dfTree = testTL
+#       ,dfTreeNms = c(plotIDs = c("pltId") , trIDs = c("trid") , dbh = "db" , ht = "ht" , spcd = "spp" , trWt = "TPA" )
+#       ,dir_out= file.path("c:/temp/RSForInvt/Compile",format(Sys.Date()))
+#       ,fnCompute = list(
+#         plotWtMn
+#         ,plotWtSum
+#       )
+#
+#       ,return = T
+#       ,doDebug = F
+#
+#       ,nclus = 1
+#
+#       #arguments to custom functions
+#       ,vSumNm = c("TPA",grep("^ba",names(testTL),value=T))
+#
+#     )
+#
+# }
 
 
-if(F){
-
-  tltest = readRDS("D:\\Box\\VMARS\\Projects\\2019 Savannah River\\R\\Jacob Post-Stratification Evaluation\\data/tlManuscript_20200515.RDS")
-
-  compilePlots(
-
-    data = list(
-      dfTree = tltest
-      #, dfPlot = data.frame()
-    )
-    ,trNms = c( trIDs = c("UNQ_TR") , plotIDs = "Plot" , dbh = "DIA" , ht = "HT" , spcd = "SPCD" , trWt = "TPA" )
-    ,plotNms = c(plotIDs = c( "STATE" , "COUNTY" , "PROJECT" , "PLOT" , "YEAR" ) )
-
-    ,plot_filter = c(NA, "select * from dfPlot where YEAR = 2018 and STATE = 'WA' and CONDITION = 1")
-    ,tree_filter = c(NA, "select * from dfTree where dbh > 2 ")
-
-    ,dir_out= file.path("c:/temp/RSForInvt/Compile",format(Sys.Date()))
-
-    ,fnCompute = list(
-      plotWtMn(dfTree_in , trNms , dbh_units = c("in","cm") , ht_units = c("ft","m") )
-      ,plotWtSum( dfTree_in , trNms , vSumNm = c('DRYBIOM',"VOLBFNET" , "VOLCFGRS", "VOLCFNET", "CARBON_AG", "DRYBIO_AG","DRYBIOT") )
-      #, other custom tree compilation functions
-    )
-
-    ,return = F
-    ,doDebug = F
-
-    ,nclus = 4
-
-  )
-
-}
-
-
-if(F){
-
-	source("compileTrees")
-	if(!"tr1" %in% ls()) tr1 = readRDS("D:\\data\\RFIA\\NIMS\\2018-10-24\\tr.rds")
-	if(!"tr2" %in% ls()) tr2 = compileTrees(tr1)
-
-}
-
-if(F){
-
-
-	#load and fix FIA data
-	if(!"fiaDat" %in% ls()){
-
-		dat_paths = list.files("D:\\data\\RFIA\\NIMS\\2018-10-24\\",full.names=T,pattern="[.]rds$")
-		tree0 = compileTrees(readRDS("D:\\data\\RFIA\\NIMS\\2018-10-24\\tr.rds"))
-		plot0 = readRDS("D:\\data\\RFIA\\NIMS\\2018-10-24\\pl_snp.rds")
-		plot0[,c("PLT_CN")] = plot0[,c("CN")]	#fix weird cn inconsistency
-		cond0 = readRDS("D:\\data\\RFIA\\NIMS\\2018-10-24\\cond.rds")
-
-		fiaDat = list(
-			plot = plot0
-			,tree = tree0
-			,cond = cond0
-		)
-
-	}
-	#these are columns added to tree0 by compileTrees
-	vSumNm = c('DRYBIOM',"VOLBFNET" , "VOLCFGRS", "VOLCFNET", "CARBON_AG", "DRYBIO_AG","DRYBIOT",'ba_ft','ba_ft_dbcl2','ba_ft_dbcl6','ba_ft_dbcl10','ba_ft_dbcl14','ba_ft_dbcl18','ba_ft_dbcl22','ba_ft_dbcl26','ba_ft_dbcl30','ba_ft_dbcl41','ba_ft_dbcl525','ba_ft_dbclNA','ba_ft_SPGRPCD10','ba_ft_SPGRPCD11','ba_ft_SPGRPCD12','ba_ft_SPGRPCD13','ba_ft_SPGRPCD15','ba_ft_SPGRPCD17','ba_ft_SPGRPCD18','ba_ft_SPGRPCD19','ba_ft_SPGRPCD21','ba_ft_SPGRPCD22','ba_ft_SPGRPCD24','ba_ft_SPGRPCD44','ba_ft_SPGRPCD45','ba_ft_SPGRPCD46','ba_ft_SPGRPCD47','ba_ft_SPGRPCD48'
-						 ,'SPGRPCD_dbcl_10_2','SPGRPCD_dbcl_10_6','SPGRPCD_dbcl_10_10','SPGRPCD_dbcl_10_14','SPGRPCD_dbcl_10_18','SPGRPCD_dbcl_10_22','SPGRPCD_dbcl_10_26','SPGRPCD_dbcl_10_30','SPGRPCD_dbcl_10_41','SPGRPCD_dbcl_10_525','SPGRPCD_dbcl_10_NA','SPGRPCD_dbcl_11_2','SPGRPCD_dbcl_11_6','SPGRPCD_dbcl_11_10','SPGRPCD_dbcl_11_14','SPGRPCD_dbcl_11_18','SPGRPCD_dbcl_11_22','SPGRPCD_dbcl_11_26','SPGRPCD_dbcl_11_30','SPGRPCD_dbcl_11_41','SPGRPCD_dbcl_11_525','SPGRPCD_dbcl_11_NA'
-						 ,'SPGRPCD_dbcl_12_2','SPGRPCD_dbcl_12_6','SPGRPCD_dbcl_12_10','SPGRPCD_dbcl_12_14','SPGRPCD_dbcl_12_18','SPGRPCD_dbcl_12_22','SPGRPCD_dbcl_12_26','SPGRPCD_dbcl_12_30','SPGRPCD_dbcl_12_41','SPGRPCD_dbcl_12_525','SPGRPCD_dbcl_12_NA','SPGRPCD_dbcl_13_2','SPGRPCD_dbcl_13_6','SPGRPCD_dbcl_13_10','SPGRPCD_dbcl_13_14','SPGRPCD_dbcl_13_18','SPGRPCD_dbcl_13_22','SPGRPCD_dbcl_13_26','SPGRPCD_dbcl_13_30','SPGRPCD_dbcl_13_41','SPGRPCD_dbcl_13_525','SPGRPCD_dbcl_13_NA'
-						 ,'SPGRPCD_dbcl_15_2','SPGRPCD_dbcl_15_6','SPGRPCD_dbcl_15_10','SPGRPCD_dbcl_15_14','SPGRPCD_dbcl_15_18','SPGRPCD_dbcl_15_22','SPGRPCD_dbcl_15_26','SPGRPCD_dbcl_15_30','SPGRPCD_dbcl_15_41','SPGRPCD_dbcl_15_525','SPGRPCD_dbcl_15_NA','SPGRPCD_dbcl_17_2','SPGRPCD_dbcl_17_6','SPGRPCD_dbcl_17_10','SPGRPCD_dbcl_17_14','SPGRPCD_dbcl_17_18','SPGRPCD_dbcl_17_22','SPGRPCD_dbcl_17_26','SPGRPCD_dbcl_17_30','SPGRPCD_dbcl_17_41','SPGRPCD_dbcl_17_525','SPGRPCD_dbcl_17_NA'
-						 ,'SPGRPCD_dbcl_18_2','SPGRPCD_dbcl_18_6','SPGRPCD_dbcl_18_10','SPGRPCD_dbcl_18_14','SPGRPCD_dbcl_18_18','SPGRPCD_dbcl_18_22','SPGRPCD_dbcl_18_26','SPGRPCD_dbcl_18_30','SPGRPCD_dbcl_18_41','SPGRPCD_dbcl_18_NA','SPGRPCD_dbcl_19_2','SPGRPCD_dbcl_19_6','SPGRPCD_dbcl_19_10','SPGRPCD_dbcl_19_14','SPGRPCD_dbcl_19_18','SPGRPCD_dbcl_19_22','SPGRPCD_dbcl_19_26','SPGRPCD_dbcl_19_30','SPGRPCD_dbcl_19_41','SPGRPCD_dbcl_19_525','SPGRPCD_dbcl_19_NA','SPGRPCD_dbcl_21_2'
-						 ,'SPGRPCD_dbcl_21_6','SPGRPCD_dbcl_21_10','SPGRPCD_dbcl_21_14','SPGRPCD_dbcl_21_18','SPGRPCD_dbcl_21_22','SPGRPCD_dbcl_21_26','SPGRPCD_dbcl_21_30','SPGRPCD_dbcl_21_NA','SPGRPCD_dbcl_22_2','SPGRPCD_dbcl_22_6','SPGRPCD_dbcl_22_10','SPGRPCD_dbcl_22_14','SPGRPCD_dbcl_22_18','SPGRPCD_dbcl_22_22','SPGRPCD_dbcl_22_26','SPGRPCD_dbcl_22_30','SPGRPCD_dbcl_22_41','SPGRPCD_dbcl_22_525','SPGRPCD_dbcl_22_NA','SPGRPCD_dbcl_24_2','SPGRPCD_dbcl_24_6','SPGRPCD_dbcl_24_10'
-						 ,'SPGRPCD_dbcl_24_14','SPGRPCD_dbcl_24_18','SPGRPCD_dbcl_24_22','SPGRPCD_dbcl_24_26','SPGRPCD_dbcl_24_30','SPGRPCD_dbcl_24_41','SPGRPCD_dbcl_24_525','SPGRPCD_dbcl_24_NA','SPGRPCD_dbcl_44_2','SPGRPCD_dbcl_44_6','SPGRPCD_dbcl_44_10','SPGRPCD_dbcl_44_14','SPGRPCD_dbcl_44_18','SPGRPCD_dbcl_44_22','SPGRPCD_dbcl_44_26','SPGRPCD_dbcl_44_30','SPGRPCD_dbcl_44_41','SPGRPCD_dbcl_44_525','SPGRPCD_dbcl_44_NA','SPGRPCD_dbcl_45_2','SPGRPCD_dbcl_45_6','SPGRPCD_dbcl_45_10'
-						 ,'SPGRPCD_dbcl_45_14','SPGRPCD_dbcl_45_18','SPGRPCD_dbcl_45_22','SPGRPCD_dbcl_45_26','SPGRPCD_dbcl_45_30','SPGRPCD_dbcl_45_41','SPGRPCD_dbcl_45_NA','SPGRPCD_dbcl_46_2','SPGRPCD_dbcl_46_6','SPGRPCD_dbcl_46_10','SPGRPCD_dbcl_46_14','SPGRPCD_dbcl_46_18','SPGRPCD_dbcl_46_26','SPGRPCD_dbcl_46_41','SPGRPCD_dbcl_46_NA','SPGRPCD_dbcl_47_2','SPGRPCD_dbcl_47_6','SPGRPCD_dbcl_47_10','SPGRPCD_dbcl_47_14','SPGRPCD_dbcl_47_18','SPGRPCD_dbcl_47_22','SPGRPCD_dbcl_47_26'
-						 ,'SPGRPCD_dbcl_47_30','SPGRPCD_dbcl_47_41','SPGRPCD_dbcl_47_525','SPGRPCD_dbcl_47_NA','SPGRPCD_dbcl_48_NA')
-
-
-	plDat = compilePlots(
-
-		data=fiaDat
-		,dir_out = c(file.path("d:/data/RFIA/Compile/",format(Sys.Date())),NA)
-		,doDebug = F
-		,fnArg = list(
-			vSumNm = vSumNm
-			#vSumNm = c('DRYBIOM',"VOLBFNET" , "VOLCFGRS", "VOLCFNET", "CARBON_AG", "DRYBIO_AG","DRYBIOT")
-		)
-
-	)
-
-
-}
-
-#only runs if outside of a function call
-#this allows sourcing to re-load functions that are being debugged while inside of another function
-if(identical(environment(),.GlobalEnv) & F){
-
-	#load and fix FIA data
-	if(!"tree" %in% ls() | T){
-
-		tree = read.csv("D:\\data\\RFIA\\mergeFIA\\2019-08-26\\mergeFIA.csv")
-		#cond0 = readRDS("D:\\data\\RFIA\\NIMS\\2018-10-24\\cond.rds")
-
-	}
-	compilePlots( data = list(tree = tree), return = T, tree_filter = "select * from tree where INVYR > 2013 and STATECD = 53", doDebug = F,nclus=5
-								#,plotIDs = c("PLT_CN","PLOT","INVYR","STATECD","COUNTYCD","CTY_CN","PLOT_STATUS_CD","EVAL_GRP")
-								,plotIDs = c("PLT_CN","PLOT","INVYR","STATECD","COUNTYCD","CTY_CN","PLOT_STATUS_CD")
-	)
-
-
-}
-
-
+#
+#
+# if(F){
+#
+#   tltest = readRDS("D:\\Box\\VMARS\\Projects\\2019 Savannah River\\R\\Jacob Post-Stratification Evaluation\\data/tlManuscript_20200515.RDS")
+#
+#   compilePlots(
+#
+#     data = list(
+#       dfTree = tltest
+#       #, dfPlot = data.frame()
+#     )
+#     ,trNms = c( trIDs = c("UNQ_TR") , plotIDs = "Plot" , dbh = "DIA" , ht = "HT" , spcd = "SPCD" , trWt = "TPA" )
+#     ,plotNms = c(plotIDs = c( "STATE" , "COUNTY" , "PROJECT" , "PLOT" , "YEAR" ) )
+#
+#     ,plot_filter = c(NA, "select * from dfPlot where YEAR = 2018 and STATE = 'WA' and CONDITION = 1")
+#     ,tree_filter = c(NA, "select * from dfTree where dbh > 2 ")
+#
+#     ,dir_out= file.path("c:/temp/RSForInvt/Compile",format(Sys.Date()))
+#
+#     ,fnCompute = list(
+#       plotWtMn(dfTree_in , trNms , dbh_units = c("in","cm") , ht_units = c("ft","m") )
+#       ,plotWtSum( dfTree_in , trNms , vSumNm = c('DRYBIOM',"VOLBFNET" , "VOLCFGRS", "VOLCFNET", "CARBON_AG", "DRYBIO_AG","DRYBIOT") )
+#       #, other custom tree compilation functions
+#     )
+#
+#     ,return = F
+#     ,doDebug = F
+#
+#     ,nclus = 4
+#
+#   )
+#
+# }
+#
+#
+# if(F){
+#
+# 	source("compileTrees")
+# 	if(!"tr1" %in% ls()) tr1 = readRDS("D:\\data\\RFIA\\NIMS\\2018-10-24\\tr.rds")
+# 	if(!"tr2" %in% ls()) tr2 = compileTrees(tr1)
+#
+# }
+#
+# if(F){
+#
+#
+# 	#load and fix FIA data
+# 	if(!"fiaDat" %in% ls()){
+#
+# 		dat_paths = list.files("D:\\data\\RFIA\\NIMS\\2018-10-24\\",full.names=T,pattern="[.]rds$")
+# 		tree0 = compileTrees(readRDS("D:\\data\\RFIA\\NIMS\\2018-10-24\\tr.rds"))
+# 		plot0 = readRDS("D:\\data\\RFIA\\NIMS\\2018-10-24\\pl_snp.rds")
+# 		plot0[,c("PLT_CN")] = plot0[,c("CN")]	#fix weird cn inconsistency
+# 		cond0 = readRDS("D:\\data\\RFIA\\NIMS\\2018-10-24\\cond.rds")
+#
+# 		fiaDat = list(
+# 			plot = plot0
+# 			,tree = tree0
+# 			,cond = cond0
+# 		)
+#
+# 	}
+# 	#these are columns added to tree0 by compileTrees
+# 	vSumNm = c('DRYBIOM',"VOLBFNET" , "VOLCFGRS", "VOLCFNET", "CARBON_AG", "DRYBIO_AG","DRYBIOT",'ba_ft','ba_ft_dbcl2','ba_ft_dbcl6','ba_ft_dbcl10','ba_ft_dbcl14','ba_ft_dbcl18','ba_ft_dbcl22','ba_ft_dbcl26','ba_ft_dbcl30','ba_ft_dbcl41','ba_ft_dbcl525','ba_ft_dbclNA','ba_ft_SPGRPCD10','ba_ft_SPGRPCD11','ba_ft_SPGRPCD12','ba_ft_SPGRPCD13','ba_ft_SPGRPCD15','ba_ft_SPGRPCD17','ba_ft_SPGRPCD18','ba_ft_SPGRPCD19','ba_ft_SPGRPCD21','ba_ft_SPGRPCD22','ba_ft_SPGRPCD24','ba_ft_SPGRPCD44','ba_ft_SPGRPCD45','ba_ft_SPGRPCD46','ba_ft_SPGRPCD47','ba_ft_SPGRPCD48'
+# 						 ,'SPGRPCD_dbcl_10_2','SPGRPCD_dbcl_10_6','SPGRPCD_dbcl_10_10','SPGRPCD_dbcl_10_14','SPGRPCD_dbcl_10_18','SPGRPCD_dbcl_10_22','SPGRPCD_dbcl_10_26','SPGRPCD_dbcl_10_30','SPGRPCD_dbcl_10_41','SPGRPCD_dbcl_10_525','SPGRPCD_dbcl_10_NA','SPGRPCD_dbcl_11_2','SPGRPCD_dbcl_11_6','SPGRPCD_dbcl_11_10','SPGRPCD_dbcl_11_14','SPGRPCD_dbcl_11_18','SPGRPCD_dbcl_11_22','SPGRPCD_dbcl_11_26','SPGRPCD_dbcl_11_30','SPGRPCD_dbcl_11_41','SPGRPCD_dbcl_11_525','SPGRPCD_dbcl_11_NA'
+# 						 ,'SPGRPCD_dbcl_12_2','SPGRPCD_dbcl_12_6','SPGRPCD_dbcl_12_10','SPGRPCD_dbcl_12_14','SPGRPCD_dbcl_12_18','SPGRPCD_dbcl_12_22','SPGRPCD_dbcl_12_26','SPGRPCD_dbcl_12_30','SPGRPCD_dbcl_12_41','SPGRPCD_dbcl_12_525','SPGRPCD_dbcl_12_NA','SPGRPCD_dbcl_13_2','SPGRPCD_dbcl_13_6','SPGRPCD_dbcl_13_10','SPGRPCD_dbcl_13_14','SPGRPCD_dbcl_13_18','SPGRPCD_dbcl_13_22','SPGRPCD_dbcl_13_26','SPGRPCD_dbcl_13_30','SPGRPCD_dbcl_13_41','SPGRPCD_dbcl_13_525','SPGRPCD_dbcl_13_NA'
+# 						 ,'SPGRPCD_dbcl_15_2','SPGRPCD_dbcl_15_6','SPGRPCD_dbcl_15_10','SPGRPCD_dbcl_15_14','SPGRPCD_dbcl_15_18','SPGRPCD_dbcl_15_22','SPGRPCD_dbcl_15_26','SPGRPCD_dbcl_15_30','SPGRPCD_dbcl_15_41','SPGRPCD_dbcl_15_525','SPGRPCD_dbcl_15_NA','SPGRPCD_dbcl_17_2','SPGRPCD_dbcl_17_6','SPGRPCD_dbcl_17_10','SPGRPCD_dbcl_17_14','SPGRPCD_dbcl_17_18','SPGRPCD_dbcl_17_22','SPGRPCD_dbcl_17_26','SPGRPCD_dbcl_17_30','SPGRPCD_dbcl_17_41','SPGRPCD_dbcl_17_525','SPGRPCD_dbcl_17_NA'
+# 						 ,'SPGRPCD_dbcl_18_2','SPGRPCD_dbcl_18_6','SPGRPCD_dbcl_18_10','SPGRPCD_dbcl_18_14','SPGRPCD_dbcl_18_18','SPGRPCD_dbcl_18_22','SPGRPCD_dbcl_18_26','SPGRPCD_dbcl_18_30','SPGRPCD_dbcl_18_41','SPGRPCD_dbcl_18_NA','SPGRPCD_dbcl_19_2','SPGRPCD_dbcl_19_6','SPGRPCD_dbcl_19_10','SPGRPCD_dbcl_19_14','SPGRPCD_dbcl_19_18','SPGRPCD_dbcl_19_22','SPGRPCD_dbcl_19_26','SPGRPCD_dbcl_19_30','SPGRPCD_dbcl_19_41','SPGRPCD_dbcl_19_525','SPGRPCD_dbcl_19_NA','SPGRPCD_dbcl_21_2'
+# 						 ,'SPGRPCD_dbcl_21_6','SPGRPCD_dbcl_21_10','SPGRPCD_dbcl_21_14','SPGRPCD_dbcl_21_18','SPGRPCD_dbcl_21_22','SPGRPCD_dbcl_21_26','SPGRPCD_dbcl_21_30','SPGRPCD_dbcl_21_NA','SPGRPCD_dbcl_22_2','SPGRPCD_dbcl_22_6','SPGRPCD_dbcl_22_10','SPGRPCD_dbcl_22_14','SPGRPCD_dbcl_22_18','SPGRPCD_dbcl_22_22','SPGRPCD_dbcl_22_26','SPGRPCD_dbcl_22_30','SPGRPCD_dbcl_22_41','SPGRPCD_dbcl_22_525','SPGRPCD_dbcl_22_NA','SPGRPCD_dbcl_24_2','SPGRPCD_dbcl_24_6','SPGRPCD_dbcl_24_10'
+# 						 ,'SPGRPCD_dbcl_24_14','SPGRPCD_dbcl_24_18','SPGRPCD_dbcl_24_22','SPGRPCD_dbcl_24_26','SPGRPCD_dbcl_24_30','SPGRPCD_dbcl_24_41','SPGRPCD_dbcl_24_525','SPGRPCD_dbcl_24_NA','SPGRPCD_dbcl_44_2','SPGRPCD_dbcl_44_6','SPGRPCD_dbcl_44_10','SPGRPCD_dbcl_44_14','SPGRPCD_dbcl_44_18','SPGRPCD_dbcl_44_22','SPGRPCD_dbcl_44_26','SPGRPCD_dbcl_44_30','SPGRPCD_dbcl_44_41','SPGRPCD_dbcl_44_525','SPGRPCD_dbcl_44_NA','SPGRPCD_dbcl_45_2','SPGRPCD_dbcl_45_6','SPGRPCD_dbcl_45_10'
+# 						 ,'SPGRPCD_dbcl_45_14','SPGRPCD_dbcl_45_18','SPGRPCD_dbcl_45_22','SPGRPCD_dbcl_45_26','SPGRPCD_dbcl_45_30','SPGRPCD_dbcl_45_41','SPGRPCD_dbcl_45_NA','SPGRPCD_dbcl_46_2','SPGRPCD_dbcl_46_6','SPGRPCD_dbcl_46_10','SPGRPCD_dbcl_46_14','SPGRPCD_dbcl_46_18','SPGRPCD_dbcl_46_26','SPGRPCD_dbcl_46_41','SPGRPCD_dbcl_46_NA','SPGRPCD_dbcl_47_2','SPGRPCD_dbcl_47_6','SPGRPCD_dbcl_47_10','SPGRPCD_dbcl_47_14','SPGRPCD_dbcl_47_18','SPGRPCD_dbcl_47_22','SPGRPCD_dbcl_47_26'
+# 						 ,'SPGRPCD_dbcl_47_30','SPGRPCD_dbcl_47_41','SPGRPCD_dbcl_47_525','SPGRPCD_dbcl_47_NA','SPGRPCD_dbcl_48_NA')
+#
+#
+# 	plDat = compilePlots(
+#
+# 		data=fiaDat
+# 		,dir_out = c(file.path("d:/data/RFIA/Compile/",format(Sys.Date())),NA)
+# 		,doDebug = F
+# 		,fnArg = list(
+# 			vSumNm = vSumNm
+# 			#vSumNm = c('DRYBIOM',"VOLBFNET" , "VOLCFGRS", "VOLCFNET", "CARBON_AG", "DRYBIO_AG","DRYBIOT")
+# 		)
+#
+# 	)
+#
+#
+# }
+#
+# #only runs if outside of a function call
+# #this allows sourcing to re-load functions that are being debugged while inside of another function
+# if(identical(environment(),.GlobalEnv) & F){
+#
+# 	#load and fix FIA data
+# 	if(!"tree" %in% ls() | T){
+#
+# 		tree = read.csv("D:\\data\\RFIA\\mergeFIA\\2019-08-26\\mergeFIA.csv")
+# 		#cond0 = readRDS("D:\\data\\RFIA\\NIMS\\2018-10-24\\cond.rds")
+#
+# 	}
+# 	compilePlots( data = list(tree = tree), return = T, tree_filter = "select * from tree where INVYR > 2013 and STATECD = 53", doDebug = F,nclus=5
+# 								#,plotIDs = c("PLT_CN","PLOT","INVYR","STATECD","COUNTYCD","CTY_CN","PLOT_STATUS_CD","EVAL_GRP")
+# 								,plotIDs = c("PLT_CN","PLOT","INVYR","STATECD","COUNTYCD","CTY_CN","PLOT_STATUS_CD")
+# 	)
+#
+#
+# }
+#
+#
 

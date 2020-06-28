@@ -16,7 +16,8 @@ makeStrata(
   type_x1 = c("factor", "numeric")[1],
   type_x2 = c("numeric", "factor")[1],
   minRecs = 7,
-  precision = 0
+  precision = 0,
+  collapse = T
 )
 }
 \arguments{

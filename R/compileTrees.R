@@ -1,12 +1,12 @@
 #'@name compileTrees
-#'@title
-#'  Facilitate computation of tree level attributes
+#'
+#'@title Compile tree data
 #'
 #'@description
 #'  Compute tree level attributes using optional and custom functions, e.g., ba, volume, Lorey's height
 #'
 #'@details
-#'  Accepts a list of trees and a series of functions (some provides them) and additively applies the
+#'  Accepts a list of trees and a series of functions (some provided) and additively applies the
 #'  functions to the tree list. Something like computeVolume(computeBA(computeTPA(treeList))) ... A number
 #'  of functions are provided - feel free to modify or update them to meet your needs
 #'
@@ -118,12 +118,12 @@ compileTrees=function(
 
   tlDF
   ,fnCompute = list(
-      tpa
-      ,ba_ft
-      ,dbcl
-      ,dbclY
-      ,sppY
-      ,dbclSppY
+    tpa
+    ,ba_ft
+    ,dbcl
+    ,dbclY
+    ,sppY
+    ,dbclSppY
   )
 
   ,...
@@ -252,49 +252,49 @@ dbclSppY = function(x,trID,sppY,dbclNm,sppNm,...){
 }
 
 #test this code
-if(F){
-
-  set.seed=111
-  nfake=50
-  dbh_fk = 10*abs(rnorm(nfake))
-  df_fake = data.frame(
-    pltId = sample((1:7),nfake,replace=T)
-    ,trid=1:50
-    ,db= dbh_fk
-    ,ht=75*dbh_fk + rnorm(nfake)*10
-    ,spp = sample(c("df","wh","cw","ra") , nfake , T)
-    ,acres = 0.1
-    ,trees = round(1+ abs(rnorm(nfake)/3))
-
-  )
-
-  testTL =
-    compileTrees(
-      df_fake
-      ,trID = "trid"
-      ,sppNm = "spp"
-      ,dbNm = "db"
-      ,htNm = "ht"
-      ,dbclNm = "dbcl"
-      ,dbcl = c(seq(0,32,4),50,1000)
-      ,dbclY = c("ba_ft")
-      ,sppY = c("ba_ft")
-      ,sppDbclY = c("ba_ft")
-      ,acresNm = "acres"
-      ,nTreesNm = NA
-
-      ,fnCompute =
-        list(
-          tpa
-          ,ba_ft
-          ,dbcl
-          ,dbclY
-          ,sppY
-          ,dbclSppY
-        )
-    )
-
-  testTL
-
-}
+# if(F){
+#
+#   set.seed=111
+#   nfake=50
+#   dbh_fk = 10*abs(rnorm(nfake))
+#   df_fake = data.frame(
+#     pltId = sample((1:7),nfake,replace=T)
+#     ,trid=1:50
+#     ,db= dbh_fk
+#     ,ht=75*dbh_fk + rnorm(nfake)*10
+#     ,spp = sample(c("df","wh","cw","ra") , nfake , T)
+#     ,acres = 0.1
+#     ,trees = round(1+ abs(rnorm(nfake)/3))
+#
+#   )
+#
+#   testTL =
+#     compileTrees(
+#       df_fake
+#       ,trID = "trid"
+#       ,sppNm = "spp"
+#       ,dbNm = "db"
+#       ,htNm = "ht"
+#       ,dbclNm = "dbcl"
+#       ,dbcl = c(seq(0,32,4),50,1000)
+#       ,dbclY = c("ba_ft")
+#       ,sppY = c("ba_ft")
+#       ,sppDbclY = c("ba_ft")
+#       ,acresNm = "acres"
+#       ,nTreesNm = NA
+#
+#       ,fnCompute =
+#         list(
+#           tpa
+#           ,ba_ft
+#           ,dbcl
+#           ,dbclY
+#           ,sppY
+#           ,dbclSppY
+#         )
+#     )
+#
+#   testTL
+#
+# }
 

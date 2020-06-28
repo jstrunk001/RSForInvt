@@ -152,6 +152,7 @@ makeStrata = function(
   , type_x2 = c("numeric","factor")[1]
   , minRecs = 7
   , precision = 0
+  , collapse=T
 ){
 
 	x1_in = x1
@@ -164,7 +165,7 @@ makeStrata = function(
 	}
 	if( type_x1 == "numeric"){
 
-	  dfStr0 = data.frame(text=paste("stratum_x1,x1.from,x1.to,n_x1"))
+	  dfStr0 = read.csv(text=paste("stratum_x1,x1.from,x1.to,n_x1"))
 
 		r_x1 = range(data[,x1])
 		dr_x1 = diff(r_x1)
@@ -186,7 +187,9 @@ makeStrata = function(
 		}
 
 		#prep description of x1 stratum
-		str_levels_x1 = unique(round(str_levels_x1,precision) )
+		str_levels_x1 = unique(str_levels_x1)
+		str_levels_x1[-c(1,length(str_levels_x1))] = round(str_levels_x1[-c(1,length(str_levels_x1))],precision)
+		str_levels_x1 = unique(str_levels_x1)
 
 		#prepare new factor version of attribute
 		x1_in = paste(x1,"_ctg",sep="")
@@ -201,7 +204,7 @@ makeStrata = function(
 
 
 
-  if( nest_x2 ){
+  if( nest_x2 & type_x2 == "numeric"){
 
     spl1 = split(data,data[,x1_in])
 
@@ -233,9 +236,13 @@ makeStrata = function(
             ,seq(ri[1],ri[2],dri/n2i)[-c(1,n2i)]
             ,ri[2]+dri
           )
+
         }
 
-        str_levels_x2 = unique(round(str_levels_x2,precision) )
+        #prep description of x2 stratum
+        str_levels_x2 = unique(str_levels_x2)
+        str_levels_x2[-c(1,length(str_levels_x2))] = round(str_levels_x2[-c(1,length(str_levels_x2))],precision)
+        str_levels_x2 = unique(str_levels_x2)
 
         dfStri[1:(length(str_levels_x2)-1),"stratum_x2"] = 1:(length(str_levels_x2)-1)
         dfStri[, "stratum_x1" ] =  dati[1,x1_in]
@@ -248,26 +255,104 @@ makeStrata = function(
         if(i > 1) dfStr1 = plyr::rbind.fill(dfStr1, merge(x=dfStri,df_ct,by.x="stratum_x2",by.y="Var1",all=T))
       }
 
-
     }
-
-    if( type_x2 == "factor"){
-
-      str_levels_x1b = levels(as.factor(dfStr0[,"stratum_x1"]))
-      str_levels_x2 = levels(as.factor(data[,x2]))
-      dfStr1 = data.frame(stratum=NA,stratum_x1 = sort(rep(str_levels_x1b,length(str_levels_x2))) , stratum_x2 = rep(str_levels_x2 , length(str_levels_x1b))  )
-      dfStr1[,"stratum"] = apply(dfStr1[,c("stratum_x1","stratum_x2")],1,paste,collapse=".")
-      dfStr1[,"x2.from"] = NA
-      dfStr1[,"x2.to"] = NA
-    }
-
   }
+	if(!nest_x2 & type_x2 == "numeric"){
+
+	  dfStr1 = read.csv(text=paste("stratum_x2,x2.from,x2.to,n_x2"))
+
+	  r_x2 = range(data[,x2])
+	  dr_x2 = diff(r_x2)
+
+	  if(split_x2[1] == "qt" ){
+
+	    str_levels_x2 = c(
+	      r_x2[1]-dr_x2
+	      ,quantile(data[,x2] ,seq(1/n1,1-1/n1,1/n1))
+	      ,r_x2[1]+dr_x2
+	    )
+	  }
+	  if(split_x2[1] == "eq" ){
+	    str_levels_x2 = c(
+	      r_x2[1] - dr_x2
+	      ,seq(r_x2[1],r_x2[2],dr_x2/n1)[-c(1,n1)]
+	      ,r_x2[1]+ dr_x2
+	    )
+	  }
+
+	  #prep description of x2 stratum
+	  str_levels_x2 = unique(str_levels_x2)
+	  str_levels_x2[-c(1,length(str_levels_x2))] = round(str_levels_x2[-c(1,length(str_levels_x2))],precision)
+	  str_levels_x2 = unique(str_levels_x2)
+
+	  #prepare new factor version of attribute
+	  x2_in = paste(x2,"_ctg",sep="")
+	  data[,x2_in] = cut(data[,x2] , str_levels_x2 , labels = 1:(length(str_levels_x2)-1) )
+
+	  #assign bins
+	  str_levels_x1b = levels(as.factor(dfStr0[,"stratum_x1"]))
+	  str_levels_x2b = levels(as.factor(data[,x2_in]))
+	  dfStr1 = data.frame(stratum=NA,stratum_x1 = sort(rep(str_levels_x1b,length(str_levels_x2b))) , stratum_x2 = rep(str_levels_x2b , length(str_levels_x1b))  )
+	  dfStr1[,"stratum"] = gsub(" ","",apply(dfStr1[,c("stratum_x1","stratum_x2")],1,paste,collapse="."))
+	  dfStr1[, "x2.from"] = rep(str_levels_x2[-length(str_levels_x2)],length(str_levels_x1b))
+	  dfStr1[, "x2.to"] = rep(str_levels_x2[-1],length(str_levels_x1b))
+
+	}
+
+	if( type_x2 == "factor"){
+
+	  str_levels_x1b = levels(as.factor(dfStr0[,"stratum_x1"]))
+	  str_levels_x2 = levels(as.factor(data[,x2]))
+	  dfStr1 = data.frame(stratum=NA,stratum_x1 = sort(rep(str_levels_x1b,length(str_levels_x2))) , stratum_x2 = rep(str_levels_x2 , length(str_levels_x1b))  )
+	  dfStr1[,"stratum"] = gsub(" ","",apply(dfStr1[,c("stratum_x1","stratum_x2")],1,paste,collapse="."))
+	  dfStr1[,"x2.from"] = NA
+	  dfStr1[,"x2.to"] = NA
+
+	}
 
 	#prep final data
   dfStr2 = merge(x=dfStr0, dfStr1 , by = 'stratum_x1',all.y=T)
   dfStr2[, "nm_x1"] = x1
   dfStr2[, "nm_x2"] = x2
 
+  #collapse strata ?
+  if(collapse){
+    pdstrat_in = assignStrata(dfStr2,data[,c(x1,x2)])$stratum
+    tbtest = table(data$strat_in)
+    nmtest = names(tbtest)
+    missing_idx = !dfStr2$stratum %in% pdstrat_in
+
+    if( sum(missing_idx) > 0 ){
+
+      warning("currently 'collapse=T' uses a cheap fix - eventually add something smarter")
+
+      idx_bad = which(missing_idx)
+      idx_update = which(missing_idx) - 1
+      idx_update1 = which(missing_idx) + 1
+      idx_update[idx_update < 1] = idx_update1[idx_update < 1]
+      idx_update[idx_update %in% idx_bad] = idx_update1[idx_update %in% idx_bad]
+      dfStr2[idx_update,c("x1.to","x2.to")] = dfStr2[idx_bad,c("x1.to","x2.to")]
+      dfStr2 = dfStr2[-idx_bad,]
+
+
+      #eventually add something smarter:
+      if(type_x1 == "numeric" & type_x2 == "numeric"){
+
+
+
+      }
+      if(type_x1 != "numeric" & type_x2 == "numeric"){
+
+
+      }
+      if(type_x1 == "numeric" & type_x2 != "numeric"){
+
+
+      }
+
+    }
+
+  }
   return( dfStr2[,c('stratum','stratum_x1','stratum_x2','x1.from','x1.to','x2.from','x2.to',"nm_x1","nm_x2")])
 
 }

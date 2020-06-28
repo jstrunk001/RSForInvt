@@ -22,9 +22,12 @@ RoxygenNote: 7.1.0
 Imports: 
         bootstrap
         ,backports
+        ,colorRamps
         ,data.table
+        ,DBI
         ,dplyr
         ,gdalUtils
+        ,knitr
         ,leaps
         ,lidR
         ,maptools
