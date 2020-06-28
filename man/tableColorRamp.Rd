@@ -14,6 +14,9 @@ tableColorRamp(
   plotMar = c(8, 8, 8, 10),
   plotMain = "Table Of Values",
   legendPrecision = 0,
+  addStat = c(NA, median, mean, sum)[1],
+  statText = "-MEDIAN-",
+  statLine = 2,
   ...
 )
 }
