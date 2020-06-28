@@ -60,29 +60,41 @@ tableColorRamp = function(
                           , plotMar = c(8,8,8,10)
                           , plotMain = "Table Of Values"
                           , legendPrecision = 0
+                          , addStat = c(NA,median,mean,sum)[1]
+                          , statText = "-MEDIAN-"
+                          , statLine = 2
                           ,...
                           ){
+
+  if(!is.na(addStat)){
+    dat_in = rbind(apply(data,2,addStat),data)
+    row.names(dat_in)[1] = statText
+  }else{
+    dat_in = data
+  }
 
   if(!is.na(pdfOut)) pdf( pdfOut , height=pdfHeight , width=pdfWidth )
   par( mar = plotMar )
 
-  image( 1:ncol(data) , 1:nrow(data) , t(data) , col = colorRamp(nColors) , axes = FALSE,xlab="",ylab="", main = plotMain, ...)
-  axis(1, 1:ncol(data), colnames(data),las=2)
-  axis(2, 1:nrow(data), rownames(data),las=2)
-  for (x in 1:ncol(data))
-    for (y in 1:nrow(data))
-      text(x, y, round(data[y,x]))
+  image( 1:ncol(dat_in) , 1:nrow(dat_in) , t(dat_in) , col = colorRamp(nColors) , axes = FALSE,xlab="",ylab="", main = plotMain, ...)
+  axis(1, 1:ncol(dat_in), colnames(dat_in),las=2)
+  axis(2, 1:nrow(dat_in), rownames(dat_in),las=2)
+  for (x in 1:ncol(dat_in))
+    for (y in 1:nrow(dat_in))
+      text(x, y, round(dat_in[y,x]))
 
-  data_range = range(data)
+  dat_in_range = range(dat_in)
 
-  ncols_in = ncol(data)
-  nrows_in = nrow(data)
+  ncols_in = ncol(dat_in)
+  nrows_in = nrow(dat_in)
 
   plotrix::color.legend(ncols_in + 1.5,1,ncols_in + 2,nrows_in
-                        , round(seq(data_range[1],data_range[2] , length.out = nColors),legendPrecision)
+                        , round(seq(dat_in_range[1],dat_in_range[2] , length.out = nColors),legendPrecision)
                         , colorRamp(nColors)
                         , gradient="y"
                         )
+
+  if(!is.na(addStat)) abline(h=1.5,lwd=3)
 
   if(!is.na(pdfOut)) dev.off()
 
