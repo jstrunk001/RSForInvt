@@ -88,7 +88,7 @@ tableColorRamp = function(
   ncols_in = ncol(dat_in)
   nrows_in = nrow(dat_in)
 
-  plotrix::color.legend(ncols_in + 1.5,1,ncols_in + 2,nrows_in
+  plotrix::color.legend(ncols_in + 1.3,1,ncols_in + 1.8,nrows_in
                         , round(seq(dat_in_range[1],dat_in_range[2] , length.out = nColors),legendPrecision)
                         , colorRamp(nColors)
                         , gradient="y"
