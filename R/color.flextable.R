@@ -50,7 +50,8 @@
 #
 #
 
-color.flextable = function(x
+color.flextable = function(
+                   x
                    ,colFields
                    ,cols = colorRamps::blue2red(40)[10:40]
                    ,breaks = NA
