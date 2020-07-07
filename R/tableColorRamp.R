@@ -72,11 +72,14 @@ tableColorRamp = function(
   }else{
     dat_in = data
   }
-
+browser()
   if(!is.na(pdfOut)) pdf( pdfOut , height=pdfHeight , width=pdfWidth )
   par( mar = plotMar )
 
-  image( 1:ncol(dat_in) , 1:nrow(dat_in) , t(dat_in) , col = colorRamp(nColors) , axes = FALSE,xlab="",ylab="", main = plotMain, ...)
+  graphics::image( 1:ncol(dat_in) , 1:nrow(dat_in) , t(dat_in) , col = "white" , axes = FALSE,xlab="",ylab="", main = plotMain, ...)
+  graphics::image( 1:ncol(dat_in) , 1:nrow(dat_in) , t(dat_in) , col = colorRamp(nColors) , axes = FALSE,xlab="",ylab="", main = plotMain, add=T,...)
+
+
   axis(1, 1:ncol(dat_in), colnames(dat_in),las=2)
   axis(2, 1:nrow(dat_in), rownames(dat_in),las=2)
   for (x in 1:ncol(dat_in))
