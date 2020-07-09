@@ -6,7 +6,8 @@
 \usage{
 color.flextable(
   x,
-  colFields,
+  colFields = NA,
+  colRows = NA,
   cols = colorRamps::blue2red(40)[10:40],
   breaks = NA,
   breaksType = c("quantile", "equal"),
@@ -20,6 +21,8 @@ color.flextable(
 \item{x}{input data.frame}
 
 \item{colFields}{numeric fields to color}
+
+\item{colRows}{choose a subset of rows (numbers or row ids) to color}
 
 \item{cols}{sequence of colors as from colorRamps::blue2red(40)}
 
