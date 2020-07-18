@@ -189,39 +189,64 @@ cloud2xSample=function(
   extOnly = hasExt & !hasPolyA & !hasPolyB
 
   #check projections
-  if(hasPolyA) hasCRSPolyA = !is.na(sp::proj4string(extentPolyA_in))
-  if(hasPolyB) hasCRSPolyB = !is.na(sp::proj4string(extentPolyB_in))
-  if(polyAB){
-
-    #assign proj4
-    if(!hasCRSPolyA & hasProj4A) sp::proj4string(extentPolyA_in) = proj4A
-    if(!hasCRSPolyB & hasProj4B) sp::proj4string(extentPolyB_in) = proj4B
-    bad_proj = !raster::compareCRS(extentPolyA_in, extentPolyB_in)
-
-    #check for proj4 again
+  hasCRSPolyA = F
+  hasCRSPolyB = F
+  if(hasPolyA){
     hasCRSPolyA = !is.na(sp::proj4string(extentPolyA_in))
-    hasCRSPolyB = !is.na(sp::proj4string(extentPolyB_in))
-
-    #transform if needed
-    if(!bad_proj) extentPolyB_proj4A = extentPolyB_in
-    if(bad_proj & hasCRSPolyA & hasCRSPolyB) extentPolyB_proj4A = spTransform(extentPolyB_in, sp::proj4string(extentPolyA_in))
+    if(!hasCRSPolyA & hasProj4A) sp::proj4string(extentPolyA_in) = proj4A
+    if(hasCRSPolyA & !hasProj4A) proj4A = sp::proj4string(extentPolyA_in)
+    hasCRSPolyA = !is.na(sp::proj4string(extentPolyA_in))
+    hasProj4A = !is.na(proj4A )
   }
+  if(hasPolyB){
+    hasCRSPolyB = !is.na(sp::proj4string(extentPolyB_in))
+    if(!hasCRSPolyB & hasProj4B) sp::proj4string(extentPolyB_in) = proj4B
+    if(hasCRSPolyB & !hasProj4B) proj4B = sp::proj4string(extentPolyB_in)
+    hasCRSPolyB = !is.na(sp::proj4string(extentPolyB_in))
+    hasProj4B = !is.na(proj4B )
+  }
+  bad_proj = !raster::compareCRS(proj4A, proj4B)
+
+  # if(hasPolyB) hasCRSPolyB = !is.na(sp::proj4string(extentPolyB_in))
+  #
+  #
+  # if(polyAB & hasPolyA & hasPolyB){
+  #
+  #   #assign proj4
+  #
+  #   if(!hasCRSPolyB & hasProj4B) sp::proj4string(extentPolyB_in) = proj4B
+  #   bad_proj = !raster::compareCRS(extentPolyA_in, extentPolyB_in)
+  #
+  #   #check for proj4 again
+  #   hasCRSPolyA = !is.na(sp::proj4string(extentPolyA_in))
+  #   hasCRSPolyB = !is.na(sp::proj4string(extentPolyB_in))
+  #
+  #   #transform if needed
+  #   if(!bad_proj) extentPolyB_proj4A = extentPolyB_in
+  #   if(bad_proj & hasCRSPolyA & hasCRSPolyB) extentPolyB_proj4A = spTransform(extentPolyB_in, sp::proj4string(extentPolyA_in))
+  #
+  # }
+  # else{
+  #
+  #   bad_proj = !raster::compareCRS(proj4A, proj4B)
+  #
+  # }
 
   #catch errors
   errExtent = !hasExt & !hasPolyA & !hasPolyB & !hasSample
   errShape = !hasShape & !hasSample
   errType = !hasType & !hasSample
   errExtPolyB = hasExt & hasPolyB & !hasPolyA
-  errProj4 = bad_proj & (!hasCRSPolyA | !hasCRSPolyB)
-  errPath = !hasPolyA | (polyAB & !hasPathB) | (polyAExt & !hasPathB)
-  warnProj4 = (polyAOnly & !hasCRSPolyA) | (polyAB & !hasCRSPolyA)
+  #errProj4 = bad_proj & (!hasCRSPolyA | !hasCRSPolyB)
+  errPath = !hasPathA | (polyAB & !hasPathB) | (polyAExt & !hasPathB)
+  warnProj4 = (polyAOnly & !hasCRSPolyA & !hasProj4A) | (polyAB & ((!hasCRSPolyA & !hasProj4A) | (!hasCRSPolyB & !hasProj4B)) )
 
   #throw errors based on arguments
   if(errExtent) stop("must at minimum provide argument 'PolyA' or 'extentSample' ")
   if(errShape) stop("shape must be 'circle' or 'square' or you must provide 'sampleShpA'")
   if(errType) stop("'sampleType' must be 'regular','random','hexagonal' or you must provide 'sampleShpA'")
   if(errExtPolyB) stop("oops: argument 'extentSample' can be used with 'extentPolyA', but 'extentSample' cannot be used with argument 'extentPolyB' ")
-  if(errProj4) stop("Couldn't confirm that 'extPolyA' and 'extPolyB' had the same projections - define both polygon projections (e.g. arcmap) or provide proj4 strings")
+  #if(errProj4) stop("Couldn't confirm that 'extPolyA' and 'extPolyB' had the same projections - define both polygon projections (e.g. arcmap) or provide proj4 strings")
   if(errPath) stop("Either 'pathLasA' or 'pathLasB' is missing: 'pathLasB' is optional but must be provided if two extents are provided")
 
   #throw warnings
@@ -250,7 +275,6 @@ cloud2xSample=function(
     }
   }
   if(hasOutB ){
-
     #create output elevation folders for project B
     if(!is.null(names(radii_in))) pathsOutB_in = paste(pathOutB,"/",paste("clipElev",names(radii_in),sep="_"),sep="")
     if(is.null(names(radii_in))) pathsOutB_in = paste(pathOutB,"/",paste("clipElev_Rad",radii_in,sep=""),sep="")
@@ -275,107 +299,177 @@ cloud2xSample=function(
     }
   }
 
-  #intersect extents
-  if(polyAExt) extInA = rgeos::gIntersection(extentPolyA_in, extentPoly_in)
-  if(polyAB) extInA = rgeos::gIntersection(extentPolyA_in, extentPolyB_in)
-  if(polyAOnly) extInA = extentPolyA_in
-  if(extOnly) extInA = extentPoly_in
+  if(!hasSample){
 
-  #try and load existing sample sampleShpA
-  sampleShpA_in = loadPoly(sampleShpA,proj4A)
+    #intersect extents
+    if(polyAExt) extInA = rgeos::gIntersection(extentPolyA_in, extentPoly_in)
+    if(polyAB) extInA = rgeos::gIntersection(extentPolyA_in, extentPolyB_in)
+    if(polyAOnly) extInA = extentPolyA_in
+    if(extOnly) extInA = extentPoly_in
 
-  #build sample if necessary
-  if(!inherits(sampleShpA_in,"Spatial")){
+    # #try and load existing sample sampleShpA
+    # sampleShpA_in = loadPoly(sampleShpA,proj4A)
+
+    #build sample if necessary
+    #if(!inherits(sampleShpA_in,"Spatial")){
 
     sInA = spsample( extInA , n = nSample , type = sampleType[1] )
     sInDFA = SpatialPointsDataFrame(sInA, data.frame(id=1:nrow(sInA@coords)), match.ID = F)
     sInBuffA = lapply(radii_in, .fn_buff, sInDFA , sampleShape)
 
-  }
-  #browser()
-  #use existing sample
-  if(inherits(sampleShpA_in,"Spatial")){
+    #}
 
-    #get correct data type
-    if(class(sampleShpA_in) == "SpatialPoints"){
-      sInA = sampleShpA_in
-      sInDFA = SpatialPointsDataFrame(sInA, data.frame(id=1:nrow(sInA@coords)), match.ID = F)
-      sInBuffA = lapply(radii_in, .fn_buff, sInDFA , sampleShape)
-    }
-    if(class(sampleShpA_in) == "SpatialPointsDataFrame"){
-      sInA = data.frame(coordinates(sampleShpA_in))
-      names(sInA) = c("x","y")
-      sInDFA = sampleShpA_in
-      sInBuffA = lapply(radii_in, .fn_buff, sInDFA , sampleShape)
-    }
-    if(class(sampleShpA_in) == "SpatialPolygons" & userPly){
-      sInA = data.frame(getSpPPolygonsLabptSlots(sampleShpA_in))
-      names(sInA) = c("x","y")
-      coordinates(sInA) = ~x+y
-      sInDFA = SpatialPointsDataFrame(sInA, data.frame(id=1:nrow(sInA@coords)), match.ID = F)
-      sInBuffA = list(userPly = SpatialPolygonsDataFrame(sampleShpA_in, data.frame(id=1:length(sampleShpA_in))), match.ID = F)
-    }
-    if(class(sampleShpA_in) == "SpatialPolygons" & !userPly){
-      sInA = data.frame(getSpPPolygonsLabptSlots(sampleShpA_in))
-      names(sInA) = c("x","y")
-      coordinates(sInA) = ~x+y
-      sInDFA = SpatialPointsDataFrame(sInA, data.frame(id=1:nrow(sInA@coords)), match.ID = F)
-      sInBuffA = lapply(radii_in, .fn_buff, sampleShpA_in, sampleShape)
-    }
-    if(class(sampleShpA_in) == "SpatialPolygonsDataFrame" & userPly){
-      sInA = data.frame(getSpPPolygonsLabptSlots(sampleShpA_in))
-      names(sInA) = c("x","y")
-      coordinates(sInA) = ~x+y
-      sInDFA = SpatialPointsDataFrame(sInA, data.frame(id=1:nrow(sInA@coords)), match.ID = F)
-      sInBuffA = list( userPly = sampleShpA_in )
-    }
-    if(class(sampleShpA_in) == "SpatialPolygonsDataFrame" & !userPly){
-      sInA = data.frame(getSpPPolygonsLabptSlots(sampleShpA_in))
-      names(sInA) = c("x","y")
-      coordinates(sInA) = ~x+y
-      sInDFA = SpatialPointsDataFrame(sInA, data.frame(id=1:nrow(sInA@coords)), match.ID = F)
-      sInBuffA = lapply(radii_in, .fn_buff, sampleShpA_in, sampleShape)
+    # #use existing sample
+    # if(inherits(sampleShpA_in,"Spatial")){
+    #
+    #   #get correct data type
+    #   if(class(sampleShpA_in) == "SpatialPoints"){
+    #     sInA = sampleShpA_in
+    #     sInDFA = SpatialPointsDataFrame(sInA, data.frame(id=1:nrow(sInA@coords)), match.ID = F)
+    #     sInBuffA = lapply(radii_in, .fn_buff, sInDFA , sampleShape)
+    #   }
+    #   if(class(sampleShpA_in) == "SpatialPointsDataFrame"){
+    #     sInA = data.frame(coordinates(sampleShpA_in))
+    #     names(sInA) = c("x","y")
+    #     sInDFA = sampleShpA_in
+    #     sInBuffA = lapply(radii_in, .fn_buff, sInDFA , sampleShape)
+    #   }
+    #   if(class(sampleShpA_in) == "SpatialPolygons" & userPly){
+    #     sInA = data.frame(getSpPPolygonsLabptSlots(sampleShpA_in))
+    #     names(sInA) = c("x","y")
+    #     coordinates(sInA) = ~x+y
+    #     sInDFA = SpatialPointsDataFrame(sInA, data.frame(id=1:nrow(sInA@coords)), match.ID = F)
+    #     sInBuffA = list(userPly = SpatialPolygonsDataFrame(sampleShpA_in, data.frame(id=1:length(sampleShpA_in))), match.ID = F)
+    #   }
+    #   if(class(sampleShpA_in) == "SpatialPolygons" & !userPly){
+    #     sInA = data.frame(getSpPPolygonsLabptSlots(sampleShpA_in))
+    #     names(sInA) = c("x","y")
+    #     coordinates(sInA) = ~x+y
+    #     sInDFA = SpatialPointsDataFrame(sInA, data.frame(id=1:nrow(sInA@coords)), match.ID = F)
+    #     sInBuffA = lapply(radii_in, .fn_buff, sampleShpA_in, sampleShape)
+    #   }
+    #   if(class(sampleShpA_in) == "SpatialPolygonsDataFrame" & userPly){
+    #     sInA = data.frame(getSpPPolygonsLabptSlots(sampleShpA_in))
+    #     names(sInA) = c("x","y")
+    #     coordinates(sInA) = ~x+y
+    #     sInDFA = SpatialPointsDataFrame(sInA, data.frame(id=1:nrow(sInA@coords)), match.ID = F)
+    #     sInBuffA = list( userPly = sampleShpA_in )
+    #   }
+    #   if(class(sampleShpA_in) == "SpatialPolygonsDataFrame" & !userPly){
+    #     sInA = data.frame(getSpPPolygonsLabptSlots(sampleShpA_in))
+    #     names(sInA) = c("x","y")
+    #     coordinates(sInA) = ~x+y
+    #     sInDFA = SpatialPointsDataFrame(sInA, data.frame(id=1:nrow(sInA@coords)), match.ID = F)
+    #     sInBuffA = lapply(radii_in, .fn_buff, sampleShpA_in, sampleShape)
+    #   }
+    #
+    # }
+  }
+  if(hasSample){
+
+
+    #try and load existing sample sampleShpA
+    sampleShpA_in = loadPoly(sampleShpA,proj4A)
+
+    #use existing sample
+    if(inherits(sampleShpA_in,"Spatial")){
+
+      #get correct data type
+      if(class(sampleShpA_in) == "SpatialPoints"){
+        sInA = sampleShpA_in
+        sInDFA = SpatialPointsDataFrame(sInA, data.frame(id=1:nrow(sInA@coords)), match.ID = F)
+        sInBuffA = lapply(radii_in, .fn_buff, sInDFA , sampleShape)
+      }
+      if(class(sampleShpA_in) == "SpatialPointsDataFrame"){
+        sInA = data.frame(coordinates(sampleShpA_in))
+        names(sInA) = c("x","y")
+        sInDFA = sampleShpA_in
+        sInBuffA = lapply(radii_in, .fn_buff, sInDFA , sampleShape)
+      }
+      if(class(sampleShpA_in) == "SpatialPolygons" & userPly){
+        sInA = data.frame(getSpPPolygonsLabptSlots(sampleShpA_in))
+        names(sInA) = c("x","y")
+        coordinates(sInA) = ~x+y
+        sInDFA = SpatialPointsDataFrame(sInA, data.frame(id=1:nrow(sInA@coords)), match.ID = F)
+        sInBuffA = list(userPly = SpatialPolygonsDataFrame(sampleShpA_in, data.frame(id=1:length(sampleShpA_in))), match.ID = F)
+      }
+      if(class(sampleShpA_in) == "SpatialPolygons" & !userPly){
+        sInA = data.frame(getSpPPolygonsLabptSlots(sampleShpA_in))
+        names(sInA) = c("x","y")
+        coordinates(sInA) = ~x+y
+        sInDFA = SpatialPointsDataFrame(sInA, data.frame(id=1:nrow(sInA@coords)), match.ID = F)
+        sInBuffA = lapply(radii_in, .fn_buff, sampleShpA_in, sampleShape)
+      }
+      if(class(sampleShpA_in) == "SpatialPolygonsDataFrame" & userPly){
+        sInA = data.frame(getSpPPolygonsLabptSlots(sampleShpA_in))
+        names(sInA) = c("x","y")
+        coordinates(sInA) = ~x+y
+        sInDFA = SpatialPointsDataFrame(sInA, data.frame(id=1:nrow(sInA@coords)), match.ID = F)
+        sInBuffA = list( userPly = sampleShpA_in )
+      }
+      if(class(sampleShpA_in) == "SpatialPolygonsDataFrame" & !userPly){
+        sInA = data.frame(getSpPPolygonsLabptSlots(sampleShpA_in))
+        names(sInA) = c("x","y")
+        coordinates(sInA) = ~x+y
+        sInDFA = SpatialPointsDataFrame(sInA, data.frame(id=1:nrow(sInA@coords)), match.ID = F)
+        sInBuffA = lapply(radii_in, .fn_buff, sampleShpA_in, sampleShape)
+      }
+
+
+
+    }else{
+      stop("something is wrong with the sample you provided it does not inherit class 'Spatial'")
     }
 
   }
 
 
   #reproject spatial data for project B or extent - if necessary
+  if(bad_proj){
 
-  proj4string(sInA) = proj4A
-  if(!is.null(extInA)) proj4string(extInA) = proj4A
-  proj4string(sInDFA) = proj4A
-  sInBuffA = lapply( sInBuffA , function(x,proj4){ proj4string(x) = proj4 ; x } , proj4A)
-
-  if(polyAB){
-    if(bad_proj & hasCRSPolyB){
-
-      sInB = spTransform(sInA , sp::proj4string(extentPolyB_in))
-      if(!is.null(extInA)) extInB = spTransform(extInA , sp::proj4string(extentPolyB_in))
-      sInDFB = spTransform(sInDFA , sp::proj4string(extentPolyB_in))
-      sInBuffB = sapply(sInBuffA , spTransform, sp::proj4string(extentPolyB_in))
-
-    }else{
-      sInB = sInA
-      extInB = extInA
-      sInDFB = sInDFA
-      sInBuffB = sInBuffA
-
+    #make sure everything has a proj4 string
+    if(hasProj4A){
+      sp::proj4string(sInA) = proj4A
+      sp::proj4string(sInDFA) = proj4A
+      sInBuffA = lapply(sInBuffA, function(x){ proj4string(x) = proj4A; x})
     }
-  }
-  if(polyAExt){
-    if(bad_proj & hasProj4B){
-      sInB = spTransform(sInA , proj4B)
-      if(!is.null(extInA)) extInB = spTransform(extInA , proj4B)
-      sInDFB = spTransform(sInDFA , proj4B)
-      sInBuffB = sapply(sInBuffA , spTransform, proj4B)
 
-    }else{
-      sInB = sInA
-      extInB = extInA
-      sInDFB = sInDFA
-      sInBuffB = sInBuffA
 
+    #project objects form proj4a to proj4b
+    if(polyAB){
+      #if(bad_proj & hasCRSPolyB){
+      if(bad_proj & hasProj4B){
+
+        sInB = sp::spTransform(sInA , sp::CRS(proj4B))
+        if("extInA" %in% ls()) extInB = spTransform(extInA , sp::proj4string(extentPolyB_in))
+        sInDFB = spTransform(sInDFA , proj4B)
+        sInBuffB = sapply(sInBuffA , spTransform, proj4B)
+
+      }else{
+
+        sInB = sInA
+        extInB = extInA
+        sInDFB = sInDFA
+        sInBuffB = sInBuffA
+
+      }
+    }
+    if(polyAExt){
+      if(bad_proj & hasProj4B){
+
+        sInB = spTransform(sInA , proj4B)
+        if(!is.null(extInA)) extInB = spTransform(extInA , proj4B)
+        sInDFB = spTransform(sInDFA , proj4B)
+        sInBuffB = sapply(sInBuffA , spTransform, proj4B)
+
+      }else{
+
+        sInB = sInA
+        extInB = extInA
+        sInDFB = sInDFA
+        sInBuffB = sInBuffA
+
+      }
     }
   }
 
@@ -390,22 +484,22 @@ cloud2xSample=function(
     for(i in 1:length(sInBuffA)){
       write_test=try(writeOGR(sInBuffA[[i]] ,pathSampleADir, paste(date_in,"_SamplePointPolys",names(sInBuffA)[[i]],sep=""), driver="ESRI Shapefile"),silent=T)
     }
-
   }
 
-  if("sInDFB" %in% ls() ){
-    #prep
-    pathSampleBDir = file.path(pathOutB,"shapefiles")
-    if(!dir.exists(pathSampleBDir)) errPathOutB = try(dir.create(pathSampleBDir, recursive = T))
-    #write
-    writeTestSInDFB = try(writeOGR(sInDFB ,pathSampleBDir, paste(date_in,"_SamplePoints",sep=""), driver="ESRI Shapefile"),silent=T)
-    writeTestExtB = try(writeOGR(extInB ,pathSampleBDir, paste(date_in,"_SampleExtentB",sep=""), driver="ESRI Shapefile"),silent=T)
-    for(i in 1:length(sInBuffB)){
-      write_test=try(writeOGR(sInBuffB[[i]] ,pathSampleBDir, paste(date_in,"_SamplePointPolys",names(sInBuffB)[[i]],sep=""), driver="ESRI Shapefile"),silent=T)
+    if("sInDFB" %in% ls() ){
+      #prep
+      pathSampleBDir = file.path(pathOutB,"shapefiles")
+      if(!dir.exists(pathSampleBDir)) errPathOutB = try(dir.create(pathSampleBDir, recursive = T))
+      #write
+      writeTestSInDFB = try(writeOGR(sInDFB ,pathSampleBDir, paste(date_in,"_SamplePoints",sep=""), driver="ESRI Shapefile"),silent=T)
+      writeTestExtB = try(writeOGR(extInB ,pathSampleBDir, paste(date_in,"_SampleExtentB",sep=""), driver="ESRI Shapefile"),silent=T)
+      for(i in 1:length(sInBuffB)){
+        write_test=try(writeOGR(sInBuffB[[i]] ,pathSampleBDir, paste(date_in,"_SamplePointPolys",names(sInBuffB)[[i]],sep=""), driver="ESRI Shapefile"),silent=T)
+      }
     }
 
-  }
-
+  #}
+  browser()
   #clip plots
   if(procMethod[1] == "lidR"){
 
@@ -439,7 +533,6 @@ cloud2xSample=function(
       }
     }
     if(hasPathB){
-
 
       for(i in 1:length(sInBuffB) ){
 
