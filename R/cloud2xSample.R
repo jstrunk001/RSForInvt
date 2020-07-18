@@ -499,7 +499,7 @@ cloud2xSample=function(
     }
 
   #}
-  browser()
+
   #clip plots
   if(procMethod[1] == "lidR"){
 
