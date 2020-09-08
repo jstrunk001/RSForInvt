@@ -341,9 +341,10 @@ output: html_document
 		,pathLasB = dir_tn_dap
 		,pathDTMA = out_dtm_tn_las
 		,pathDTMB = out_dtm_tn_dap
-		,extentPolyA = border_las
-		,extentPolyB = border_dap
+		#,extentPolyA = border_las
+		#,extentPolyB = border_dap
 		,nCore = 3
+		,nSample = 10
 		#,nSample = 100 #not used when argument is provided to sampleShpA
 		,procMethod = "lidR"
 		#,radii = list( feet = c(FtTenthAc = 37.2 )) #not used when sampleShape = "userPoly"

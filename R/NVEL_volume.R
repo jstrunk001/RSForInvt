@@ -162,6 +162,7 @@ NVEL_volume=function(
   #,ncore = 4
 
   ){
+
   options(stringsAsFactors = F)
   #load dll if needed
   if(load_dll) .load_dll(dll_64,dll_32,dll_func )
@@ -220,10 +221,15 @@ NVEL_volume=function(
     voleqNm = "voleq"
   }
 
-  #compute volumes
+
     #turn of warnings temporarily, this generates scads of them
   defaultW <- getOption("warn")
   options(warn = -1)
+
+  #fix bad values
+  dfTL0_in[is.na(dfTL0_in)] = 0
+
+  #compute volumes
   vol_pd0 = mapply(.fn_fortran_vol
 
                           ,voleq = dfTL0_in[,voleqNm[1]]
@@ -233,7 +239,6 @@ NVEL_volume=function(
                           ,spcd = dfTL0_in[,spcdNm[1]]
                           ,dbh  = dfTL0_in[,dbhNm[1]]
                           ,ht  = dfTL0_in[,htNm[1]]
-
                           ,pulpDb = dfTL0_in[,pulpDbNm[1]]
                           ,sawDb = dfTL0_in[,sawDbNm[1]]
 
@@ -380,6 +385,8 @@ NVEL_volume=function(
 
   dfTL1 = dfTL0
 
+
+
   nms_in = c(
     voleq= voleqNm[1]
     ,region = regionNm[1]
@@ -404,7 +411,6 @@ NVEL_volume=function(
     ,btr = btrNm
   )
 
-
   #add columns with na in nms
   na_nms = is.na(nms_in)
   nms_fill_NA = names(nms_in)[na_nms]
@@ -427,10 +433,11 @@ NVEL_volume=function(
   if(!is.na(district)) dfTL1[,"district"] = district
 
   #return correctly named data
-  dfTL1[,names(nms_in)]
+  dfTL1[,nms_in]
 
 }
-
+#names(nms_in)[! names(nms_in)  %in% names(dfTL1) ]
+#(nms_in)[! (nms_in)  %in% names(dfTL1) ]
 
 NVEL_ht2topd = function(){
 
