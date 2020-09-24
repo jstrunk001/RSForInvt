@@ -385,8 +385,6 @@ NVEL_volume=function(
 
   dfTL1 = dfTL0
 
-
-
   nms_in = c(
     voleq= voleqNm[1]
     ,region = regionNm[1]

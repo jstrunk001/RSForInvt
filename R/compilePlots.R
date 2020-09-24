@@ -3,10 +3,10 @@
 #'@title Compile tree data by plot
 #'
 #'@description
-#'  Supply data.frame of tree data with plot ids a data.frame of plots. The function works by iterating through the tree
+#'  Supply data.frame of tree data with plot ids and a data.frame of plot records. The function works by iterating through the tree
 #'  data plot by plot. The compilePlots() function accepts a list of functions which compute attributes. Several example functions
 #'  are provided, but they are probably not sufficient for operational usage. Hopefully more will be added over time. This function
-#'  is mean to work hand in hand with compileTrees() but is still a work in progress.
+#'  is meant to work hand in hand with compileTrees() but is still a work in progress.
 #'
 #'@details
 #'  This program is free software but it is provided WITHOUT WARRANTY
@@ -127,9 +127,9 @@
 compilePlots=function(
 
   dfTree = data.frame(PLT_CN = 1, year = 2020 , dbh = NA , spcd = NA , ac = 0.1  )
-  ,dfPlot = c( NA, data.frame (PLT_CN=c(1,2) , PLOT = 1 , YEAR = 2020, STATE =1 , COUNTY = 1 , PROJECT = "Test"))[1]
-  ,dfTreeNms = c( plotIDs = c("PLOT", "YEAR") , trIDs = c("tr_cn") , dbh = "DIA" , ht = "HT" , spcd = "SPCD" , trWt = "TPA" )
-  ,dfPlotNms = c(plotIDs = c( "STATE" , "COUNTY" , "PROJECT" , "PLOT" , "YEAR" ), pltWt = NA )
+  ,dfPlot = list( NA, data.frame (PLT_CN=c(1,2) , PLOT = 1 , YEAR = 2020, STATE =1 , COUNTY = 1 , PROJECT = "Test"))[1]
+  ,dfTreeNms = list( plotIDs = c("PLOT", "YEAR") , trIDs = c("tr_cn") , dbh = "DIA" , ht = "HT" , spcd = "SPCD" , trWt = "TPA" )
+  ,dfPlotNms = list(plotIDs = c( "STATE" , "COUNTY" , "PROJECT" , "PLOT" , "YEAR" ), pltWt = NA )
   ,plot_filter = c(NA, "select * from dfPlot where YEAR = 2018 and STATE = 'WA' and CONDITION = 1")
   ,tree_filter = c(NA, "select * from dfTree where dbh > 2 ")
 
@@ -161,17 +161,17 @@ compilePlots=function(
   dir_out = dir_out[1]
 
 	#grab IDs for tree records
-	plotIDs_in = dfTreeNms["plotIDs"]
+	plotIDs_in = dfTreeNms[["plotIDs"]]
 
 	if(!is.na(dir_out)) if(!dir.exists(dir_out)) dir.create( dir_out , recursive = T )
 
 	#check that tree / plot datasets have matching id fields
-	tr_ids_ok = dfTreeNms["plotIDs"] %in% names(dfTree)
-	if(mean(tr_ids_ok) < 1 ) stop(paste("dfTree does not have some plotIDs:",dfTreeNms["plotIDs"][!tr_ids_ok]))
+	tr_ids_ok = dfTreeNms[["plotIDs"]] %in% names(dfTree)
+	if(mean(tr_ids_ok) < 1 ) stop(paste("dfTree does not have some plotIDs:",dfTreeNms[["plotIDs"]][!tr_ids_ok]))
 
 	if(!no_dfPlot){
-  	pl_ids_ok = dfPlotNms["plotIDs"] %in% names(dfPlot)
-  	if(mean(pl_ids_ok) < 1 ) stop(paste("dfPlot does not have some plotIDs:",dfPlotNms["plotIDs"][!pl_ids_ok]))
+  	pl_ids_ok = dfPlotNms[["plotIDs"]] %in% names(dfPlot)
+  	if(mean(pl_ids_ok) < 1 ) stop(paste("dfPlot does not have some plotIDs:",dfPlotNms[["plotIDs"]][!pl_ids_ok]))
 	}
 
 	#subset data before compilation
@@ -179,7 +179,7 @@ compilePlots=function(
 		dfPlot_in = sqldf(plot_filter, envir=as.environment(data))
 	}
 	if((!"dfPlot_in" %in% ls()) & !no_dfPlot){
-		dfPlot_in = data$dfPlot
+		dfPlot_in = dfPlot
 	}
 	if(!is.na(tree_filter[1])){
 		dfTree_in = sqldf(tree_filter, envir=as.environment(data))
@@ -190,7 +190,7 @@ compilePlots=function(
 
 	#merge trees and plots
 	if(("dfPlot_in" %in% ls()) & ("dfTree_in" %in% ls())){
-		dat_in = merge(x=dfPlot, y = data[["dfTree"]], by = plotIDs_in, all.x=T, all.y=T)
+		dat_in = merge(x=dfPlot, y = dfTree, by = plotIDs_in, all.x=T, all.y=T)
 		rm("dfTree_in");gc()
 		rm("dfPlot_in");gc()
 	}
@@ -261,12 +261,12 @@ compilePlots=function(
   trs_i = .subsetIDs(trs,id)
 
   #get grouping variables as seed columns with id fields
-  trs_ID = trs_i[1, trNms["plotIDs"]]
+  trs_ID = trs_i[1, trNms[["plotIDs"]]]
 
   #iterate through compute functions and append dataframes horizontally
   for(i in 1:length(fnCompute)){
     fni = fnCompute[[i]]
-    if(nrow(trs_i) > 0 ) browser()
+    #if(nrow(trs_i) > 0 ) browser()
     resi = try(fni(trs_i, trNms = trNms , ... ))
     if(class(resi) == "try-error") return(NULL)
     if(i==1) res_in = data.frame(trs_ID, resi)
@@ -345,7 +345,7 @@ plotWtMn = function(
 ){
 
 	#remove trees without ID fields
-	bad_ids = is.na(trs[,trNms[["plotIDs"]]])
+	bad_ids = apply(is.na(trs[,trNms[["plotIDs"]],drop=F]),1,function(x) TRUE %in% x )
 	tr_in = trs[!bad_ids,]
 
 	#correct for NA weights
