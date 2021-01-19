@@ -9,11 +9,12 @@
 \usage{
 compilePlots(
   dfTree = data.frame(PLT_CN = 1, year = 2020, dbh = NA, spcd = NA, ac = 0.1),
-  dfPlot = c(NA, data.frame(PLT_CN = c(1, 2), PLOT = 1, YEAR = 2020, STATE = 1, COUNTY
-    = 1, PROJECT = "Test"))[1],
-  dfTreeNms = c(plotIDs = c("PLOT", "YEAR"), trIDs = c("tr_cn"), dbh = "DIA", ht =
+  dfPlot = list(NA, data.frame(PLT_CN = c(1, 2), PLOT = 1, YEAR = 2020, STATE = 1,
+    COUNTY = 1, PROJECT = "Test"))[1],
+  dfTreeNms = list(plotIDs = c("PLOT", "YEAR"), trIDs = c("tr_cn"), dbh = "DIA", ht =
     "HT", spcd = "SPCD", trWt = "TPA"),
-  dfPlotNms = c(plotIDs = c("STATE", "COUNTY", "PROJECT", "PLOT", "YEAR"), pltWt = NA),
+  dfPlotNms = list(plotIDs = c("STATE", "COUNTY", "PROJECT", "PLOT", "YEAR"), pltWt =
+    NA),
   plot_filter = c(NA,
     "select * from dfPlot where YEAR = 2018 and STATE = 'WA' and CONDITION = 1"),
   tree_filter = c(NA, "select * from dfTree where dbh > 2 "),
@@ -60,10 +61,10 @@ sppYplot(x, ID, sppY, sppNm, wtNm, ...)
 NULL (return=F) or a data.frame of plot attributes (return=T)
 }
 \description{
-Supply data.frame of tree data with plot ids a data.frame of plots. The function works by iterating through the tree
+Supply data.frame of tree data with plot ids and a data.frame of plot records. The function works by iterating through the tree
  data plot by plot. The compilePlots() function accepts a list of functions which compute attributes. Several example functions
  are provided, but they are probably not sufficient for operational usage. Hopefully more will be added over time. This function
- is mean to work hand in hand with compileTrees() but is still a work in progress.
+ is meant to work hand in hand with compileTrees() but is still a work in progress.
 
 #remove trees without ID fields
   bad_ids = is.na(trs[,trNms[["plotIDs"]]])

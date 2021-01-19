@@ -213,43 +213,53 @@ yai_weights=function(
 	,zero_dist=c("small","min","NA")
 ){
 
-	if(zero_dist[1]=="min")zero_fn=function(x){x[x==0]=min(x[x>0]);x}
-	if(zero_dist[1]=="NA") zero_fn=function(x){x[x==0]=NA;x}
-	if(zero_dist[1]=="small") zero_fn=function(x){x[x==0]=.001;x}
+  k_in = yaimod$k
+  
+  if( k_in > 1 ){
+    
+  	if(zero_dist[1]=="min") zero_fn=function(x){x[x==0]=min(x[x>0]);x}
+  	if(zero_dist[1]=="NA") zero_fn=function(x){x[x==0]=NA;x}
+  	if(zero_dist[1]=="small") zero_fn=function(x){x[x==0]=.001;x}
+  	
+  	#select group for which to calculate weights
+  	dist_in=apply(yaimod[["neiDstTrgs"]],2,as.numeric)
+  	if(nrow(yaimod[["neiDstTrgs"]])==1) dist_in = data.frame(t(dist_in))
+  	dist_id = yaimod$neiIdsTrgs
+  
+  	ndist=nrow(dist_in)
+  
+  	#if weight is zero (??):
+  	dist_in = data.frame(t(apply(dist_in,1,zero_fn)) )
+  
+  	#problem with names
+  	#if(length(yaimod[["neiDstTrgs"]][1,])==1) names(dist_in) = dimnames(yaimod[["neiDstTrgs"]])[[2]]
+  
+  	#calculate distances
+  	if(dtype[1]=="invdist") wt_in = (1/dist_in)/apply(1/dist_in,1,sum,na.rm=TRUE)
+  	if(dtype[1]=="invdist2") wt_in = (1/dist_in^2)/apply(1/dist_in^2,1,sum,na.rm=TRUE)
+  	if(dtype[1]=="eq") wt_in = rep(1/(ncol(dist_in)),ndist,na.rm=TRUE)
+  	#wt_in=data.frame(dist_id,wt_in,stringsAsFactors=FALSE)
+  	names(wt_in)=gsub("Dst[.]","wt.",names(wt_in))
+  	
+  	#number of columns of weights and references
+  	#nwt=ncol(wt_in)
+  	
+  	#add row for target ids
+  	dat_in=data.frame(target=yaimod[["trgRows"]],wt_in,dist_in,yaimod[["neiIdsTrgs"]],row.names=NULL)
+  	
+  }else{
+    
+    dat_in=data.frame(target=yaimod[["trgRows"]],wt.k1 = 1,yaimod[["neiDstTrgs"]],yaimod[["neiIdsTrgs"]],row.names=NULL)
+    
+  }
+    
+  
 
-	#select group for which to calculate weights
-	dist_in=apply(yaimod[["neiDstTrgs"]],2,as.numeric)
-	if(nrow(yaimod[["neiDstTrgs"]])==1)dist_in=data.frame(t(dist_in))
-	dist_id=yaimod$neiIdsTrgs
-
-
-	ndist=nrow(dist_in)
-
-	#if weight is zero (??):
-	dist_in=data.frame(t(apply(dist_in,1,zero_fn)) )
-
-	#problem with
-	if(length(yaimod[["neiDstTrgs"]][1,])==1)names(dist_in)=dimnames(yaimod[["neiDstTrgs"]])[[2]]
-
-
-	#calculate distances
-	if(dtype[1]=="invdist") wt_in= (1/dist_in)/apply(1/dist_in,1,sum,na.rm=TRUE)
-	if(dtype[1]=="invdist2") wt_in= (1/dist_in^2)/apply(1/dist_in^2,1,sum,na.rm=TRUE)
-	if(dtype[1]=="eq") wt_in= rep(1/(ncol(dist_in)),ndist,na.rm=TRUE)
-
-	#wt_in=data.frame(dist_id,wt_in,stringsAsFactors=FALSE)
-	names(wt_in)=gsub("Dst[.]","wt.",names(wt_in))
-
-	#number of columns of weights and references
-	#nwt=ncol(wt_in)
-
-	#add row for target ids
-	dat_in=data.frame(target=yaimod[["trgRows"]],wt_in,dist_in,yaimod[["neiIdsTrgs"]],row.names=NULL)
 
 	#wt_in[,reord]
 
 	list(
-		k = ncol(wt_in)
+		k = k_in
 		, col_dist = grep("Dst[.]k",names(dat_in),value=T)
 		, col_wt = grep("wt[.]k",names(dat_in),value=T)
 		, col_id = grep("Id[.]k",names(dat_in),value=T)

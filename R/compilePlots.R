@@ -134,6 +134,7 @@ compilePlots=function(
   ,tree_filter = c(NA, "select * from dfTree where dbh > 2 ")
 
   ,dir_out= file.path("c:/temp/RSForInvt/Compile",format(Sys.Date()))
+  ,nm_out = "plot_compile"
 
   #functions to compute on tree lists
   #functions must accept ... argument e.g. fn1 = function(x,...) data.frame(mean(x)) ???
@@ -237,8 +238,8 @@ compilePlots=function(
 	res_in = plyr::rbind.fill(res_i[sapply(res_i,is.data.frame)])
 
 	if(!is.na(dir_out)){
-		out_csv = file.path(dir_out,"plot_compile.csv")
-		out_rds = file.path(dir_out,"plot_compile.rds")
+		out_csv = file.path(dir_out,paste(nm_out,".csv",sep=""))
+		out_rds = file.path(dir_out,paste(nm_out,".rds",sep=""))
 		write.csv(res_in,out_csv)
 		saveRDS(res_in,out_rds)
 	}
@@ -360,7 +361,7 @@ plotWtMn = function(
 			,ba_ftac_ge3 = sum((.005454*tr_in[,trNms[["dbh"]]]^2*tr_in[,trNms[["trWt"]]])[tr_in[,trNms[["dbh"]]] > 3],na.rm=T)
 			,ba_m3ha_ge3 = sum((.005454*tr_in[,trNms[["dbh"]]]^2*tr_in[,trNms[["trWt"]]])[tr_in[,trNms[["dbh"]]] > 3],na.rm=T)*(0.3048^2)/0.404686
 			,qmd = sqrt(sum(tr_in[,trNms[["trWt"]]]*tr_in[,trNms[["dbh"]]]^2,na.rm=T) / sum(tr_in[,trNms[["trWt"]]],na.rm=T))
-			,lorht = sum(tr_in[,trNms[["ht"]]] * tr_in[,trNms[["dbh"]]]^2,na.rm=T)/ sum(tr_in[,trNms[["dbh"]]]^2,na.rm=T)
+			,lorht = sum(tr_in[,trNms[["ht"]]] * tr_in[,trNms[["trWt"]]] * tr_in[,trNms[["dbh"]]]^2,na.rm=T)/ sum(tr_in[,trNms[["trWt"]]] * tr_in[,trNms[["dbh"]]]^2,na.rm=T)
 		)
 
 	}else{

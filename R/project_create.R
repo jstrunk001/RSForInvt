@@ -51,6 +51,8 @@
 #'   ,las_year="2018"
 #'   ,do_scan_dtms=F #'we already scanned the dtm folder - ok, to rescan, but slower
 #'   ,do_scan_las=F #'we already scanned the las folder - ok, to rescan, but slower
+#'   ,duplicate_las = c("ignore","remove")
+#'   ,duplicate_dtm = c("ignore","remove")
 #'   ,tile_size=1650
 #'   ,pixel_size=66
 #'   #',xmn=561066,xmx=2805066,ymn=33066,ymx=1551066
@@ -87,6 +89,8 @@ project_create=function(
   ,las_year="2099"
   ,do_scan_dtms=T
   ,do_scan_las=T
+  ,duplicate_las = c("ignore","remove")
+  ,duplicate_dtm = c("ignore","remove")
   ,tile_size=1650
   ,pixel_size=66
   ,xmn=c(NA,561066)
@@ -132,6 +136,14 @@ project_create=function(
   #read in las and dtm polygons
   dtm_polys=readOGR(dsn = path_dtm_proj,"dtm_polys")
   las_polys=readOGR(dsn = path_las_proj,"las_polys")
+
+  #remove duplicates if present
+  if(duplicate_las == "remove"){
+    las_polys = subset( las_polys , subset= !duplicated(las_polys$file_name) )
+  }
+  if(duplicate_dtm == "remove"){
+    dtm_polys = subset( dtm_polys , subset= !duplicated(dtm_polys$file_name) )
+  }
 
   #get proj4 if not provided and add to dtms if needed
   if(!is.na(proj4)) proj4_in = proj4

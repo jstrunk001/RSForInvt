@@ -33,8 +33,8 @@
 #'@param temp temp folder to hold batch files for use with gridmetrics.exe
 #'@param fast_cache experimental - a high-speed temporary folder to copy las files to
 #'@param n_cache experimental - number of las files to copy to cache
-#'@param dir_dtm in case path to dtms has changed from lasR_project
-#'@param dir_las in case path to las has changed from lasR_project
+#'@param dir_dtm in case path to dtms has changed from project
+#'@param dir_las in case path to las has changed from project
 #'@param skip_existing skip tiles if they already have output csvs
 #'@param table output folder name
 #'@param existing_coms path to existing batch comamnds, incase processing was interrupted the first time
@@ -45,7 +45,7 @@
 #'@examples
 #'
 #'  gmi=run_gridmetrics(
-#'  project_gpkg="D:\\projects\\2017_WA_DSM_Pilot_usgs\\2017Aug_NAIP_usgs\\lasR_project003.gpkg"
+#'  project_gpkg="D:\\projects\\2017_WA_DSM_Pilot_usgs\\2017Aug_NAIP_usgs\\RSForInvt_project003.gpkg"
 #' ,dir_out="I:\\projects\\2017_WA_DSM_Pilot\\2017Aug_NAIP_usgs\\gridmetrics_07\\"
 #' ,dir_dtm="c:\\usgs_dtms\\dtms\\"
 #' ,dir_las="D:\\naip_2015_laz\\"
@@ -244,7 +244,7 @@ run_gridmetrics=function(
     if(n_core>1 & is.na(fast_cache)){
 
       clus=makeCluster(n_core)
-      clusterEvalQ(clus,{library(lasR);gc()})
+      clusterEvalQ(clus,{library(RSForInvt);gc()})
       res=parLapply(clus,coms,shell);gc()
       gc();stopCluster(clus);gc()
 
@@ -252,7 +252,7 @@ run_gridmetrics=function(
 
       #set up clusters
       clus=makeCluster(n_core)
-      clusterEvalQ(clus,{library(lasR);gc()})
+      clusterEvalQ(clus,{library(RSForInvt);gc()})
 
       #figure out number of clumps to make
       n_clumps=ceiling(length(coms)/n_cache)
@@ -349,7 +349,7 @@ if(debug) browser()
 
     if(n_core>1){
       clus=makeCluster(n_core)
-      clusterEvalQ(clus,{library(lasR);gc()})
+      clusterEvalQ(clus,{library(RSForInvt);gc()})
 
       res_i=clusterMap(
                       clus
