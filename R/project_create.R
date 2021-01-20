@@ -121,7 +121,12 @@ project_create=function(
   project_path=dirname(path_gpkg_out)
   if(!dir.exists(project_path)) dir.create(project_path,recursive=T)
 
-  #create sqlite database / tables
+  #match tile size with pixel size
+  tile_pixel_ratio = tile_size / pixel_size
+  if(ceiling(tile_pixel_ratio) > tile_pixel_ratio){
+    tile_size = ceiling(tile_size / pixel_size)
+    warning("tile size not a multiple of pixel size, tile size set to ", tile_size)
+  }
 
   #inventory las and dtms
   if(do_scan_las) scan_las(project=project_las, project_year=las_year,dir_las=dir_las,create_polys=T , recursive = recurse_las , proj4 = proj4)

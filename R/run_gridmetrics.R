@@ -79,7 +79,7 @@ run_gridmetrics=function(
   ,intensity = F
   ,outlier = c(-5,400)
   ,fusion_switches = "/nointensity /first"
-  ,xmn = 561066,xmx=2805066,ymn=33066,ymx=1551066
+  ,xmn = 561066 , xmx= 2805066 , ymn=33066 , ymx=1551066
   ,fun = compute_metrics2 #list(min=min,max=max,mean=mean,sd=sd)#,p20=function(x,...)quantile(x,.2,...),p75=function(x,...)quantile(x,.2,...),p95=function(x,...)quantile(x,.2,...))
   ,temp = "c:\\temp\\run_gridmetrics\\"
 

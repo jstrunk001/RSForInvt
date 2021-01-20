@@ -74,7 +74,7 @@ sqlite_to_raster = function(
     timesA = timesB = list()
     xyz_test = as.data.frame(r0,xy=T)
     #for approach A we only need to make the "holder" raster 1x, and then repeatedly load id values
-    r0_test = raster::rasterFromXYZ(xyz_test[,c(1:2)])
+    r0_test = raster::rasterFromXYZ(xyz_test[,c(1:2)],digits=2)
 
     r0_test[] = -9999
     for(i in 1:50){
@@ -87,16 +87,38 @@ sqlite_to_raster = function(
   }
   debugRows = 50000
   require(raster)
-  if(doDebug) xy = dbGetQuery(db,paste("select",paste(colsxy,collapse=","),"from",tb_csv,"limit",debugRows))
-  else xy = dbGetQuery(db,paste("select",paste(colsxy,collapse=","),"from",tb_csv))
+  if(doDebug) xy = dbGetQuery(db,paste("select",paste(colsxy,collapse=","),"from",tb_gm,"limit",debugRows))
+  else xy = dbGetQuery(db,paste("select",paste(colsxy,collapse=","),"from",tb_gm))
 
-  xy = dbGetQuery(db, "select center_x,center_y from vw_gm_id_10674")
+  #xy = dbGetQuery(db, "select center_x,center_y from vw_gm_id_10674")
 
   if(!dir.exists(dirOut)) dir.create(dirOut)
-  #browser()
-  raster::beginCluster(nProc)
+  # 
+  # if(F){
+  #   
+  #   
+  #   (xy[sample(1:nrow(xy),50000),2] - 561066) / 66
+  #   
+  #   x0 = sort(xy[sample(1:nrow(xy),500),1])
+  #   x1 = ( ( x0 - 561066 - 40)/66 )
+  #   cbind(x0,x1)[1:10,]
+  #   
+  #   
+  #   
+  #   ( 612650 - 561066 ) / 66
+  #   
+  #   ( 1011066 - 561066 ) / 66
+  #   
+  #   ( 584034 - 561066 ) / 66
+  #   ( 591066 - 561066 + 30 ) / 66
+  #   ( 591096 - 561066 ) / 66
+  #   
+  #   561066 + 1150*66
+  #   
+  # }
 
-  r0 = raster::rasterFromXYZ(xy)
+  raster::beginCluster(nProc)
+  r0 = raster::rasterFromXYZ(xy , digits=2)
   xy1 = xy
   coordinates(xy) = xy[,colsxy]
   ids = raster::cellFromXY(r0, xy1)
