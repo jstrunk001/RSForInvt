@@ -236,7 +236,7 @@ run_gridmetrics=function(
         writeLines(gsub(",","\n",proj_polys@data[i,"las_file"]),proj_polys@data[i,"las_txt"])
         writeLines(gsub(",","\n",proj_polys@data[i,"dtm_file"]),proj_polys@data[i,"dtm_txt"])
       }
-      print("create list of dtms and las files");print(Sys.time())
+      print("create and write list of dtms and las files");print(Sys.time())
     }
 
 
@@ -245,7 +245,7 @@ run_gridmetrics=function(
 
       clus=makeCluster(n_core)
       clusterEvalQ(clus,{library(RSForInvt);gc()})
-      res=parLapply(clus,coms,shell);gc()
+      res=parLapply(clus,sample(coms),shell);gc()
       gc();stopCluster(clus);gc()
 
     }else if(n_core>1 & !is.na(fast_cache)){
