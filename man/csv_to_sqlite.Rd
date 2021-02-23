@@ -5,7 +5,7 @@
 \title{load csvs into database}
 \usage{
 csv_to_sqlite(
-  db_csvOut,
+  db_path = "c:/temp/gridmetrics_compilation.sqlite",
   csv_folder,
   tb_summary = "gm_summary",
   tb_csv = "gm",
@@ -16,7 +16,9 @@ csv_to_sqlite(
   notes = "",
   skip_loaded = T,
   n_load = NA,
-  use_col_classes = T
+  use_col_classes = T,
+  ncore = 4,
+  dir_status = "c:\\\\temp\\\\csv_to_sqlite_status\\\\some_project\\\\"
 )
 }
 \arguments{
@@ -42,6 +44,10 @@ csv_to_sqlite(
 
 \item{use_col_classes}{read colClasses from first file, and apply to remaining files - big read speedup}
 
+\item{ncore}{number of parallel threads to use at one time, ssds can handle many}
+
+\item{dir_status}{a way to report the status of the parallel threads, there is an output file for each input csv with at TRUE or FALSE in the name for write status}
+
 \item{db}{sqlite database connection}
 }
 \description{
@@ -62,6 +68,7 @@ point at a directory and load fusion derived tabular csv data into an sqlite dat
 Revision History
 \tabular{ll}{
 1.0 \tab 1/18/2018 header added \cr
+1.1 \tab 1/21/2021 parallel writes enabled \cr
 }
 }
 \examples{
@@ -83,5 +90,5 @@ Revision History
 \code{\link{run_gridmetrics}}\cr \code{\link{lasR_project}}\cr
 }
 \author{
-Jacob Strunk <Jstrunk@fs.fed.us>
+Jacob Strunk <jacob.strunk@usda.gov>
 }

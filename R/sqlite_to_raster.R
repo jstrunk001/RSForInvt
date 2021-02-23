@@ -61,6 +61,7 @@ sqlite_to_raster = function(
   ,nProc = 4
   ,doDebug=F
   ,doBuild=F
+  ,setNeg9999toNA = T
 
 ){
 
@@ -85,7 +86,7 @@ sqlite_to_raster = function(
     summary( unlist(timesB ))
     browser()
   }
-  debugRows = 50000
+  debugRows = 500000
   require(raster)
   if(doDebug) xy = dbGetQuery(db,paste("select",paste(colsxy,collapse=","),"from",tb_gm,"limit",debugRows))
   else xy = dbGetQuery(db,paste("select",paste(colsxy,collapse=","),"from",tb_gm))
@@ -93,42 +94,21 @@ sqlite_to_raster = function(
   #xy = dbGetQuery(db, "select center_x,center_y from vw_gm_id_10674")
 
   if(!dir.exists(dirOut)) dir.create(dirOut)
-  # 
-  # if(F){
-  #   
-  #   
-  #   (xy[sample(1:nrow(xy),50000),2] - 561066) / 66
-  #   
-  #   x0 = sort(xy[sample(1:nrow(xy),500),1])
-  #   x1 = ( ( x0 - 561066 - 40)/66 )
-  #   cbind(x0,x1)[1:10,]
-  #   
-  #   
-  #   
-  #   ( 612650 - 561066 ) / 66
-  #   
-  #   ( 1011066 - 561066 ) / 66
-  #   
-  #   ( 584034 - 561066 ) / 66
-  #   ( 591066 - 561066 + 30 ) / 66
-  #   ( 591096 - 561066 ) / 66
-  #   
-  #   561066 + 1150*66
-  #   
-  # }
 
   raster::beginCluster(nProc)
   r0 = raster::rasterFromXYZ(xy , digits=2)
   xy1 = xy
   coordinates(xy) = xy[,colsxy]
   ids = raster::cellFromXY(r0, xy1)
-  r0[] = -9999
+  r0[] = NA
 
   for(i in 1:length(cols2Raster)){
 
     print(paste("start:",cols2Raster[i],"at",Sys.time()))
-    if(doDebug) dati = dbGetQuery(db,paste("select",cols2Raster[i],"from",tb_csv,"limit",debugRows))
-    else dati = dbGetQuery(db,paste("select",cols2Raster[i],"from",tb_csv))
+    if(doDebug) dati = dbGetQuery(db,paste("select",cols2Raster[i],"from",tb_gm,"limit",debugRows))
+    else dati = dbGetQuery(db,paste("select",cols2Raster[i],"from",tb_gm))
+
+    if(setNeg9999toNA){ dati[dati[,1] == -9999 ,1] = NA}
 
     r0[ids] = dati[,1]
     outi = file.path(dirOut,paste(raster_prefix,cols2Raster[i],format,sep=""))

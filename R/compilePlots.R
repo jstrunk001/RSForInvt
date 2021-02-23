@@ -113,7 +113,7 @@
 #'
 #'
 #'
-#'@import plyr parallel sqldf
+#'@import plyr parallel sqldf reshape2
 #'
 #'@seealso \code{\link{compileTrees}}\cr \code{\link{parLapplyLB}}\cr
 
@@ -373,6 +373,60 @@ plotWtMn = function(
 	return( wtmn )
 
 }
+
+#'@export
+#'@rdname compilePlots
+#sppYplot = function(x,sppY,sppNm,plotIDs,wtNm=NA,...){
+sppYplot = function(
+  trs
+  ,trNms
+  ,nDomSpp = 3
+  ,sppY
+  #x,sppNm,plotIDs,wtNm=NA,...
+  ,...
+){
+
+  require("reshape2")
+  
+  #remove trees without ID fields
+  bad_ids = apply(is.na(trs[,trNms[["plotIDs"]],drop=F]),1,function(x) TRUE %in% x )
+  if(sum(bad_ids) > 0){
+    warning("some records have bad plotIDs fields:", unique(trs[bad_ids,trNms[["plotIDs"]]]) )
+  }
+  tr_in = trs[!bad_ids,]
+  
+  #correct for NA weights
+  tr_in[is.na(tr_in[,trNms[["dbh"]]]),trNms[["dbh"]]] = 0
+  tr_in[is.na(tr_in[,trNms[["trWt"]]]),trNms[["trWt"]]] = 0
+  
+  #get data holder for results
+  res_in = tr_in[1,trNms[["plotIDs"]],drop=F]
+
+  #iterate across response fields
+  for(i in 1:length(trNms[["domSppY"]])){
+    
+    #compute weighted values
+    if(!is.na(trNms[["trWt"]])) tr_in[,trNms[["domSppY"]][i]] = tr_in[,trNms[["domSppY"]][i]] * tr_in[,trNms[["trWt"]]]
+    
+    #cast and aggregate
+    mi = reshape2::melt( tr_in[,c(trNms[["plotIDs"]],trNms[["spcd"]],trNms[["domSppY"]][i]) ] , id.vars = c(trNms[["plotIDs"]],trNms[["spcd"]]) )
+    fi = as.formula(paste("variable  + ", paste(trNms[["plotIDs"]],collapse = "+")," ~ ",trNms[["spcd"]], sep=""))
+    dfi = reshape2::dcast( mi , formula =  fi , fun.aggregate = sum )[,-1]
+    
+    #get dominant species by y
+    n_dom = min(ncol(dfi)-1, nDomSpp)
+    dom_order = order(dfi[,-1] , decreasing = T)
+    spp_nms = names(dfi)[-1]
+    nmsMx = paste("dom", trNms[["spcd"]], trNms[["domSppY"]][i],1:n_dom, sep="_")
+    dfi[,nmsMx] = spp_nms[dom_order][1:n_dom]
+    
+    #merge data
+    res_in = merge(res_in, dfi[,c(trNms[["plotIDs"]],nmsMx)], by=trNms[["plotIDs"]])
+    
+  }
+  return(res_in)
+}
+
 #'
 ##@export
 ##@rdname compilePlots
@@ -444,40 +498,6 @@ plotWtMn = function(
 # }
 
 
-#'@export
-#'@rdname compilePlots
-sppYplot = function(x,ID,sppY,sppNm,wtNm,...){
-
-  require("reshape2")
-  res_in = x[1,ID,drop=F]
-  x_in = x
-
-  for(i in 1:length(sppY)){
-
-    #compute weighted values
-    x_in[,sppY[i]] = x[,sppY[i]] * x[,wtNm]
-
-    #cast and aggregate
-    mi = reshape2::melt( x_in[,c(ID,sppNm,sppY[i]) ] , id.vars = c(ID,sppNm) )
-    fi = as.formula(paste("variable  + ", ID," ~ ",sppNm , sep=""))
-    dfi = reshape2::dcast( mi , formula =  fi , fun.aggregate = sum )[,-1]
-
-    #get dominant species by y
-    yMaxID = names(dfi)[-1][which.max(unlist(dfi[,-1]))]
-    nmMx = paste("Dom", sppNm, sppY[i], sep="_")
-
-    #add useful name to dfi
-    names(dfi)[-1] = paste(sppY[i], paste(sppNm,names(dfi)[-1],sep="_"),sep="_")
-
-    #add in dominant species after rename
-    dfi[, nmMx ] = yMaxID
-
-    #merge data
-    res_in = merge(res_in, dfi, by=ID)
-
-  }
-  return(res_in)
-}
 
 ##@export
 ##@rdname compileTrees

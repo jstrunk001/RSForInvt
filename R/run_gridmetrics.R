@@ -239,13 +239,19 @@ run_gridmetrics=function(
       print("create and write list of dtms and las files");print(Sys.time())
     }
 
+    #get identical behavior if debugging
+    #the commands are now randomly selected to help with file interference
 
+
+    set.seed(50)
 
     if(n_core>1 & is.na(fast_cache)){
 
+      print("begin paralle processing");print(Sys.time())
+
       clus=makeCluster(n_core)
       clusterEvalQ(clus,{library(RSForInvt);gc()})
-      res=parLapply(clus,sample(coms),shell);gc()
+      res=parLapplyLB(clus,sample(coms),shell);gc()
       gc();stopCluster(clus);gc()
 
     }else if(n_core>1 & !is.na(fast_cache)){
@@ -342,7 +348,7 @@ if(debug) browser()
      lapply(coms,shell) ;gc()
 
     }
-    print("run fusion");print(Sys.time())
+    print("run fusion (done)");print(Sys.time())
   }
 
   if(!do_fusion){

@@ -19,12 +19,11 @@
 #'Revision History
 #' \tabular{ll}{
 #'1.0 \tab 1/18/2018 header added \cr
-#'1.1 \tab 1/21/2021 parallel writes enabled \cr
 #'}
 #'
 #'@author
 #'
-#'Jacob Strunk <jacob.strunk@@usda.gov>
+#'Jacob Strunk <Jstrunk@@fs.fed.us>
 #'
 
 #'@param db sqlite database connection
@@ -39,8 +38,6 @@
 #'@param skip_loaded should csv files which are already loaded be skipped
 #'@param n_load max number of files to load
 #'@param use_col_classes read colClasses from first file, and apply to remaining files - big read speedup
-#'@param ncore number of parallel threads to use at one time, ssds can handle many
-#'@param dir_status a way to report the status of the parallel threads, there is an output file for each input csv with at TRUE or FALSE in the name for write status
 
 #'
 #'@return
@@ -69,6 +66,7 @@
 
 csv_to_sqlite=function(
                        db_path = "c:/temp/gridmetrics_compilation.sqlite"
+                       #,sychronous = c("off","normal","full")
                        ,csv_folder
                        ,tb_summary="gm_summary"
                        ,tb_csv="gm"
@@ -88,7 +86,7 @@ csv_to_sqlite=function(
   proc_time=format(Sys.time(),"%Y%b%d_%H%M%S")
   #dir_status_in = backslash(paste(dir_status,"/",proc_time,"/",sep=""))
   if(!dir.exists(dir_status)) dir.create(dir_status,recursive=T)
-  if(!dir.exists(dirname(db_path))) dir.create(dirname(db_path),recursive=T)
+  if(!dir.exists(basename(db_path))) dir.create(basename(db_path),recursive=T)
 
   db_in = dbConnect( RSQLite::SQLite(), db_path  , sychronous = "normal" )
 
@@ -162,7 +160,7 @@ csv_to_sqlite=function(
 
     res=parallel::parLapply(
                   clus
-                  ,csv_files
+                  ,csv_files[1:100]
                   ,.fn_read_csv_write_sql
                   ,use_col_classes = use_col_classes
                   ,col_classes = col_classes
@@ -180,7 +178,7 @@ csv_to_sqlite=function(
 
     assign("dbGlobal", db_in , envir = .GlobalEnv)
 
-    res=lapply(csv_files
+    res=lapply(csv_files[1:100]
               ,.fn_read_csv_write_sql
               ,use_col_classes = use_col_classes
               ,col_classes = col_classes
@@ -240,7 +238,7 @@ csv_to_sqlite=function(
         }
 
         is_ok = as.character( !class(err_i) == "try-error" )
-        writeLines(as.character(err_i), paste(dir_status,basename(csv_file_i),is_ok,"_writeStatus.txt",sep=""))
+        writeLines(as.character(err_i), paste(dir_status,basename(csv_file_i),"writeStatus_",is_ok,".txt",sep=""))
       }
       flock::unlock(ll)
     }

@@ -19,6 +19,8 @@ project_create(
   las_year = "2099",
   do_scan_dtms = T,
   do_scan_las = T,
+  duplicate_las = c("ignore", "remove"),
+  duplicate_dtm = c("ignore", "remove"),
   tile_size = 1650,
   pixel_size = 66,
   xmn = c(NA, 561066),
@@ -91,6 +93,8 @@ proj_tn = RSForInvt::project_create(
   ,las_year="2018"
   ,do_scan_dtms=F #'we already scanned the dtm folder - ok, to rescan, but slower
   ,do_scan_las=F #'we already scanned the las folder - ok, to rescan, but slower
+  ,duplicate_las = c("ignore","remove")
+  ,duplicate_dtm = c("ignore","remove")
   ,tile_size=1650
   ,pixel_size=66
   #',xmn=561066,xmx=2805066,ymn=33066,ymx=1551066

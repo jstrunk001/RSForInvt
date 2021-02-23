@@ -19,6 +19,7 @@ compilePlots(
     "select * from dfPlot where YEAR = 2018 and STATE = 'WA' and CONDITION = 1"),
   tree_filter = c(NA, "select * from dfTree where dbh > 2 "),
   dir_out = file.path("c:/temp/RSForInvt/Compile", format(Sys.Date())),
+  nm_out = "plot_compile",
   fnCompute = list(plotWtMn, plotWtSum),
   return = F,
   doDebug = F,
@@ -30,7 +31,7 @@ plotWtSum(trs, trNms, vSumNm, ...)
 
 plotWtMn(trs, trNms, ...)
 
-sppYplot(x, ID, sppY, sppNm, wtNm, ...)
+sppYplot(trs, trNms, nDomSpp = 3, sppY, ...)
 }
 \arguments{
 \item{dfTree}{data frame of tree records}
@@ -65,10 +66,6 @@ Supply data.frame of tree data with plot ids and a data.frame of plot records. T
  data plot by plot. The compilePlots() function accepts a list of functions which compute attributes. Several example functions
  are provided, but they are probably not sufficient for operational usage. Hopefully more will be added over time. This function
  is meant to work hand in hand with compileTrees() but is still a work in progress.
-
-#remove trees without ID fields
-  bad_ids = is.na(trs[,trNms[["plotIDs"]]])
-  tr_in = trs[!bad_ids,]
 }
 \details{
 This program is free software but it is provided WITHOUT WARRANTY
@@ -82,8 +79,6 @@ Revision History
 \tabular{ll}{
 1.0 \tab 6/12/2020 Created \cr
 }
-
-
 }
 \examples{
 

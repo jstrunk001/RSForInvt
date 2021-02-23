@@ -71,9 +71,9 @@ run_gridmetrics(
 
 \item{project_gpkg}{polygon file of intersections created by project_make() function}
 
-\item{dir_dtm}{in case path to dtms has changed from lasR_project}
+\item{dir_dtm}{in case path to dtms has changed from project}
 
-\item{dir_las}{in case path to las has changed from lasR_project}
+\item{dir_las}{in case path to las has changed from project}
 
 \item{table}{output folder name}
 }
@@ -96,7 +96,7 @@ Revision History
 \examples{
 
  gmi=run_gridmetrics(
- project_gpkg="D:\\\\projects\\\\2017_WA_DSM_Pilot_usgs\\\\2017Aug_NAIP_usgs\\\\lasR_project003.gpkg"
+ project_gpkg="D:\\\\projects\\\\2017_WA_DSM_Pilot_usgs\\\\2017Aug_NAIP_usgs\\\\RSForInvt_project003.gpkg"
 ,dir_out="I:\\\\projects\\\\2017_WA_DSM_Pilot\\\\2017Aug_NAIP_usgs\\\\gridmetrics_07\\\\"
 ,dir_dtm="c:\\\\usgs_dtms\\\\dtms\\\\"
 ,dir_las="D:\\\\naip_2015_laz\\\\"
