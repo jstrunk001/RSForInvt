@@ -71,9 +71,11 @@ clip_plots=function(
   ,idxy=NA #id,xy coordinates of vertices for each polygon
   ,plot_polys=NA #shapefile path, or sp object for plots
   ,id_field_plots="plot"
-  ,project=NA
-  ,project_polys=NA
-  ,plot_tile_intersect=NA
+  ,las_polys=NA
+  ,dtm_polys=NA
+  # ,project=NA
+  # ,project_polys=NA
+  # ,plot_tile_intersect=NA
   ,dir_out=NA
   ,height=F
   ,do_plot=F
@@ -100,23 +102,14 @@ clip_plots=function(
   dir_skip=file.path(dir_out,"skip")
   if(!file.exists(dir_skip)) try(dir.create(dir_skip, recursive=T),silent=T)
 
-  if(is.na(plot_tile_intersect)){
+  if(!inherits(las_polys,"SpatialPolygonsDataFrame")){
+    las_polys = readOGR(las_polys,stringsAsFactors=F)
+  }
+  if(!inherits(dtm_polys,"SpatialPolygonsDataFrame")){
+    dtm_polys = readOGR(dtm_polys,stringsAsFactors=F)
+  }
 
-    #load project
-    if(!is.na(project) & is.na(project_polys[1])){
-      if(!inherits(project,"SpatialPolygonsDataFrame")){
-        proj=read.csv(project,stringsAsFactors =F)
-        proj_polys0=bbox2polys(proj[,c("tile_id","mnx","mxx","mny","mxy")])
-        row.names(proj)=proj[,"tile_id"]
-        proj_polys=SpatialPolygonsDataFrame(proj_polys0,proj)
-      }
-      if(inherits(project,"SpatialPolygonsDataFrame")) proj_polys=project
-    }
-    if(!is.na(project_polys[1])){
-      if(!inherits(project_polys,"SpatialPolygonsDataFrame")) proj_polys=readOGR(project_polys,stringsAsFactors=F)#readOGR(dirname(project_polys),basename(project_polys))
-      if(inherits(project_polys,"SpatialPolygonsDataFrame")) proj_polys=project_polys
-    }
-    print("load project");print(Sys.time())
+    print("load dtms and las");print(Sys.time())
 
     #create sp objects for plots
     plot_polys_in=NULL
@@ -149,14 +142,18 @@ clip_plots=function(
     print("Get / create Plot Polys");print(Sys.time())
 
     #clean up self intersections
-    proj_polys_b=gBuffer(proj_polys, byid=TRUE, width=0)
+    las_polys_b=gBuffer(las_polys, byid=TRUE, width=0)
+    dtm_polys_b=gBuffer(dtm_polys, byid=TRUE, width=0)
     plot_polys_b=gBuffer(plot_polys_in, byid=TRUE, width=0)
 
     #clip data to match extents
-    ext_tile=as(extent(as.vector(t(bbox(proj_polys_b)))), "SpatialPolygons")
+    ext_las=as(extent(as.vector(t(bbox(las_polys_b)))), "SpatialPolygons")
+    ext_dtm=as(extent(as.vector(t(bbox(dtm_polys_b)))), "SpatialPolygons")
     ext_plot=as(extent(as.vector(t(bbox(plot_polys_b)))), "SpatialPolygons")
-    plot_polys_ext=gIntersection(plot_polys_b,ext_tile, byid=T,drop_lower_td=T)
-    proj_polys_ext=gIntersection(proj_polys_b,ext_plot, byid=T,drop_lower_td=T)
+    
+    las_polys_ext=gIntersection(las_polys_b,ext_plot, byid=T,drop_lower_td=T)
+    dtm_polys_ext=gIntersection(dtm_polys_b,ext_plot, byid=T,drop_lower_td=T)
+    plot_polys_ext=gIntersection(dtm_polys_b,gIntersection(las_polys_b,ext_plot, byid=T,drop_lower_td=T), byid=T,drop_lower_td=T)
 
     #patch data back onto clipped polygons
     row.names(proj_polys_ext)=gsub(" 1","",row.names(proj_polys_ext))

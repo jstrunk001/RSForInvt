@@ -14,7 +14,10 @@ color.flextable(
   outDocx = NA,
   preview = T,
   digits = 0,
-  return = T
+  return = T,
+  by.row = F,
+  by,
+  col = F
 )
 }
 \arguments{

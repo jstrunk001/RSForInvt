@@ -412,16 +412,23 @@ sppYplot = function(
     mi = reshape2::melt( tr_in[,c(trNms[["plotIDs"]],trNms[["spcd"]],trNms[["domSppY"]][i]) ] , id.vars = c(trNms[["plotIDs"]],trNms[["spcd"]]) )
     fi = as.formula(paste("variable  + ", paste(trNms[["plotIDs"]],collapse = "+")," ~ ",trNms[["spcd"]], sep=""))
     dfi = reshape2::dcast( mi , formula =  fi , fun.aggregate = sum )[,-1]
+    dfi1=dfi
     
     #get dominant species by y
-    n_dom = min(ncol(dfi)-1, nDomSpp)
-    dom_order = order(dfi[,-1] , decreasing = T)
+    n_dom = min(ncol(dfi1)-1, nDomSpp)
+    dom_order = order(dfi1[,-1] , decreasing = T)
     spp_nms = names(dfi)[-1]
     nmsMx = paste("dom", trNms[["spcd"]], trNms[["domSppY"]][i],1:n_dom, sep="_")
+    nmsMxProp = paste("dom_prop", trNms[["spcd"]], trNms[["domSppY"]][i],1:n_dom, sep="_")
     dfi[,nmsMx] = spp_nms[dom_order][1:n_dom]
     
+    #get proportion by species 
+    nmsMx_p = paste(spp_nms, trNms[["domSppY"]][i],"p", sep="_")
+    y_ord_ndom = dfi1[,-1][dom_order][1:n_dom]
+    dfi[,nmsMx_p] = y_ord_ndom / sum(y_ord_ndom)
+    
     #merge data
-    res_in = merge(res_in, dfi[,c(trNms[["plotIDs"]],nmsMx)], by=trNms[["plotIDs"]])
+    res_in = merge(res_in, dfi[,c(trNms[["plotIDs"]],nmsMx,nmsMx_p)] , by=trNms[["plotIDs"]])
     
   }
   return(res_in)

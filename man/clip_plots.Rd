@@ -9,8 +9,8 @@ clip_plots(
   idxy = NA,
   plot_polys = NA,
   id_field_plots = "plot",
-  lasR_project = NA,
-  lasR_project_polys = NA,
+  project = NA,
+  project_polys = NA,
   plot_tile_intersect = NA,
   dir_out = NA,
   height = F,
@@ -32,11 +32,11 @@ clip_plots(
 
 \item{id_field_plots}{(optional) in the event that a polygon is provided}
 
-\item{lasR_project}{path to spatial polygons dataframe (intersection between dtm and las tiles)}
+\item{project}{path to spatial polygons dataframe (intersection between dtm and las tiles)}
 
-\item{lasR_project_polys}{spatial polygons dataframe (intersection between dtm and las tiles)}
+\item{project_polys}{spatial polygons dataframe (intersection between dtm and las tiles)}
 
-\item{plot_tile_intersect}{path to spatial polygons dataframe representing intersection between plots and lasR_project}
+\item{plot_tile_intersect}{path to spatial polygons dataframe representing intersection between plots and project}
 
 \item{dir_out}{where to send clipped plots}
 
@@ -48,9 +48,9 @@ clip_plots(
 
 \item{n_core}{number of cores to use in clipping}
 
-\item{dir_dtm}{in case path to dtms has changed from lasR_project}
+\item{dir_dtm}{in case path to dtms has changed from project}
 
-\item{dir_las}{in case path to las has changed from lasR_project}
+\item{dir_las}{in case path to las has changed from project}
 
 \item{skip_existing}{skip csv files that have been processed already - in case processing was interupted}
 }
@@ -58,7 +58,7 @@ clip_plots(
 <Delete and Replace>
 }
 \description{
-clip plots or polygons form lidar - requires that one first make a project using lasR_project which
+clip plots or polygons form lidar - requires that one first make a project using project which
  includes both lidar and dtms
 }
 \details{

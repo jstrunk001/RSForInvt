@@ -129,7 +129,7 @@ project_create=function(
   }
 
   #inventory las and dtms
-  if(do_scan_las) scan_las(project=project_las, project_year=las_year,dir_las=dir_las,create_polys=T , recursive = recurse_las , proj4 = proj4)
+  if(do_scan_las) scan_las(project=project_las, project_year=las_year, dir_las=dir_las, create_polys=T , recursive = recurse_las , proj4 = proj4)
   print("scan_las");print(Sys.time())
   if(do_scan_dtms) scan_dtm(project=project_dtm, project_year=dtm_year,dir_dtm=dir_dtm, recursive = recurse_dtm , proj4 = proj4)
   print("scan_dtm");print(Sys.time())
@@ -203,43 +203,55 @@ project_create=function(
   #   ex_dtm1 = lapply(ex_dtm[sapply(ex_dtm,length)>0],unique);gc()
   #   print("extract dtm polygons");print(Sys.time())
   # }
-  
+
   #extract dtm tiles with polygons
-  ex_dtm = sp::over(as(dtm_polys,"SpatialPolygons"),proc_poly,returnList = T , fn = unique)
+  dtm_poly_sf <- sf::st_as_sf(dtm_polys)
+  proc_poly_sf <- sf::st_as_sf(proc_poly)
+  st_crs(dtm_poly_sf) = st_crs(proc_poly_sf)
+  #ex_las_sf <- sf::st_intersection(las_polys1_sf, proc_poly_sf)
+  ex_dtm <- sf::st_intersects(dtm_poly_sf, proc_poly_sf,sparse=T)
   names(ex_dtm) = dtm_polys1$file_path
+  ex_dtm1 = ex_dtm[lapply(ex_dtm,length)>0]
+
+  #ex_dtm = sp::over(as(dtm_polys,"SpatialPolygons"),proc_poly,returnList = T , fn = unique)
+
   print("extract dtm polygons");print(Sys.time())
-  
+
 
   #extract las tiles with polygons
-  # if(F){
-  #   ex_las = raster::extract(proc_rast1,las_polys1);gc()
-  #   if("file_path" %in% names(las_polys1)) names(ex_las)=las_polys1$file_path
-  #   else if("fil_pth" %in% names(las_polys1)) names(ex_las)=las_polys1$fil_pth
-  #   ex_las1 = lapply(ex_las[sapply(ex_las,length)>0],unique);gc()
-  #   print("extract las polygons");print(Sys.time())
+  las_polys1_sf <- sf::st_as_sf(las_polys1)
+  #proc_poly_sf <- sf::st_as_sf(proc_poly)
+  st_crs(las_polys1_sf) = st_crs(proc_poly_sf)
+  #ex_las_sf <- sf::st_intersection(las_polys1_sf, proc_poly_sf)
+  ex_las <- sf::st_intersects(las_polys1_sf, proc_poly_sf,sparse=T)
+  names(ex_las)=las_polys1$file_path
+  ex_las1 = ex_las[lapply(ex_las,length)>0]
+
+  # raster::crs(las_polys1) = raster::crs(proc_poly)
+  # ex_las = sp::over(as(las_polys1,"SpatialPolygons"),proc_poly,returnList = T , fn = unique)
+  # ex_las = sp::over(as(las_polys1,"SpatialPolygons")[1:100],proc_poly,returnList = T , fn = unique)
+  #
+  # if("file_path" %in% names(las_polys1)){
+  #
+  # }else if("fil_pth" %in% names(las_polys1)){
+  #   names(ex_las)=las_polys1$fil_pth
   # }
-  
-  #extract las tiles with polygons
-  raster::crs(las_polys1) = raster::crs(proc_poly)
-  ex_las = sp::over(as(las_polys1,"SpatialPolygons"),proc_poly,returnList = T , fn = unique)
-  if("file_path" %in% names(las_polys1)){ 
-    names(ex_las)=las_polys1$file_path
-  }else if("fil_pth" %in% names(las_polys1)){
-    names(ex_las)=las_polys1$fil_pth
-  }
   print("extract las polygons");print(Sys.time())
-  
+
   #create dataframe from dtm and las intersections on tiles
-  tiles_las_df=data.frame(data.table::rbindlist(mapply(function(tile_id,file){data.frame(tile_id,las_file=file,stringsAsFactors=F)},ex_las,names(ex_las),SIMPLIFY=F)))
-  print("create dataframe from dtm and las intersections on tiles A");print(Sys.time())
-  tiles_dtm_df=data.frame(data.table::rbindlist(mapply(function(tile_id,file){data.frame(tile_id,dtm_file=file,stringsAsFactors=F)},ex_dtm,names(ex_dtm),SIMPLIFY=F)))
-  print("create dataframe from dtm and las intersections on tiles B");print(Sys.time())
+  print(paste("create data.frame from dtm and las intersections on tiles steps 1 and 2 (start):",as.character(Sys.time())))
+  tiles_las_df=data.frame(data.table::rbindlist(mapply(function(layer,file){data.frame(layer,las_file=file,stringsAsFactors=F)},ex_las1,names(ex_las1),SIMPLIFY=F)))
+  tiles_dtm_df = data.frame(data.table::rbindlist(mapply(function(layer,file){data.frame(layer,dtm_file=file,stringsAsFactors=F)},ex_dtm1,names(ex_dtm1),SIMPLIFY=F)))
+  print(paste("create data.frame from dtm and las intersections on tiles steps 1 and 2 (end):",as.character(Sys.time())))
+
+  print(paste("create data.frame from dtm and las intersections on tiles steps 3 and 4 (start):",as.character(Sys.time())))
   tiles_dtm_agg=aggregate(dtm_file ~ layer,data=tiles_dtm_df,FUN=function(x)paste(unique(x),collapse=","))
   tiles_las_agg=aggregate(las_file ~ layer,data=tiles_las_df,FUN=function(x)paste(unique(x),collapse=","))
-  print("create dataframe from dtm and las intersections on tiles C");print(Sys.time())
+  print(paste("create data.frame from dtm and las intersections on tiles steps 3 and 4 (end):",as.character(Sys.time())))
 
+  print(paste("merge dtm and las tile (start) :",as.character(Sys.time())))
   tiles_las_dtm = merge(tiles_las_agg,tiles_dtm_agg,by="layer")
-  print("Merge");print(Sys.time())
+  print(paste("merge dtm and las tile (end) :",as.character(Sys.time())))
 
   #add tile bounds
   tiles_coords = merge(x=tiles_las_dtm,y=xy,by.x="layer",by.y="layer")
@@ -297,6 +309,7 @@ project_create=function(
   #write project polygons
   sp::proj4string(tile_polys1) = proj4_in
   sf_proj = sf::st_as_sf(tile_polys1)
+
   try(sf::st_write(obj = sf_proj , dsn = path_gpkg_out , layer = layer_project, driver="GPKG",  layer_options = c("OVERWRITE=yes") ))
 
   #write dtm polygons

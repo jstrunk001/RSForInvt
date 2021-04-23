@@ -18,6 +18,7 @@
 #' \tabular{ll}{
 #'1.0 \tab 7/7/2020 function created \cr
 #'1.1 \tab date and revisions.. \cr
+#'1.2 \tab add row / column options \cr
 #'}
 #'
 #'@author
@@ -62,45 +63,31 @@ color.flextable = function(
                    ,preview=T
                    ,digits=0
                    ,return=T
-                   ,by.row=F,by,col=F
+                   ,by.row=F
+                   ,by.col=F
 ){
 
+  
   if(is.na(colFields[1])) colFields = names(x)
   if(is.na(colRows[1])) colRows = row.names(x)
-  ncolors = length(cols)
+  
   x_in = x
   x_in[colRows,colFields] = round(as.numeric(as.matrix(x[colRows,colFields])),digits)
+  browser()
+  cutMat = .fn_cut(
+              xmat = x_in
+              ,nbreaks = length(cols)
+              ,breaks = breaks
+              ,breaksType = breaksType
+              ,by.row=by.row
+              ,by.col=by.col
+            )
+  
+  #assign colors to records
+  colsIn = cols_in[cutMat]
 
-  #prepare breaks
-  if(!is.na(breaks[1])) breaks_in = breaks
-  if(is.na(breaks[1])){
-    num_vec = as.numeric(unlist(x_in[colRows,colFields]))
-    if(breaksType[1] == "quantile" ) breaks_in = quantile(num_vec, seq(0,1,length.out = length(cols)),na.rm=T)
-    if(breaksType[1] == "equal" )    breaks_in = seq(min(num_vec,na.rm=T),max(num_vec,na.rm=T) , length.out = ncolors )
-  }
 
-  #fix duplicates in breaks (if data are clumped e.g.)
-  dups = duplicated(breaks_in)
-  ndups = sum(dups)
-  if(ndups  > 0 ){
-    breaks_in = unique(breaks_in)
-    omit_cols = round((1:ndups)*(ncolors/(ndups + 1)))
-    cols_in = cols[-omit_cols]
-    warning("There were ",ndups," duplicate breaks. These colors were removed:",cols[omit_cols])
-  }else{
-    cols_in = cols
-  }
-
-  #cut inputs
-  cutIn <- cut(
-    as.numeric(as.matrix(x_in[colRows,colFields]))
-    ,breaks = breaks_in
-    ,include.lowest = TRUE
-    ,label = FALSE
-  )
-  #assign colors to recors
-  colsIn = cols_in[cutIn]
-
+  
   #prepare ft table
   ftIn1 = flextable::flextable(x_in)
   ftIn2 = flextable::colformat_num(ftIn1 , i = colRows , j = colFields)
@@ -115,3 +102,54 @@ color.flextable = function(
 }
 
 
+.fn_cut = function(xmat
+                    ,nbreaks
+                    ,breaks = NA
+                    ,breaksType = c("quantile","equal")
+                    ,by.row=F
+                    ,by.col=F
+                    ){
+  
+    if(!by.row & !by.col){
+      
+      nOut = nbreaks + 1
+      
+      #prepare breaks
+      if(!is.na(breaks[1])) breaks_in = breaks
+      if(is.na(breaks[1])){
+        num_vec = as.numeric(unlist(xmat[colRows,colFields]))
+        if(breaksType[1] == "quantile" ) breaks_in = quantile(num_vec, seq(0,1,length.out = nOut),na.rm=T)
+        if(breaksType[1] == "equal" )    breaks_in = seq(min(num_vec,na.rm=T),max(num_vec,na.rm=T) , length.out = nOut )
+      }
+      
+      #fix duplicates in breaks (if data are clumped e.g.)
+      dups = duplicated(breaks_in)
+      ndups = sum(dups)
+      if(ndups  > 0 ){
+        breaks_in = unique(breaks_in)
+        omit_cols = round((1:ndups)*(nOut/(ndups + 1)))
+        cols_in = cols[-omit_cols]
+        warning("There were ",ndups," duplicate breaks. These colors were removed:",cols[omit_cols])
+      }else{
+        breaks_in = breaks
+      }
+      
+      #cut inputs
+      cutIn <- cut(
+        as.numeric(as.matrix(xmat[colRows,colFields]))
+        ,breaks = breaks_in
+        ,include.lowest = TRUE
+        ,label = FALSE
+      )
+      
+    }else if(by.col){
+      
+      apply(xmat,.fn_cut,2,nbreaks=nbreaks,breaksType=breaksType)
+      
+    }else if(by.row){
+      
+      apply(xmat,.fn_cut,1,nbreaks=nbreaks,breaksType=breaksType)
+      
+    }
+
+}

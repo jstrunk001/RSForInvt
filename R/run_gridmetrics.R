@@ -247,7 +247,7 @@ run_gridmetrics=function(
 
     if(n_core>1 & is.na(fast_cache)){
 
-      print("begin paralle processing");print(Sys.time())
+      print("begin parallel processing");print(Sys.time())
 
       clus=makeCluster(n_core)
       clusterEvalQ(clus,{library(RSForInvt);gc()})
