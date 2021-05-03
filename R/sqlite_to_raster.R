@@ -43,8 +43,8 @@
 #
 #'@seealso \code{\link{rasterFromXYZ}}\cr \code{\link{writeRaster}}\cr
 
-#Desired upgrades to this function:
-#
+#Desired upgrades to this function, something like:
+# "select ?? from gm where NOT NULL center_x and NOT NULL center_y")
 #
 #
 #'@export
@@ -66,6 +66,8 @@ sqlite_to_raster = function(
 ){
 
 
+  warning("update me to query only coordinates that are not null")
+
   if(doBuild & F){
 
     dimsxy=c(1000,1000)
@@ -86,7 +88,7 @@ sqlite_to_raster = function(
     summary( unlist(timesB ))
     browser()
   }
-  debugRows = 500000
+  debugRows = 5000000
   require(raster)
   if(doDebug) xy = dbGetQuery(db,paste("select",paste(colsxy,collapse=","),"from",tb_gm,"limit",debugRows))
   else xy = dbGetQuery(db,paste("select",paste(colsxy,collapse=","),"from",tb_gm))
