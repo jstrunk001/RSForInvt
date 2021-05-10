@@ -160,8 +160,7 @@ project_create=function(
   #buffer polygons
   dtm_polys1=rgeos::gBuffer(dtm_polys,byid=T,width=round(pixel_size*4+1),capStyle="square");gc()
   las_polys1=rgeos::gBuffer(las_polys,byid=T,width=round(pixel_size*4+1),capStyle="square");gc()
-
-  print("buffer complete");print(Sys.time())
+  print("completed: buffer las and dtm polygons");print(Sys.time())
 
   #create processing tiles
   if( ( is.na(xmn[1]) | is.na(xmx[1]) | is.na(ymn[1]) | is.na(ymx[1]) ) ){
@@ -174,75 +173,40 @@ project_create=function(
   proc_rast = raster::raster(xmn=xmn,xmx=xmx,ymn=ymn,ymx=ymx,resolution=tile_size,crs=raster::crs(proj4_in));gc()
   proc_rast[] = raster::cellsFromExtent(proc_rast,raster::extent(proc_rast));gc()
   xy = raster::as.data.frame(proc_rast,xy=T)
-  print("tile scheme complete");print(Sys.time())
   proc_poly = raster::rasterToPolygons(proc_rast, fun=NULL, n=4, na.rm=TRUE, digits=12, dissolve=FALSE)
-
-  # #create sub-processing tiles (100x density) for intersection with polygons
-  # proc_rast1 = raster::raster(xmn=xmn,xmx=xmx,ymn=ymn,ymx=ymx,resolution=tile_size/10,crs=raster::crs(proj4_in));gc()
-  # xy1 = raster::as.data.frame(proc_rast1,xy=T);gc()
-  # xy1[,"layer"] = NULL;gc()
-  # xy1[,"tile_id"] = raster::cellFromXY(proc_rast, xy1[,c(1:2)]);gc()
-  # proc_rast1[] = xy1[,"tile_id"];gc()
-  # print("sub-tiles to fix edge problem");print(Sys.time())
-
+  print("completed: create tile scheme ");print(Sys.time())
 
   #mask if desired
   if(!is.na(mask[1])){
     mask1=rgeos::gBuffer(mask,width=tile_size,capStyle="square")
-    #mask1=raster::buffer(mask,tile_size)
-    # proc_rast = raster::crop(proc_rast,mask1)
-    # proc_rast1 = raster::crop(proc_rast1,mask1)
     proc_poly = raster::crop(proc_poly,mask1)
   }
-  print("mask");print(Sys.time())
+  print("completed: mask to sub extent");print(Sys.time())
 
-  #extract dtm tiles with polygons
-  # if(F){
-  #   ex_dtm = raster::extract(proc_rast1,dtm_polys1);gc()
-  #   names(ex_dtm) = dtm_polys1$file_path
-  #   ex_dtm1 = lapply(ex_dtm[sapply(ex_dtm,length)>0],unique);gc()
-  #   print("extract dtm polygons");print(Sys.time())
-  # }
 
   #extract dtm tiles with polygons
   dtm_poly_sf <- sf::st_as_sf(dtm_polys)
   proc_poly_sf <- sf::st_as_sf(proc_poly)
   st_crs(dtm_poly_sf) = st_crs(proc_poly_sf)
-  #ex_las_sf <- sf::st_intersection(las_polys1_sf, proc_poly_sf)
   ex_dtm <- sf::st_intersects(dtm_poly_sf, proc_poly_sf,sparse=T)
   names(ex_dtm) = dtm_polys1$file_path
   ex_dtm1 = ex_dtm[lapply(ex_dtm,length)>0]
-
-  #ex_dtm = sp::over(as(dtm_polys,"SpatialPolygons"),proc_poly,returnList = T , fn = unique)
-
-  print("extract dtm polygons");print(Sys.time())
+  print("completed: extract dtm polygons");print(Sys.time())
 
 
   #extract las tiles with polygons
   las_polys1_sf <- sf::st_as_sf(las_polys1)
-  #proc_poly_sf <- sf::st_as_sf(proc_poly)
   st_crs(las_polys1_sf) = st_crs(proc_poly_sf)
-  #ex_las_sf <- sf::st_intersection(las_polys1_sf, proc_poly_sf)
   ex_las <- sf::st_intersects(las_polys1_sf, proc_poly_sf,sparse=T)
   names(ex_las)=las_polys1$file_path
   ex_las1 = ex_las[lapply(ex_las,length)>0]
-
-  # raster::crs(las_polys1) = raster::crs(proc_poly)
-  # ex_las = sp::over(as(las_polys1,"SpatialPolygons"),proc_poly,returnList = T , fn = unique)
-  # ex_las = sp::over(as(las_polys1,"SpatialPolygons")[1:100],proc_poly,returnList = T , fn = unique)
-  #
-  # if("file_path" %in% names(las_polys1)){
-  #
-  # }else if("fil_pth" %in% names(las_polys1)){
-  #   names(ex_las)=las_polys1$fil_pth
-  # }
-  print("extract las polygons");print(Sys.time())
+  print("completed: extract las polygons");print(Sys.time())
 
   #create dataframe from dtm and las intersections on tiles
   print(paste("create data.frame from dtm and las intersections on tiles steps 1 and 2 (start):",as.character(Sys.time())))
   tiles_las_df=data.frame(data.table::rbindlist(mapply(function(layer,file){data.frame(layer,las_file=file,stringsAsFactors=F)},ex_las1,names(ex_las1),SIMPLIFY=F)))
   tiles_dtm_df = data.frame(data.table::rbindlist(mapply(function(layer,file){data.frame(layer,dtm_file=file,stringsAsFactors=F)},ex_dtm1,names(ex_dtm1),SIMPLIFY=F)))
-  print(paste("create data.frame from dtm and las intersections on tiles steps 1 and 2 (end):",as.character(Sys.time())))
+  print(paste("Create data.frame from dtm and las intersections on tiles steps 1 and 2 (end):",as.character(Sys.time())))
 
   print(paste("create data.frame from dtm and las intersections on tiles steps 3 and 4 (start):",as.character(Sys.time())))
   tiles_dtm_agg=aggregate(dtm_file ~ layer,data=tiles_dtm_df,FUN=function(x)paste(unique(x),collapse=","))

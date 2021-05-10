@@ -30,7 +30,6 @@
 #'@param outlier c(-5,500) range of inclusion
 #'@param fusion_switches other fusion switches as a string e.g. "/noground"
 #'@param xmn,xmx,ymn,ymx set extent for analysis
-#'@param fun a custom function if gridmetrics is not used
 #'@param temp temp folder to hold batch files for use with gridmetrics.exe
 #'@param n_cache experimental - number of las files to copy to cache
 #'@param dir_dtm in case path to dtms has changed from project
@@ -70,17 +69,15 @@ run_gridmetrics=function(
   ,layer_proj_config = "RSForInvt_config"
   ,dir_out = "c:/temp/test_project/gridmetrics"
   ,n_core = 4
-  ,gridmetrics_path = "c:\\fusion\\gridmetrics.exe"
+  ,gridmetrics_path = "c:\\fusion\\gridmetrics64.exe"
   ,heightbreak = 3
   ,minht = NA
   ,cellsize = 66
-
   ,first = T
   ,intensity = F
   ,outlier = c(-5,400)
-  ,fusion_switches = "/nointensity /first"
-  ,xmn = 561066 , xmx= 2805066 , ymn=33066 , ymx=1551066
-  ,fun = compute_metrics2 #list(min=min,max=max,mean=mean,sd=sd)#,p20=function(x,...)quantile(x,.2,...),p75=function(x,...)quantile(x,.2,...),p95=function(x,...)quantile(x,.2,...))
+  ,fusion_switches = "/nointensity /first /failnoz"
+  ,xmn = NA , xmx= NA , ymn=NA , ymx=NA
   ,temp = "c:\\temp\\run_gridmetrics\\"
 
   ,new_dtm_path = c(from = NA, to = NA) #in case drive paths are wrong (e.g. External drives...)
@@ -200,7 +197,7 @@ run_gridmetrics=function(
 
     coms=apply(coms_df,1,paste,collapse=" ")
     print("set up commands");print(Sys.time())
-    browser()
+
 
     if(is.na(existing_coms[1]) ){
 

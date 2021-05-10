@@ -200,7 +200,6 @@ run_gridmetrics=function(
 
     coms=apply(coms_df,1,paste,collapse=" ")
     print("set up commands");print(Sys.time())
-    browser()
 
     if(is.na(existing_coms[1]) ){
 
@@ -216,6 +215,30 @@ run_gridmetrics=function(
     #get identical behavior if debugging
     #the commands are now randomly selected to help with file interference
 
+    #add gridded alternative
+    #send chunks of tiles to the same thread
+
+    if(F){
+
+      browser()
+
+      #build raster with large tiles
+
+
+      #create points from lower left corner of processing tiles
+
+
+
+      #intersect points with large tiles
+
+
+
+      #split commands by large processing tiles
+
+
+
+    }
+
 
     set.seed(50)
     if(do_run){
@@ -225,7 +248,9 @@ run_gridmetrics=function(
 
         clus=makeCluster(n_core)
         clusterEvalQ(clus,{library(RSForInvt);gc()})
+
         res=parLapplyLB(clus,sample(coms),shell);gc()
+
         gc();stopCluster(clus);gc()
 
       }else{

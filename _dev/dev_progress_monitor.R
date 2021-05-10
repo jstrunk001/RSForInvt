@@ -213,11 +213,11 @@ progress_monitor=function(
 
 progress_monitor(
   #dir = "C:\\Temp\\test_progress"
-  dir = "E:/projects/DAP_NAIP_OR_2018/gridmetrics/gridmetrics_csv"
+  dir = "f:/projects/DAP_NAIP_OR_2018/gridmetrics1/gridmetrics_csv"
   ,pattern = "[.]csv"
-  ,nTotal = 98060
+  ,nTotal = 3407
   #,nTotal = 700
-  ,ylim_days = c(0,12)
+  ,ylim_days = c(0,10)
   ,prompt=T
   #, interval_mins=c(10,30,60)
 )

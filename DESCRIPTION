@@ -22,6 +22,7 @@ RoxygenNote: 7.1.1
 Depends: 
         bootstrap
         ,backports
+        ,caret
         ,colorRamps
         ,data.table
         ,DBI
@@ -29,10 +30,13 @@ Depends:
         ,flextable
         ,flock
         ,gdalUtils
+        ,greenbrown
         ,knitr
         ,leaps
         ,lidR
         ,maptools
+        ,MLmetrics
+        ,mltools
         ,odbc
         ,rlas
         ,pander
